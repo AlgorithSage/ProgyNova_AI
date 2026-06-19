@@ -1,0 +1,160 @@
+.reorder-card {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-normal),
+              border-color var(--transition-normal);
+}
+
+.reorder-card__header {
+  margin-bottom: var(--space-md);
+}
+
+.reorder-card__title {
+  font-size: var(--text-card-title);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Stats grid */
+.reorder-card__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.reorder-card__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-md) var(--space-sm);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+}
+
+.reorder-card__stat-value {
+  font-size: var(--text-page-title);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.reorder-card__stat-value--error {
+  color: var(--error);
+}
+
+.reorder-card__stat-value--primary {
+  color: var(--primary);
+}
+
+.reorder-card__stat-label {
+  font-size: var(--text-small);
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+/* Download button */
+.reorder-card__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: #FFFFFF;
+  background: var(--primary);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.reorder-card__button:hover {
+  background: var(--primary-hover);
+}
+
+/* Empty state */
+.reorder-card__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-body);
+}
+
+/* Confirmation modal overlay */
+.reorder-card__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.reorder-card__modal {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow-xl);
+}
+
+.reorder-card__modal-title {
+  font-size: var(--text-section-heading);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.reorder-card__modal-text {
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
+}
+
+.reorder-card__modal-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+.reorder-card__modal-cancel {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.reorder-card__modal-cancel:hover {
+  background: var(--border);
+}
+
+.reorder-card__modal-confirm {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: #FFFFFF;
+  background: var(--primary);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.reorder-card__modal-confirm:hover {
+  background: var(--primary-hover);
+}

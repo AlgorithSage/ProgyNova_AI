@@ -1,0 +1,17 @@
+store_id,name,city,state,region,catchment_population,supplier_lead_time_weeks
+S01,"MedPlus Pharmacy, Kothrud",Pune,Maharashtra,West,68000,1
+S02,"Jan Aushadhi Kendra, Nashik Road",Nashik,Maharashtra,West,42000,2
+S03,"Apollo Pharmacy, Koramangala",Bengaluru,Karnataka,South,81000,1
+S04,"Sanjivini Medicals, Hubli",Hubli,Karnataka,South,35000,2
+S05,"Dhanwantari Pharmacy, Salt Lake",Kolkata,West Bengal,East,74000,1
+S06,"Jan Aushadhi Kendra, Howrah",Howrah,West Bengal,East,51000,2
+S07,"Netmeds Store, T. Nagar",Chennai,Tamil Nadu,South-East,72000,1
+S08,"Apollo Pharmacy, Madurai",Madurai,Tamil Nadu,South-East,38000,2
+S09,"MedPlus Pharmacy, Dwarka",New Delhi,Delhi,North,85000,1
+S10,"Jan Aushadhi Kendra, Noida Sec-62",Noida,Uttar Pradesh,North,46000,2
+S11,"Lifeline Pharmacy, Saheed Nagar",Bhubaneswar,Odisha,East-Central,55000,1
+S12,District Hospital Pharmacy,Cuttack,Odisha,East-Central,31000,3
+S13,"Oushadhi Pharmacy, MG Road",Kochi,Kerala,South-West,62000,1
+S14,"Jan Aushadhi Kendra, Kozhikode",Kozhikode,Kerala,South-West,40000,2
+S15,"Rajasthan Medicals, MI Road",Jaipur,Rajasthan,North-West,70000,1
+S16,"PHC Pharmacy, Barmer",Barmer,Rajasthan,North-West,22000,3

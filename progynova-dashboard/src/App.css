@@ -1,0 +1,36 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.dashboard__row {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.dashboard__row--upload {
+  display: block;
+}
+
+.dashboard__col--wide {
+  flex: 2;
+  min-width: 0;
+}
+
+.dashboard__col--narrow {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .dashboard__row {
+    flex-direction: column;
+  }
+
+  .dashboard__col--wide,
+  .dashboard__col--narrow {
+    flex: 1;
+  }
+}

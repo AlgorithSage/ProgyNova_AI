@@ -1,0 +1,192 @@
+.csv-uploader {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-normal),
+              border-color var(--transition-normal);
+}
+
+.csv-uploader__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.csv-uploader__title {
+  font-size: var(--text-card-title);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.csv-uploader__reset {
+  font-size: var(--text-small);
+  font-weight: 500;
+  color: var(--primary);
+  background: none;
+  padding: var(--space-xxs) var(--space-sm);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.csv-uploader__reset:hover {
+  background: var(--primary-light);
+}
+
+/* Dropzone */
+.csv-uploader__dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-xxl) var(--space-lg);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-align: center;
+}
+
+.csv-uploader__dropzone:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.csv-uploader__dropzone--dragging {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  transform: scale(1.01);
+}
+
+.csv-uploader__dropzone--error {
+  border-color: var(--error);
+}
+
+.csv-uploader__input {
+  display: none;
+}
+
+.csv-uploader__icon {
+  color: var(--text-tertiary);
+}
+
+.csv-uploader__text {
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+}
+
+.csv-uploader__text strong {
+  color: var(--text-primary);
+}
+
+.csv-uploader__hint {
+  font-size: var(--text-small);
+  color: var(--text-tertiary);
+}
+
+/* Loading */
+.csv-uploader__loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-secondary);
+}
+
+.csv-uploader__spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error */
+.csv-uploader__error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.csv-uploader__error-text {
+  font-size: var(--text-body);
+  color: var(--error);
+}
+
+.csv-uploader__retry {
+  font-size: var(--text-small);
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: var(--space-xxs) var(--space-md);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.csv-uploader__retry:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Result */
+.csv-uploader__result {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--success-light);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-md);
+}
+
+.csv-uploader__result-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.csv-uploader__result-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.csv-uploader__result-file {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.csv-uploader__result-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+}
+
+.csv-uploader__stat-divider {
+  color: var(--text-tertiary);
+}
+
+.csv-uploader__columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xxs);
+  margin-top: var(--space-xxs);
+}
+
+.csv-uploader__column-tag {
+  padding: 2px var(--space-xs);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+}

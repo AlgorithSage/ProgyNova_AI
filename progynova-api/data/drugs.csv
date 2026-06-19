@@ -1,0 +1,20 @@
+drug_id,name,category,baseline_weekly_demand,shelf_life_weeks,seasonal_amplitude,responds_to
+D01,Metformin 500mg,Antidiabetic,320,104,0.05,
+D02,Human Insulin 40IU/ml,Antidiabetic,90,52,0.05,
+D03,Telmisartan 40mg,Antihypertensive,210,104,0.04,
+D04,Amlodipine 5mg,Antihypertensive,240,104,0.04,
+D05,Atorvastatin 10mg,Lipid-lowering,180,104,0.04,
+D06,Phenytoin Sodium 100mg,Antiepileptic,70,78,0.03,
+D07,Levothyroxine 50mcg,Thyroid,130,104,0.03,
+D08,Paracetamol 500mg,Analgesic/Antipyretic,450,104,0.25,dengue;flu;chikungunya;typhoid
+D09,ORS (WHO formula),Rehydration,300,78,0.3,dengue;diarrhoeal;typhoid
+D10,Oseltamivir 75mg,Antiviral,40,52,0.2,flu
+D11,Amoxicillin 500mg,Antibiotic,260,78,0.15,respiratory;typhoid
+D12,Azithromycin 500mg,Antibiotic,170,78,0.12,respiratory;typhoid
+D13,Cetirizine 10mg,Antihistamine,200,104,0.25,flu
+D14,Salbutamol Inhaler 100mcg,Bronchodilator,85,78,0.3,respiratory
+D15,Artemether+Lumefantrine 20/120mg,Antimalarial,55,52,0.35,malaria
+D16,Doxycycline 100mg,Antibiotic,75,78,0.3,leptospirosis
+D17,Zinc Dispersible 20mg,Supplement,140,78,0.25,diarrhoeal
+D18,Pantoprazole 40mg,Proton Pump Inhibitor,190,104,0.1,
+D19,Dextromethorphan Syrup,Cough Suppressant,230,78,0.3,flu;respiratory

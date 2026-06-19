@@ -1,0 +1,180 @@
+import { useState, useRef, useCallback } from 'react';
+import type { UploadResponse } from '../../types';
+import { uploadCSV } from '../../services/api';
+import './CSVUploader.css';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+interface CSVUploaderProps {
+  onUploadSuccess: (response: UploadResponse, file: File) => void;
+  onUploadError: (error: string) => void;
+}
+
+type UploadState = 'default' | 'dragging' | 'uploading' | 'completed' | 'error';
+
+export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps) {
+  const [state, setState] = useState<UploadState>('default');
+  const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [fileName, setFileName] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleError = useCallback((message: string) => {
+    setState('error');
+    setErrorMessage(message);
+    onUploadError(message);
+  }, [onUploadError]);
+
+  const processFile = useCallback(async (file: File) => {
+    if (!file.name.endsWith('.csv')) {
+      handleError('Invalid file type. Please upload a CSV file.');
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      handleError(`File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`);
+      return;
+    }
+
+    setFileName(file.name);
+    setState('uploading');
+    setErrorMessage('');
+
+    const result = await uploadCSV(file);
+
+    if (result) {
+      setState('completed');
+      setUploadResult(result);
+      onUploadSuccess(result, file);
+    } else {
+      handleError('Backend not connected. Configure VITE_API_URL to connect.');
+    }
+  }, [handleError, onUploadSuccess]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setState('dragging');
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setState('default');
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  }, [processFile]);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  }, [processFile]);
+
+  const handleReset = useCallback(() => {
+    setState('default');
+    setUploadResult(null);
+    setErrorMessage('');
+    setFileName('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
+
+  return (
+    <div className="csv-uploader">
+      <div className="csv-uploader__header">
+        <h2 className="csv-uploader__title">Upload Dataset</h2>
+        {state === 'completed' && (
+          <button className="csv-uploader__reset" onClick={handleReset}>
+            Upload New
+          </button>
+        )}
+      </div>
+
+      {state === 'completed' && uploadResult ? (
+        <div className="csv-uploader__result">
+          <div className="csv-uploader__result-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+          <div className="csv-uploader__result-details">
+            <span className="csv-uploader__result-file mono">{fileName}</span>
+            <div className="csv-uploader__result-stats">
+              <span className="csv-uploader__stat">
+                <strong>{uploadResult.rows.toLocaleString()}</strong> rows
+              </span>
+              <span className="csv-uploader__stat-divider">·</span>
+              <span className="csv-uploader__stat">
+                <strong>{uploadResult.columns.length}</strong> columns
+              </span>
+            </div>
+            <div className="csv-uploader__columns">
+              {uploadResult.columns.map((col) => (
+                <span key={col} className="csv-uploader__column-tag mono">{col}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div
+          className={`csv-uploader__dropzone csv-uploader__dropzone--${state}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          aria-label="Upload CSV file"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click();
+          }}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+            className="csv-uploader__input"
+            aria-hidden="true"
+          />
+
+          {state === 'uploading' ? (
+            <div className="csv-uploader__loading">
+              <div className="csv-uploader__spinner" />
+              <span>Processing {fileName}…</span>
+            </div>
+          ) : state === 'error' ? (
+            <div className="csv-uploader__error-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--error)" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+                <line x1="9" y1="9" x2="15" y2="15" />
+              </svg>
+              <span className="csv-uploader__error-text">{errorMessage}</span>
+              <button className="csv-uploader__retry" onClick={(e) => { e.stopPropagation(); handleReset(); }}>
+                Try Again
+              </button>
+            </div>
+          ) : (
+            <>
+              <svg className="csv-uploader__icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <p className="csv-uploader__text">
+                <strong>Drop CSV file here</strong> or click to browse
+              </p>
+              <p className="csv-uploader__hint">CSV files up to 10MB</p>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

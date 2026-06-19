@@ -1,0 +1,159 @@
+import { useMemo, useState } from 'react';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
+import type { ForecastPoint } from '../../types';
+import './ForecastChart.css';
+
+interface ForecastChartProps {
+  data: ForecastPoint[];
+  onSelectItem?: (index: number) => void;
+}
+
+export function ForecastChart({ data, onSelectItem }: ForecastChartProps) {
+  const [selectedEntity, setSelectedEntity] = useState<string>('all');
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
+
+  const entities = useMemo(() => {
+    const unique = [...new Set(data.map((d) => d.entity_id))];
+    return unique.sort();
+  }, [data]);
+
+  const locations = useMemo(() => {
+    const unique = [...new Set(data.map((d) => d.location_id))];
+    return unique.sort();
+  }, [data]);
+
+  const filteredData = useMemo(() => {
+    return data.filter((d) => {
+      const matchEntity = selectedEntity === 'all' || d.entity_id === selectedEntity;
+      const matchLocation = selectedLocation === 'all' || d.location_id === selectedLocation;
+      return matchEntity && matchLocation;
+    });
+  }, [data, selectedEntity, selectedLocation]);
+
+  if (data.length === 0) {
+    return (
+      <div className="forecast-chart">
+        <div className="forecast-chart__header">
+          <h2 className="forecast-chart__title">Demand Forecast</h2>
+        </div>
+        <div className="forecast-chart__empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+          <p>Upload a dataset to view forecast predictions</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="forecast-chart">
+      <div className="forecast-chart__header">
+        <h2 className="forecast-chart__title">Demand Forecast</h2>
+        <div className="forecast-chart__filters">
+          <select
+            className="forecast-chart__select"
+            value={selectedEntity}
+            onChange={(e) => setSelectedEntity(e.target.value)}
+            aria-label="Filter by entity"
+          >
+            <option value="all">All SKUs</option>
+            {entities.map((e) => (
+              <option key={e} value={e}>{e}</option>
+            ))}
+          </select>
+          <select
+            className="forecast-chart__select"
+            value={selectedLocation}
+            onChange={(e) => setSelectedLocation(e.target.value)}
+            aria-label="Filter by location"
+          >
+            <option value="all">All Locations</option>
+            {locations.map((l) => (
+              <option key={l} value={l}>{l}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="forecast-chart__container">
+        <ResponsiveContainer width="100%" height={320}>
+          <AreaChart
+            data={filteredData}
+            onClick={(state) => {
+              if (state && typeof state.activeTooltipIndex === 'number' && onSelectItem) {
+                onSelectItem(state.activeTooltipIndex);
+              }
+            }}
+          >
+            <defs>
+              <linearGradient id="gradTarget" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--chart-secondary)" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="var(--chart-secondary)" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="gradForecast" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--chart-primary)" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="var(--chart-primary)" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis
+              dataKey="time_index"
+              tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--border)' }}
+              tickLine={{ stroke: 'var(--border)' }}
+            />
+            <YAxis
+              tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
+              axisLine={{ stroke: 'var(--border)' }}
+              tickLine={{ stroke: 'var(--border)' }}
+            />
+            <Tooltip
+              contentStyle={{
+                background: 'var(--surface-elevated)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                fontSize: '13px',
+                color: 'var(--text-primary)',
+                boxShadow: 'var(--shadow-lg)',
+              }}
+            />
+            <Legend
+              wrapperStyle={{ fontSize: '13px', color: 'var(--text-secondary)' }}
+            />
+            <Area
+              type="monotone"
+              dataKey="target"
+              name="Actual Demand"
+              stroke="var(--chart-secondary)"
+              fill="url(#gradTarget)"
+              strokeWidth={2}
+              dot={false}
+              activeDot={{ r: 4, fill: 'var(--chart-secondary)' }}
+            />
+            <Area
+              type="monotone"
+              dataKey="forecast"
+              name="Forecast"
+              stroke="var(--chart-primary)"
+              fill="url(#gradForecast)"
+              strokeWidth={2}
+              strokeDasharray="6 3"
+              dot={false}
+              activeDot={{ r: 4, fill: 'var(--chart-primary)' }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}

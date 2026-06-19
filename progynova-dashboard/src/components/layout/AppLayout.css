@@ -1,0 +1,23 @@
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.app-layout__main {
+  flex: 1;
+  padding: var(--space-lg);
+  transition: background-color var(--transition-normal);
+}
+
+.app-layout__container {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .app-layout__main {
+    padding: var(--space-md);
+  }
+}
