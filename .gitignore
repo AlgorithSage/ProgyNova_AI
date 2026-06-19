@@ -1,0 +1,38 @@
+# Python Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python Caches & Compiled bytecode
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+.mypy_cache/
+
+# Local Datasets & Cached features
+progynova-api/data/
+*.csv
+*.parquet
+*.npy
+
+# Model Checkpoints (excluding baseline model if required)
+progynova-api/models/checkpoints/
+
+# Node & Build artifacts (Frontend)
+progynova-dashboard/node_modules/
+progynova-dashboard/dist/
+progynova-dashboard/.env.development.local
+progynova-dashboard/.env.local
+
+# OS Specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Agent Workspace & Coworker Memories
+AI_COWORKER/
+shared_memory/
