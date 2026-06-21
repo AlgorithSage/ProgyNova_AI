@@ -20,14 +20,20 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["target_lag_52"] = df.groupby(group_keys)["target"].shift(52)
         
     # 2. Rolling averages & std deviations
+    shifted_target = df.groupby(group_keys)["target"].shift(1)
+    group_iter = [df[k] for k in group_keys]
     for w in [4, 8, 12]:
         df[f"target_roll_mean_{w}"] = (
-            df.groupby(group_keys)["target"]
-              .transform(lambda x: x.shift(1).rolling(window=w, min_periods=1).mean())
+            shifted_target.groupby(group_iter)
+                          .rolling(window=w, min_periods=1)
+                          .mean()
+                          .reset_index(level=list(range(len(group_keys))), drop=True)
         )
         df[f"target_roll_std_{w}"] = (
-            df.groupby(group_keys)["target"]
-              .transform(lambda x: x.shift(1).rolling(window=w, min_periods=2).std())
+            shifted_target.groupby(group_iter)
+                          .rolling(window=w, min_periods=2)
+                          .std()
+                          .reset_index(level=list(range(len(group_keys))), drop=True)
         )
     for c in [c for c in df.columns if "roll_std" in c]:
         df[c] = df[c].fillna(0.0)
@@ -81,6 +87,12 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     unique_weeks = df_clean["time_index"].nunique()
     if unique_weeks >= 53:
         df_clean = df_clean.dropna(subset=["target_lag_52"]).copy()
+        
+    unique_drugs = df_clean['entity_id'].unique()
+    drug_mapping = {d: extract_digit_or_hash(d) for d in unique_drugs}
+    
+    unique_stores = df_clean['location_id'].unique()
+    store_mapping = {s: extract_digit_or_hash(s) for s in unique_stores}
     
     # ---- 7. Model Feature Signature Adapter Mapping (56 features) ----
     model_df = pd.DataFrame(index=df_clean.index)
@@ -138,8 +150,8 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
         'monsoon_phase_enc': 0.0,
         'region_enc': df_clean.get('region_enc', 0.0),
         'category_enc': df_clean.get('category_enc', 0.0),
-        'drug_enc': df_clean['entity_id'].apply(extract_digit_or_hash),
-        'store_enc': df_clean['location_id'].apply(extract_digit_or_hash),
+        'drug_enc': df_clean['entity_id'].map(drug_mapping),
+        'store_enc': df_clean['location_id'].map(store_mapping),
         'demand_wow_change': df_clean['target_wow_change'],
         'demand_momentum_4wk': df_clean['target_momentum_4wk']
     }

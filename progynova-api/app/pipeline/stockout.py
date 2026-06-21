@@ -11,7 +11,7 @@ def detect_stockouts(features_df: pd.DataFrame, predictions: List[float]) -> Lis
     at_risk = features_df[features_df["forecast"] > features_df["stock_on_hand"]]
     
     alerts = []
-    for _, row in at_risk.iterrows():
+    for idx, row in at_risk.iterrows():
         deficit = float(row["forecast"] - row["stock_on_hand"])
         
         # Severity tiers based on deficit unit scale
@@ -25,6 +25,7 @@ def detect_stockouts(features_df: pd.DataFrame, predictions: List[float]) -> Lis
             severity = "LOW"
             
         alerts.append({
+            "original_index": int(idx),
             "entity_id": str(row["drug_id"]),
             "location_id": str(row["store_id"]),
             "time_index": int(row["week"]),

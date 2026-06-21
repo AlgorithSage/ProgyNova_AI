@@ -4,14 +4,11 @@ import './ReorderApprovalCard.css';
 
 interface ReorderApprovalCardProps {
   alerts: StockoutAlert[];
+  isLoading?: boolean;
 }
 
-export function ReorderApprovalCard({ alerts }: ReorderApprovalCardProps) {
+export function ReorderApprovalCard({ alerts, isLoading }: ReorderApprovalCardProps) {
   const [showConfirm, setShowConfirm] = useState(false);
-
-  const criticalCount = alerts.filter((a) => a.severity === 'CRITICAL').length;
-  const totalDeficit = alerts.reduce((sum, a) => sum + a.deficit, 0);
-  const totalReorder = alerts.reduce((sum, a) => sum + a.recommended_reorder, 0);
 
   const handleDownload = useCallback(() => {
     const headers = ['entity_id', 'location_id', 'time_index', 'stock_on_hand', 'forecast', 'deficit', 'severity', 'recommended_reorder'];
@@ -28,6 +25,29 @@ export function ReorderApprovalCard({ alerts }: ReorderApprovalCardProps) {
     URL.revokeObjectURL(url);
     setShowConfirm(false);
   }, [alerts]);
+
+  if (isLoading) {
+    return (
+      <div className="reorder-card">
+        <div className="reorder-card__skeleton-title" />
+        <div className="reorder-card__stats">
+          <div className="reorder-card__stat">
+            <div className="reorder-card__skeleton-stat-value" />
+            <div className="reorder-card__skeleton-stat-label" />
+          </div>
+          <div className="reorder-card__stat">
+            <div className="reorder-card__skeleton-stat-value" />
+            <div className="reorder-card__skeleton-stat-label" />
+          </div>
+          <div className="reorder-card__stat">
+            <div className="reorder-card__skeleton-stat-value" />
+            <div className="reorder-card__skeleton-stat-label" />
+          </div>
+        </div>
+        <div className="reorder-card__skeleton-button" />
+      </div>
+    );
+  }
 
   if (alerts.length === 0) {
     return (
@@ -47,6 +67,10 @@ export function ReorderApprovalCard({ alerts }: ReorderApprovalCardProps) {
       </div>
     );
   }
+
+  const criticalCount = alerts.filter((a) => a.severity === 'CRITICAL').length;
+  const totalDeficit = alerts.reduce((sum, a) => sum + a.deficit, 0);
+  const totalReorder = alerts.reduce((sum, a) => sum + a.recommended_reorder, 0);
 
   return (
     <div className="reorder-card">
@@ -78,30 +102,30 @@ export function ReorderApprovalCard({ alerts }: ReorderApprovalCardProps) {
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
-        Download Recommendations
+        Export Suggested Order Sheet
       </button>
 
       {/* Confirmation modal */}
       {showConfirm && (
         <div className="reorder-card__overlay" role="dialog" aria-modal="true" aria-label="Confirm download">
           <div className="reorder-card__modal">
-            <h3 className="reorder-card__modal-title">Confirm Download</h3>
+            <h3 className="reorder-card__modal-title">Export Restock Order Sheet</h3>
             <p className="reorder-card__modal-text">
-              Download reorder recommendations for <strong>{alerts.length} items</strong> totaling <strong>{totalReorder.toFixed(0)} units</strong>?
+              Would you like to save the recommended restock order sheet for <strong>{alerts.length} items</strong> (replenishing a total of <strong>{totalReorder.toFixed(0)} units</strong>)? This will export a spreadsheet to send to your suppliers.
             </p>
             <div className="reorder-card__modal-actions">
               <button
                 className="reorder-card__modal-cancel"
                 onClick={() => setShowConfirm(false)}
               >
-                Cancel
+                Go Back
               </button>
               <button
                 className="reorder-card__modal-confirm"
                 onClick={handleDownload}
                 autoFocus
               >
-                Confirm & Download
+                Save Order Sheet
               </button>
             </div>
           </div>

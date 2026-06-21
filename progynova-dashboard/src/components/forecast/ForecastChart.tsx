@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+
+const MAX_CHART_POINTS = 500;
 import {
   ResponsiveContainer,
   AreaChart,
@@ -7,17 +9,17 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
 } from 'recharts';
 import type { ForecastPoint } from '../../types';
 import './ForecastChart.css';
 
 interface ForecastChartProps {
   data: ForecastPoint[];
-  onSelectItem?: (index: number) => void;
+  onSelectItem?: (originalIndex: number) => void;
+  isLoading?: boolean;
 }
 
-export function ForecastChart({ data, onSelectItem }: ForecastChartProps) {
+export function ForecastChart({ data, onSelectItem, isLoading }: ForecastChartProps) {
   const [selectedEntity, setSelectedEntity] = useState<string>('all');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
 
@@ -38,6 +40,30 @@ export function ForecastChart({ data, onSelectItem }: ForecastChartProps) {
       return matchEntity && matchLocation;
     });
   }, [data, selectedEntity, selectedLocation]);
+
+  // Down-sample to prevent recharts stack overflow on large datasets
+  const sampledData = useMemo(() => {
+    if (filteredData.length <= MAX_CHART_POINTS) return filteredData;
+    const step = Math.ceil(filteredData.length / MAX_CHART_POINTS);
+    return filteredData.filter((_, i) => i % step === 0);
+  }, [filteredData]);
+
+  if (isLoading) {
+    return (
+      <div className="forecast-chart">
+        <div className="forecast-chart__skeleton">
+          <div className="forecast-chart__skeleton-header">
+            <div className="forecast-chart__skeleton-title" />
+            <div className="forecast-chart__skeleton-filters">
+              <div className="forecast-chart__skeleton-filter" />
+              <div className="forecast-chart__skeleton-filter" />
+            </div>
+          </div>
+          <div className="forecast-chart__skeleton-body" />
+        </div>
+      </div>
+    );
+  }
 
   if (data.length === 0) {
     return (
@@ -85,13 +111,27 @@ export function ForecastChart({ data, onSelectItem }: ForecastChartProps) {
         </div>
       </div>
 
+      <div className="forecast-chart__legend">
+        <div className="forecast-chart__legend-item">
+          <span className="forecast-chart__legend-color forecast-chart__legend-color--actual" />
+          <span className="forecast-chart__legend-label">Actual Demand</span>
+        </div>
+        <div className="forecast-chart__legend-item">
+          <span className="forecast-chart__legend-color forecast-chart__legend-color--forecast" />
+          <span className="forecast-chart__legend-label">Forecast</span>
+        </div>
+      </div>
+
       <div className="forecast-chart__container">
         <ResponsiveContainer width="100%" height={320}>
           <AreaChart
-            data={filteredData}
+            data={sampledData}
             onClick={(state) => {
               if (state && typeof state.activeTooltipIndex === 'number' && onSelectItem) {
-                onSelectItem(state.activeTooltipIndex);
+                const point = sampledData[state.activeTooltipIndex];
+                if (point) {
+                  onSelectItem(point.original_index);
+                }
               }
             }}
           >
@@ -127,9 +167,7 @@ export function ForecastChart({ data, onSelectItem }: ForecastChartProps) {
                 boxShadow: 'var(--shadow-lg)',
               }}
             />
-            <Legend
-              wrapperStyle={{ fontSize: '13px', color: 'var(--text-secondary)' }}
-            />
+
             <Area
               type="monotone"
               dataKey="target"

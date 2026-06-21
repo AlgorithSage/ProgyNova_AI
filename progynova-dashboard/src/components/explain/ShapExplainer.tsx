@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -16,108 +16,179 @@ import './ShapExplainer.css';
 interface ShapExplainerProps {
   explanation: ShapExplanation | null;
   selectedEntity: string;
+  isLoading?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function ShapExplainer({ explanation, selectedEntity }: ShapExplainerProps) {
+export function ShapExplainer({ explanation, selectedEntity, isLoading, isOpen, onClose }: ShapExplainerProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Scroll into view when panel opens
+  useEffect(() => {
+    if (isOpen && panelRef.current) {
+      panelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isOpen]);
+
+  const MAX_FEATURES = 15;
+
   const chartData = useMemo(() => {
     if (!explanation) return [];
 
     return Object.entries(explanation.shap_values)
       .map(([feature, value]) => ({ feature, value }))
-      .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+      .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+      .slice(0, MAX_FEATURES);
   }, [explanation]);
 
-  if (!explanation) {
-    return (
-      <div className="shap-explainer">
-        <div className="shap-explainer__header">
-          <h2 className="shap-explainer__title">Feature Explanation</h2>
-        </div>
-        <div className="shap-explainer__empty">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="16" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12.01" y2="8" />
-          </svg>
-          <p>Select an item from the alerts table</p>
-          <span className="shap-explainer__empty-hint">to view SHAP feature contributions</span>
-        </div>
-      </div>
-    );
-  }
+  // Not visible state
+  if (!isOpen) return null;
 
   return (
-    <div className="shap-explainer">
+    <div className={`shap-explainer shap-explainer--panel ${isOpen ? 'shap-explainer--visible' : ''}`} ref={panelRef}>
+      {/* Header with close */}
       <div className="shap-explainer__header">
-        <h2 className="shap-explainer__title">Feature Explanation</h2>
-        {selectedEntity && (
-          <span className="shap-explainer__entity mono">{selectedEntity}</span>
+        <div className="shap-explainer__header-left">
+          <div className="shap-explainer__header-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="shap-explainer__title">What's driving this forecast?</h2>
+            {selectedEntity && (
+              <span className="shap-explainer__entity mono">{selectedEntity}</span>
+            )}
+          </div>
+        </div>
+        {onClose && (
+          <button className="shap-explainer__close-btn" onClick={onClose} aria-label="Close explainer panel">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         )}
       </div>
 
-      <div className="shap-explainer__meta">
-        <div className="shap-explainer__meta-item">
-          <span className="shap-explainer__meta-label">Base Value</span>
-          <span className="shap-explainer__meta-value mono">{explanation.base_value.toFixed(2)}</span>
+      {/* Loading */}
+      {isLoading && (
+        <div className="shap-explainer__loading">
+          <div className="shap-explainer__spinner" />
+          <p>Analyzing sales drivers...</p>
         </div>
-        <div className="shap-explainer__meta-item">
-          <span className="shap-explainer__meta-label">Prediction</span>
-          <span className="shap-explainer__meta-value shap-explainer__meta-value--primary mono">
-            {explanation.prediction.toFixed(2)}
-          </span>
-        </div>
-        <div className="shap-explainer__meta-item">
-          <span className="shap-explainer__meta-label">Delta</span>
-          <span className={`shap-explainer__meta-value mono ${
-            explanation.prediction - explanation.base_value >= 0 ? 'shap-explainer__meta-value--positive' : 'shap-explainer__meta-value--negative'
-          }`}>
-            {explanation.prediction - explanation.base_value >= 0 ? '+' : ''}
-            {(explanation.prediction - explanation.base_value).toFixed(2)}
-          </span>
-        </div>
-      </div>
+      )}
 
-      <div className="shap-explainer__chart">
-        <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 36)}>
-          <BarChart data={chartData} layout="vertical" margin={{ left: 100, right: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
-            <XAxis
-              type="number"
-              tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
-              axisLine={{ stroke: 'var(--border)' }}
-              tickLine={{ stroke: 'var(--border)' }}
-            />
-            <YAxis
-              type="category"
-              dataKey="feature"
-              tick={{ fill: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font-mono)' }}
-              axisLine={false}
-              tickLine={false}
-              width={95}
-            />
-            <Tooltip
-              contentStyle={{
-                background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
-                borderRadius: '8px',
-                fontSize: '13px',
-                color: 'var(--text-primary)',
-                boxShadow: 'var(--shadow-lg)',
-              }}
-              formatter={(value) => [Number(value).toFixed(4), 'SHAP Value']}
-            />
-            <ReferenceLine x={0} stroke="var(--border)" />
-            <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={24}>
-              {chartData.map((entry) => (
-                <Cell
-                  key={entry.feature}
-                  fill={entry.value >= 0 ? 'var(--chart-primary)' : 'var(--chart-negative)'}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {/* Content */}
+      {!isLoading && explanation && (
+        <div className="shap-explainer__content">
+          {/* Meta stats row */}
+          <div className="shap-explainer__meta">
+            <div className="shap-explainer__meta-card">
+              <span className="shap-explainer__meta-label">Typical Sales</span>
+              <span className="shap-explainer__meta-value mono">{explanation.base_value.toFixed(2)}</span>
+            </div>
+            <div className="shap-explainer__meta-card shap-explainer__meta-card--primary">
+              <span className="shap-explainer__meta-label">Forecasted Need</span>
+              <span className="shap-explainer__meta-value shap-explainer__meta-value--primary mono">
+                {explanation.prediction.toFixed(2)}
+              </span>
+            </div>
+            <div className="shap-explainer__meta-card">
+              <span className="shap-explainer__meta-label">Difference</span>
+              <span className={`shap-explainer__meta-value mono ${
+                explanation.prediction - explanation.base_value >= 0 ? 'shap-explainer__meta-value--positive' : 'shap-explainer__meta-value--negative'
+              }`}>
+                {explanation.prediction - explanation.base_value >= 0 ? '+' : ''}
+                {(explanation.prediction - explanation.base_value).toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          {/* Chart */}
+          <div className="shap-explainer__chart-wrapper">
+            <h3 className="shap-explainer__chart-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 20V10M12 20V4M6 20v-6" />
+              </svg>
+              Feature Impact Analysis
+            </h3>
+            <div className="shap-explainer__chart">
+              <ResponsiveContainer width="100%" height={Math.min(600, Math.max(220, chartData.length * 38))}>
+                <BarChart data={chartData} layout="vertical" margin={{ left: 110, right: 24, top: 8, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                  <XAxis
+                    type="number"
+                    tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
+                    axisLine={{ stroke: 'var(--border)' }}
+                    tickLine={{ stroke: 'var(--border)' }}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="feature"
+                    tick={{ fill: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font-mono)' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={105}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--surface-elevated)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '10px',
+                      fontSize: '13px',
+                      color: 'var(--text-primary)',
+                      boxShadow: 'var(--shadow-xl)',
+                      backdropFilter: 'blur(8px)',
+                    }}
+                    formatter={(value) => [Number(value).toFixed(4), 'Impact on Forecast']}
+                    cursor={{ fill: 'var(--primary-light)', opacity: 0.3 }}
+                  />
+                  <ReferenceLine x={0} stroke="var(--border)" strokeWidth={2} />
+                  <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={26} animationDuration={800} animationEasing="ease-out">
+                    {chartData.map((entry) => (
+                      <Cell
+                        key={entry.feature}
+                        fill={entry.value >= 0 ? 'var(--chart-primary)' : 'var(--chart-negative)'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div className="shap-explainer__legend">
+            <div className="shap-explainer__legend-item">
+              <span className="shap-explainer__legend-dot shap-explainer__legend-dot--positive" />
+              <span>Increases forecast</span>
+            </div>
+            <div className="shap-explainer__legend-item">
+              <span className="shap-explainer__legend-dot shap-explainer__legend-dot--negative" />
+              <span>Decreases forecast</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No explanation selected yet */}
+      {!isLoading && !explanation && (
+        <div className="shap-explainer__empty">
+          <div className="shap-explainer__empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+          </div>
+          <p>Select an item from the alerts table</p>
+          <span className="shap-explainer__empty-hint">to see what factors are driving its forecast</span>
+        </div>
+      )}
     </div>
   );
 }

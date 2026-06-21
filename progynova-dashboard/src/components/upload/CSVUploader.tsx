@@ -6,7 +6,7 @@ import './CSVUploader.css';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 interface CSVUploaderProps {
-  onUploadSuccess: (response: UploadResponse, file: File) => void;
+  onUploadSuccess: (response: UploadResponse, files: File[]) => void;
   onUploadError: (error: string) => void;
 }
 
@@ -25,27 +25,32 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
     onUploadError(message);
   }, [onUploadError]);
 
-  const processFile = useCallback(async (file: File) => {
-    if (!file.name.endsWith('.csv')) {
-      handleError('Invalid file type. Please upload a CSV file.');
-      return;
+  const processFiles = useCallback(async (files: File[]) => {
+    if (files.length === 0) return;
+
+    for (const file of files) {
+      if (!file.name.endsWith('.csv')) {
+        handleError('Invalid file type. Please upload only CSV files.');
+        return;
+      }
+
+      if (file.size > MAX_FILE_SIZE) {
+        handleError(`File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`);
+        return;
+      }
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      handleError(`File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`);
-      return;
-    }
-
-    setFileName(file.name);
+    const displayNames = files.map((f) => f.name).join(', ');
+    setFileName(displayNames);
     setState('uploading');
     setErrorMessage('');
 
-    const result = await uploadCSV(file);
+    const result = await uploadCSV(files);
 
     if (result) {
       setState('completed');
       setUploadResult(result);
-      onUploadSuccess(result, file);
+      onUploadSuccess(result, files);
     } else {
       handleError('Backend not connected. Configure VITE_API_URL to connect.');
     }
@@ -66,14 +71,14 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const file = e.dataTransfer.files[0];
-    if (file) processFile(file);
-  }, [processFile]);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) processFiles(files);
+  }, [processFiles]);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) processFile(file);
-  }, [processFile]);
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length > 0) processFiles(files);
+  }, [processFiles]);
 
   const handleReset = useCallback(() => {
     setState('default');
@@ -138,6 +143,7 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
             ref={fileInputRef}
             type="file"
             accept=".csv"
+            multiple
             onChange={handleFileChange}
             className="csv-uploader__input"
             aria-hidden="true"

@@ -32,9 +32,11 @@ export async function checkHealth(): Promise<HealthResponse | null> {
   return request<HealthResponse>('/health');
 }
 
-export async function uploadCSV(file: File): Promise<UploadResponse | null> {
+export async function uploadCSV(files: File[]): Promise<UploadResponse | null> {
   const formData = new FormData();
-  formData.append('file', file);
+  files.forEach((file) => {
+    formData.append('file', file);
+  });
 
   return request<UploadResponse>('/upload', {
     method: 'POST',
@@ -42,9 +44,11 @@ export async function uploadCSV(file: File): Promise<UploadResponse | null> {
   });
 }
 
-export async function getForecast(file: File): Promise<ForecastPoint[]> {
+export async function getForecast(files: File[]): Promise<ForecastPoint[]> {
   const formData = new FormData();
-  formData.append('file', file);
+  files.forEach((file) => {
+    formData.append('file', file);
+  });
 
   const result = await request<ForecastPoint[]>('/forecast', {
     method: 'POST',
@@ -54,9 +58,11 @@ export async function getForecast(file: File): Promise<ForecastPoint[]> {
   return result ?? [];
 }
 
-export async function getAlerts(file: File): Promise<StockoutAlert[]> {
+export async function getAlerts(files: File[]): Promise<StockoutAlert[]> {
   const formData = new FormData();
-  formData.append('file', file);
+  files.forEach((file) => {
+    formData.append('file', file);
+  });
 
   const result = await request<StockoutAlert[]>('/alerts', {
     method: 'POST',
@@ -67,11 +73,13 @@ export async function getAlerts(file: File): Promise<StockoutAlert[]> {
 }
 
 export async function getExplanation(
-  file: File,
+  files: File[],
   itemIndex: number
 ): Promise<ShapExplanation | null> {
   const formData = new FormData();
-  formData.append('file', file);
+  files.forEach((file) => {
+    formData.append('file', file);
+  });
 
   return request<ShapExplanation>(
     `/explain?item_index=${itemIndex}`,

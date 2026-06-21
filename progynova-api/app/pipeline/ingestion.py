@@ -97,8 +97,14 @@ def process_upload(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     if pd.api.types.is_numeric_dtype(raw_time):
         df_processed["time_index"] = raw_time
     else:
-        # Try parsing as datetime first
-        parsed_dt = pd.to_datetime(raw_time, errors='coerce')
+        # Try parsing as datetime first using standard format or mixed parsing to prevent slow fallback loops
+        try:
+            parsed_dt = pd.to_datetime(raw_time, format='ISO8601', errors='coerce')
+            if parsed_dt.isna().all():
+                parsed_dt = pd.to_datetime(raw_time, errors='coerce', format='mixed')
+        except Exception:
+            parsed_dt = pd.to_datetime(raw_time, errors='coerce')
+            
         if not parsed_dt.isna().all():
             # It's a valid date column
             t_min = parsed_dt.min()

@@ -6,6 +6,7 @@ export interface UploadResponse {
 }
 
 export interface ForecastPoint {
+  original_index: number;
   entity_id: string;
   location_id: string;
   time_index: number;
@@ -14,6 +15,7 @@ export interface ForecastPoint {
 }
 
 export interface StockoutAlert {
+  original_index: number;
   entity_id: string;
   location_id: string;
   time_index: number;

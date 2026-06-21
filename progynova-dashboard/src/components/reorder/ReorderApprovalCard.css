@@ -158,3 +158,38 @@
 .reorder-card__modal-confirm:hover {
   background: var(--primary-hover);
 }
+
+/* Skeleton Loader for Reorder Card */
+.reorder-card__skeleton-title {
+  width: 130px;
+  height: 24px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+  animation: pulse-glow 1.5s infinite ease-in-out;
+}
+
+.reorder-card__skeleton-stat-value {
+  width: 40px;
+  height: 28px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-xs);
+  animation: pulse-glow 1.5s infinite ease-in-out;
+}
+
+.reorder-card__skeleton-stat-label {
+  width: 60px;
+  height: 14px;
+  background: var(--border);
+  border-radius: var(--radius-xs);
+  animation: pulse-glow 1.5s infinite ease-in-out;
+}
+
+.reorder-card__skeleton-button {
+  width: 100%;
+  height: 40px;
+  background: var(--border);
+  border-radius: var(--radius-md);
+  animation: pulse-glow 1.5s infinite ease-in-out;
+}
