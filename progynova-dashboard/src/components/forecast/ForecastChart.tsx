@@ -148,12 +148,12 @@ export function ForecastChart({ data, onSelectItem, isLoading }: ForecastChartPr
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis
               dataKey="time_index"
-              tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
+              tick={{ fill: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font-number)' }}
               axisLine={{ stroke: 'var(--border)' }}
               tickLine={{ stroke: 'var(--border)' }}
             />
             <YAxis
-              tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
+              tick={{ fill: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font-number)' }}
               axisLine={{ stroke: 'var(--border)' }}
               tickLine={{ stroke: 'var(--border)' }}
             />

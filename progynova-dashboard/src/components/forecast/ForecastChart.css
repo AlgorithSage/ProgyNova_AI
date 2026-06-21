@@ -1,11 +1,16 @@
 .forecast-chart {
-  background: var(--surface-elevated);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  box-shadow: var(--shadow-sm);
-  transition: background-color var(--transition-normal),
-              border-color var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.forecast-chart:hover {
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
 }
 
 .forecast-chart__header {
@@ -19,8 +24,9 @@
 
 .forecast-chart__title {
   font-size: var(--text-card-title);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .forecast-chart__filters {
@@ -31,22 +37,27 @@
 .forecast-chart__select {
   font-family: var(--font-sans);
   font-size: var(--text-small);
-  padding: var(--space-xxs) var(--space-sm);
+  font-weight: 600;
+  padding: 8px 16px;
   background: var(--surface);
   color: var(--text-primary);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   cursor: pointer;
-  transition: border-color var(--transition-fast);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
 }
 
 .forecast-chart__select:hover {
-  border-color: var(--border-hover);
+  border-color: var(--primary);
+  background: var(--primary-light);
+  transform: translateY(-1px);
 }
 
 .forecast-chart__select:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .forecast-chart__container {

@@ -82,14 +82,15 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
         LOW: { color: '#1E8E3E', bg: '#E6F4EA' },
       };
 
-  const bg = isDark ? '#1B1B1F' : '#FFFFFF';
-  const surface = isDark ? '#2B2B30' : '#F8F9FA';
-  const surfaceElevated = isDark ? '#35353B' : '#FFFFFF';
-  const textPrimary = isDark ? '#E4E4E7' : '#202124';
-  const textSecondary = isDark ? '#A1A1AA' : '#5F6368';
-  const border = isDark ? '#3F3F46' : '#DADCE0';
-  const primary = isDark ? '#4D90FE' : '#1A73E8';
-  const errorColor = isDark ? '#F87171' : '#D93025';
+  const bg = isDark ? '#090D16' : '#F8FAFC';
+  const surface = isDark ? 'rgba(15, 23, 42, 0.6)' : '#FFFFFF';
+  const surfaceElevated = isDark ? 'rgba(30, 41, 59, 0.7)' : '#FFFFFF';
+  const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
+  const textSecondary = isDark ? '#CBD5E1' : '#475569';
+  const border = isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0';
+  const primary = isDark ? '#818CF8' : '#4F46E5';
+  const primaryGradient = isDark ? 'linear-gradient(135deg, #818CF8, #6366F1)' : 'linear-gradient(135deg, #6366F1, #4F46E5)';
+  const errorColor = isDark ? '#F87171' : '#EF4444';
 
   const critCount = sorted.filter((a) => a.severity === 'CRITICAL').length;
   const highCount = sorted.filter((a) => a.severity === 'HIGH').length;
@@ -102,11 +103,11 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
     <tr style="animation: fadeIn 0.2s ease ${Math.min(i * 10, 500)}ms both;">
       <td style="font-weight:600;">${a.entity_id}</td>
       <td>${a.location_id}</td>
-      <td style="text-align:right;">${a.stock_on_hand.toFixed(0)}</td>
-      <td style="text-align:right;">${a.forecast.toFixed(1)}</td>
-      <td style="text-align:right;color:${errorColor};font-weight:700;">${a.deficit.toFixed(1)}</td>
-      <td><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;color:${severityColors[a.severity]?.color};background:${severityColors[a.severity]?.bg};">${a.severity}</span></td>
-      <td style="text-align:right;font-weight:700;">${a.recommended_reorder.toFixed(0)}</td>
+      <td class="num" style="text-align:right;">${a.stock_on_hand.toFixed(0)}</td>
+      <td class="num" style="text-align:right;">${a.forecast.toFixed(1)}</td>
+      <td class="num" style="text-align:right;color:${errorColor};font-weight:700;">${a.deficit.toFixed(1)}</td>
+      <td><span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;color:${severityColors[a.severity]?.color};background:${severityColors[a.severity]?.bg};border: 1px solid rgba(255,255,255,0.05);">${a.severity}</span></td>
+      <td class="num" style="text-align:right;font-weight:700;">${a.recommended_reorder.toFixed(0)}</td>
     </tr>`
     )
     .join('');
@@ -117,14 +118,14 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
   <meta charset="UTF-8">
   <title>Stockout Alerts - Full View | ProgyNovaAI</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap');
 
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
       background: ${bg};
       color: ${textPrimary};
-      padding: 32px;
+      padding: 40px;
       line-height: 1.5;
     }
 
@@ -137,77 +138,106 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
       gap: 16px;
     }
 
-    .header-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .header h1 { font-size: 1.5rem; font-weight: 700; }
+    .header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 850;
+      letter-spacing: -0.02em;
+      background: ${primaryGradient};
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .count-badge {
       display: inline-flex; align-items: center; justify-content: center;
       min-width: 28px; height: 28px; padding: 0 8px;
       font-size: 13px; font-weight: 700; color: #fff;
       background: linear-gradient(135deg, ${errorColor}, #b91c1c);
       border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
     }
 
     .summary-pills { display: flex; gap: 8px; flex-wrap: wrap; }
     .pill {
       display: inline-flex; align-items: center; gap: 4px;
-      padding: 4px 12px; font-size: 12px; font-weight: 600;
-      border-radius: 999px; border: 1px solid;
+      padding: 4px 12px; font-size: 12px; font-weight: 700;
+      border-radius: 999px; border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
     .actions { display: flex; gap: 8px; }
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 16px; font-size: 13px; font-weight: 600;
-      border-radius: 8px; cursor: pointer; border: 1px solid ${border};
+      padding: 10px 20px; font-size: 13px; font-weight: 600;
+      border-radius: 999px; cursor: pointer; border: 1px solid ${border};
       background: ${surfaceElevated}; color: ${textPrimary};
-      transition: all 0.15s;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .btn:hover { background: ${surface}; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .btn-primary { background: ${primary}; color: #fff; border-color: ${primary}; }
-    .btn-primary:hover { opacity: 0.9; }
+    .btn:hover {
+      background: ${primary};
+      color: #fff;
+      border-color: ${primary};
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+    .btn svg {
+      transition: transform 0.2s;
+    }
+    .btn:hover svg {
+      transform: translateY(-1px);
+    }
 
     .search-bar {
-      margin-bottom: 16px;
+      margin-bottom: 24px;
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
     }
     .search-input {
-      padding: 8px 14px; border-radius: 8px;
+      padding: 10px 18px; border-radius: 999px;
       border: 1px solid ${border}; background: ${surfaceElevated};
       color: ${textPrimary}; font-size: 14px; font-family: inherit;
-      min-width: 280px; outline: none; transition: border-color 0.15s;
+      min-width: 320px; outline: none; transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .search-input:focus { border-color: ${primary}; }
-    .search-input::placeholder { color: ${textSecondary}; }
+    .search-input:focus {
+      border-color: ${primary};
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+    .search-input::placeholder { color: ${textSecondary}; opacity: 0.7; }
 
     .stats-bar {
-      display: flex; gap: 16px; margin-bottom: 20px;
-      font-size: 13px; color: ${textSecondary}; flex-wrap: wrap;
+      margin-bottom: 20px;
+      font-size: 13px; color: ${textSecondary}; font-weight: 500;
     }
-    .stats-bar span { font-weight: 600; color: ${textPrimary}; }
+    .stats-bar span { font-weight: 700; color: ${textPrimary}; }
 
     table {
       width: 100%; border-collapse: collapse; font-size: 14px;
-      background: ${surfaceElevated}; border-radius: 12px; overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background: ${surfaceElevated}; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+      border: 1px solid ${border};
     }
     th {
-      padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700;
-      color: ${textSecondary}; text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700;
+      color: ${textSecondary}; text-transform: uppercase; letter-spacing: 0.08em;
       border-bottom: 2px solid ${border}; background: ${surface};
       position: sticky; top: 0; z-index: 10;
     }
     td {
-      padding: 10px 16px; border-bottom: 1px solid ${border};
+      padding: 12px 20px; border-bottom: 1px solid ${border};
       font-family: 'Fira Code', monospace; font-size: 13px;
     }
-    tr:hover { background: ${surface}; }
+    .num {
+      font-family: 'Inter', system-ui, sans-serif !important;
+    }
+    tr:hover { background: rgba(79, 70, 229, 0.02); }
     tr:last-child td { border-bottom: none; }
 
     .footer {
-      margin-top: 24px; text-align: center;
+      margin-top: 32px; text-align: center;
       font-size: 12px; color: ${textSecondary};
+      opacity: 0.7;
     }
 
     @keyframes fadeIn {
@@ -244,7 +274,7 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
   </div>
 
   <div class="stats-bar">
-    Showing <span id="visibleCount">${sorted.length}</span> of <span>${sorted.length}</span> alerts
+    Showing <span id="visibleCount" class="num">${sorted.length}</span> of <span class="num">${sorted.length}</span> alerts
   </div>
 
   <table>
@@ -337,6 +367,7 @@ export function AlertsTable({
 }: AlertsTableProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isOverAction, setIsOverAction] = useState(false);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const tableRef = useRef<HTMLDivElement>(null);
 
@@ -366,6 +397,7 @@ export function AlertsTable({
 
   const handleRowMouseLeave = () => {
     setHoveredIndex(null);
+    setIsOverAction(false);
   };
 
   useEffect(() => {
@@ -580,19 +612,23 @@ export function AlertsTable({
                   {alert.entity_id}
                 </td>
                 <td className="mono">{alert.location_id}</td>
-                <td className="alerts-table__num mono">{alert.stock_on_hand.toFixed(0)}</td>
-                <td className="alerts-table__num mono">{alert.forecast.toFixed(1)}</td>
-                <td className="alerts-table__num mono alerts-table__deficit">{alert.deficit.toFixed(1)}</td>
+                <td className="alerts-table__num">{alert.stock_on_hand.toFixed(0)}</td>
+                <td className="alerts-table__num">{alert.forecast.toFixed(1)}</td>
+                <td className="alerts-table__num alerts-table__deficit">{alert.deficit.toFixed(1)}</td>
                 <td>
                   <span className={`alerts-table__badge alerts-table__badge--${alert.severity.toLowerCase()}`}>
                     <SeverityIcon severity={alert.severity} />
                     {alert.severity}
                   </span>
                 </td>
-                <td className="alerts-table__num mono">
+                <td className="alerts-table__num">
                   <strong>{alert.recommended_reorder.toFixed(0)}</strong>
                 </td>
-                <td className="alerts-table__action-cell">
+                <td 
+                  className="alerts-table__action-cell"
+                  onMouseEnter={() => setIsOverAction(true)}
+                  onMouseLeave={() => setIsOverAction(false)}
+                >
                   <button
                     className="alerts-table__analyze-btn"
                     onClick={(e) => {
@@ -627,7 +663,7 @@ export function AlertsTable({
       )}
 
       {/* ── Hover Tooltip ─────────────────────── */}
-      {hoveredAlert && hoveredIndex !== selectedOriginalIndex && (
+      {hoveredAlert && hoveredIndex !== selectedOriginalIndex && !isOverAction && (
         <div
           className="alerts-table__tooltip"
           style={{
@@ -645,19 +681,19 @@ export function AlertsTable({
           <div className="alerts-table__tooltip-grid">
             <div className="alerts-table__tooltip-stat">
               <span className="alerts-table__tooltip-label">Current Stock</span>
-              <span className="alerts-table__tooltip-value mono">{hoveredAlert.stock_on_hand.toFixed(0)}</span>
+              <span className="alerts-table__tooltip-value">{hoveredAlert.stock_on_hand.toFixed(0)}</span>
             </div>
             <div className="alerts-table__tooltip-stat">
               <span className="alerts-table__tooltip-label">Forecasted</span>
-              <span className="alerts-table__tooltip-value mono">{hoveredAlert.forecast.toFixed(1)}</span>
+              <span className="alerts-table__tooltip-value">{hoveredAlert.forecast.toFixed(1)}</span>
             </div>
             <div className="alerts-table__tooltip-stat">
               <span className="alerts-table__tooltip-label">Deficit</span>
-              <span className="alerts-table__tooltip-value alerts-table__tooltip-value--danger mono">{hoveredAlert.deficit.toFixed(1)}</span>
+              <span className="alerts-table__tooltip-value alerts-table__tooltip-value--danger">{hoveredAlert.deficit.toFixed(1)}</span>
             </div>
             <div className="alerts-table__tooltip-stat">
               <span className="alerts-table__tooltip-label">Reorder</span>
-              <span className="alerts-table__tooltip-value alerts-table__tooltip-value--accent mono">{hoveredAlert.recommended_reorder.toFixed(0)}</span>
+              <span className="alerts-table__tooltip-value alerts-table__tooltip-value--accent">{hoveredAlert.recommended_reorder.toFixed(0)}</span>
             </div>
           </div>
           <div className="alerts-table__tooltip-cta">

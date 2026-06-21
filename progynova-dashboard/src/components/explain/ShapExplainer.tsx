@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -22,6 +22,7 @@ interface ShapExplainerProps {
 }
 
 export function ShapExplainer({ explanation, selectedEntity, isLoading, isOpen, onClose }: ShapExplainerProps) {
+  const [showInfo, setShowInfo] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Scroll into view when panel opens
@@ -89,17 +90,17 @@ export function ShapExplainer({ explanation, selectedEntity, isLoading, isOpen, 
           <div className="shap-explainer__meta">
             <div className="shap-explainer__meta-card">
               <span className="shap-explainer__meta-label">Typical Sales</span>
-              <span className="shap-explainer__meta-value mono">{explanation.base_value.toFixed(2)}</span>
+              <span className="shap-explainer__meta-value">{explanation.base_value.toFixed(2)}</span>
             </div>
             <div className="shap-explainer__meta-card shap-explainer__meta-card--primary">
               <span className="shap-explainer__meta-label">Forecasted Need</span>
-              <span className="shap-explainer__meta-value shap-explainer__meta-value--primary mono">
+              <span className="shap-explainer__meta-value shap-explainer__meta-value--primary">
                 {explanation.prediction.toFixed(2)}
               </span>
             </div>
             <div className="shap-explainer__meta-card">
               <span className="shap-explainer__meta-label">Difference</span>
-              <span className={`shap-explainer__meta-value mono ${
+              <span className={`shap-explainer__meta-value ${
                 explanation.prediction - explanation.base_value >= 0 ? 'shap-explainer__meta-value--positive' : 'shap-explainer__meta-value--negative'
               }`}>
                 {explanation.prediction - explanation.base_value >= 0 ? '+' : ''}
@@ -122,7 +123,7 @@ export function ShapExplainer({ explanation, selectedEntity, isLoading, isOpen, 
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
                   <XAxis
                     type="number"
-                    tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
+                    tick={{ fill: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font-number)' }}
                     axisLine={{ stroke: 'var(--border)' }}
                     tickLine={{ stroke: 'var(--border)' }}
                   />
@@ -171,6 +172,63 @@ export function ShapExplainer({ explanation, selectedEntity, isLoading, isOpen, 
               <span className="shap-explainer__legend-dot shap-explainer__legend-dot--negative" />
               <span>Decreases forecast</span>
             </div>
+          </div>
+
+          {/* Info Guide Section */}
+          <div className="shap-explainer__info-section">
+            <button 
+              className={`shap-explainer__info-btn ${showInfo ? 'shap-explainer__info-btn--active' : ''}`}
+              onClick={() => setShowInfo(!showInfo)}
+              aria-expanded={showInfo}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              {showInfo ? 'Hide Explanation Guide' : 'How to read this chart?'}
+            </button>
+            
+            {showInfo && (
+              <div className="shap-explainer__info-content">
+                <h4 className="shap-explainer__info-title">Understanding Feature Impact (SHAP Values)</h4>
+                <p className="shap-explainer__info-desc">
+                  This chart shows the exact mathematical contribution of each feature to the final forecast. 
+                  It answers the question: <strong>"Why is this week's forecast higher/lower than typical sales?"</strong>
+                </p>
+                
+                <div className="shap-explainer__guide-grid">
+                  <div className="shap-explainer__guide-col">
+                    <h5 className="shap-explainer__guide-header">Direction of Impact</h5>
+                    <ul className="shap-explainer__guide-list">
+                      <li><strong>Right-pointing bars (+):</strong> Increased the forecast compared to baseline (e.g., sudden sales spike).</li>
+                      <li><strong>Left-pointing bars (-):</strong> Decreased the forecast compared to baseline (e.g., high remaining inventory).</li>
+                    </ul>
+                  </div>
+                  <div className="shap-explainer__guide-col">
+                    <h5 className="shap-explainer__guide-header">Bar Length & Magnitude</h5>
+                    <p className="shap-explainer__guide-text">
+                      The length of each bar represents the strength of its influence. Longer bars had the highest leverage on the final prediction, while shorter bars had a minor tuning effect.
+                    </p>
+                  </div>
+                </div>
+
+                <h5 className="shap-explainer__guide-header">Variable Definitions</h5>
+                <dl className="shap-explainer__terms">
+                  <dt>demand_wow_change</dt>
+                  <dd>Week-over-Week sales velocity change. High positive values show recent accelerating sales.</dd>
+                  
+                  <dt>demand_lag_X</dt>
+                  <dd>Actual sales volume X weeks ago (e.g., demand_lag_1 is immediate past week sales).</dd>
+                  
+                  <dt>demand_roll_mean_X</dt>
+                  <dd>Moving average of sales over the last X weeks. Represents baseline mid-term demand trends.</dd>
+                  
+                  <dt>outbreak_diarrhoeal_lag2</dt>
+                  <dd>Preventative clinics data of local symptoms 2 weeks ago. Flags higher prospective stocking needs.</dd>
+                </dl>
+              </div>
+            )}
           </div>
         </div>
       )}
