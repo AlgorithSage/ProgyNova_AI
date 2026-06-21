@@ -79,7 +79,7 @@ export const lightTheme: ThemeVariables = {
   shadowGlow: '0 0 15px rgba(255, 235, 59, 0.2)',
   fontSans: "'Space Grotesk', system-ui, -apple-system, sans-serif",
   fontNumber: "'Inter', system-ui, -apple-system, sans-serif",
-  fontMono: "'Fira Code', 'Cascadia Code', Consolas, monospace",
+  fontMono: "'Google Sans', 'Product Sans', system-ui, -apple-system, sans-serif",
 };
 
 export const darkTheme: ThemeVariables = {
@@ -121,7 +121,7 @@ export const darkTheme: ThemeVariables = {
   shadowGlow: '0 0 20px rgba(255, 235, 59, 0.25)',
   fontSans: "'Space Grotesk', system-ui, -apple-system, sans-serif",
   fontNumber: "'Inter', system-ui, -apple-system, sans-serif",
-  fontMono: "'Fira Code', 'Cascadia Code', Consolas, monospace",
+  fontMono: "'Google Sans', 'Product Sans', system-ui, -apple-system, sans-serif",
 };
 
 export const themes = {
