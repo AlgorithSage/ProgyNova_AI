@@ -539,33 +539,54 @@
   padding: 6px 14px;
   font-size: var(--text-small);
   font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  color: #F5F7FA;
+  background: #0B0F19;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
-.alerts-table__toolbar-btn:hover {
+[data-theme="dark"] .alerts-table__toolbar-btn {
+  background: #131A26;
   color: var(--text-primary);
-  border-color: var(--border-hover);
-  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+}
+
+.alerts-table__toolbar-btn:hover {
+  color: #0B0F19;
+  border-color: #0B0F19;
+  background: #FFFFFF;
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .alerts-table__toolbar-btn:hover {
+  background: var(--text-primary);
+  color: #0B0F19;
+  border-color: var(--text-primary);
 }
 
 .alerts-table__toolbar-btn--accent {
   color: var(--primary);
   border-color: var(--primary);
-  background: var(--primary-light);
+  background: #0B0F19;
+}
+
+[data-theme="dark"] .alerts-table__toolbar-btn--accent {
+  background: #131A26;
 }
 
 .alerts-table__toolbar-btn--accent:hover {
   background: var(--primary);
-  color: #fff;
+  color: #0B0F19;
+  border-color: var(--primary);
   box-shadow: var(--shadow-glow);
+}
+
+[data-theme="dark"] .alerts-table__toolbar-btn--accent:hover {
+  color: #131A26;
 }
 
 /* ── Pagination info ─────────────────────────── */
