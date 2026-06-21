@@ -79,11 +79,15 @@
   margin-top: 4px;
   font-size: var(--text-small);
   font-weight: 700;
-  color: var(--primary);
+  color: #0B0F19;
   background: var(--primary-light);
   padding: 4px 12px;
   border-radius: var(--radius-full);
   border: 1px solid rgba(79, 70, 229, 0.15);
+}
+
+[data-theme="dark"] .shap-explainer__entity {
+  color: var(--primary);
 }
 
 .shap-explainer__close-btn {
@@ -174,6 +178,10 @@
 }
 
 .shap-explainer__meta-value--primary {
+  color: #0B0F19;
+}
+
+[data-theme="dark"] .shap-explainer__meta-value--primary {
   color: var(--primary);
 }
 
@@ -443,7 +451,7 @@
 .shap-explainer__terms dt {
   font-family: var(--font-mono);
   font-weight: 700;
-  color: var(--primary);
+  color: #0B0F19;
   white-space: nowrap;
 }
 
