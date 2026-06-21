@@ -371,15 +371,18 @@
 
 .shap-explainer__info-content {
   margin-top: var(--space-md);
-  padding: var(--space-md);
-  background: rgba(0, 0, 0, 0.015);
-  border: 1px solid var(--border);
+  padding: var(--space-lg);
+  background: #0B0F19; /* Black modal background */
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   animation: info-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  color: rgba(255, 255, 255, 0.85); /* White base text */
 }
 
 [data-theme="dark"] .shap-explainer__info-content {
-  background: rgba(255, 255, 255, 0.01);
+  background: #0B0F19;
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 @keyframes info-slide-down {
@@ -396,15 +399,21 @@
 .shap-explainer__info-title {
   font-size: var(--text-body);
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--space-xxs);
+  color: var(--primary); /* Yellow heading */
+  margin-bottom: var(--space-xs);
 }
 
 .shap-explainer__info-desc {
   font-size: var(--text-small);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85); /* White base text */
   line-height: 1.6;
   margin-bottom: var(--space-md);
+}
+
+/* Style strong/important tags in the card to yellow */
+.shap-explainer__info-content strong {
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .shap-explainer__guide-grid {
@@ -417,7 +426,7 @@
 .shap-explainer__guide-header {
   font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--primary); /* Yellow heading */
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -426,7 +435,7 @@
 .shap-explainer__guide-list {
   padding-left: var(--space-md);
   font-size: var(--text-small);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85); /* White base text */
 }
 
 .shap-explainer__guide-list li {
@@ -436,7 +445,7 @@
 
 .shap-explainer__guide-text {
   font-size: var(--text-small);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85); /* White base text */
   line-height: 1.5;
 }
 
@@ -451,16 +460,16 @@
 .shap-explainer__terms dt {
   font-family: var(--font-mono);
   font-weight: 700;
-  color: #0B0F19;
+  color: var(--primary); /* Yellow term */
   white-space: nowrap;
 }
 
 [data-theme="dark"] .shap-explainer__terms dt {
-  color: #818cf8;
+  color: var(--primary);
 }
 
 .shap-explainer__terms dd {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85); /* White base text */
   margin-left: 0;
 }
 
