@@ -226,7 +226,7 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
     }
     td {
       padding: 12px 20px; border-bottom: 1px solid ${border};
-      font-family: 'Fira Code', monospace; font-size: 13px;
+      font-family: 'Google Sans', 'Product Sans', system-ui, sans-serif; font-size: 13px;
     }
     .num {
       font-family: 'Inter', system-ui, sans-serif !important;

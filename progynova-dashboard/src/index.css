@@ -68,7 +68,7 @@
   /* Typography */
   --font-sans: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   --font-number: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  --font-mono: 'Google Sans', 'Product Sans', system-ui, -apple-system, sans-serif;
 
   --text-page-title: 1.75rem;
   --text-section-heading: 1.25rem;
