@@ -159,13 +159,15 @@ export function ForecastChart({ data, onSelectItem, isLoading }: ForecastChartPr
             />
             <Tooltip
               contentStyle={{
-                background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
+                background: '#FFFFFF',
+                border: '1px solid #E2E8F0',
                 borderRadius: '8px',
                 fontSize: '13px',
-                color: 'var(--text-primary)',
-                boxShadow: 'var(--shadow-lg)',
+                color: '#0B0F19',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.12)',
               }}
+              labelStyle={{ color: '#0B0F19', fontWeight: 600 }}
+              itemStyle={{ color: '#0B0F19' }}
             />
 
             <Area
