@@ -348,8 +348,8 @@
   font-size: var(--text-small);
   font-weight: 600;
   color: var(--primary);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: #0B0F19;
+  border: 1.5px solid var(--primary);
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -358,28 +358,37 @@
   white-space: nowrap;
 }
 
+[data-theme="dark"] .alerts-table__analyze-btn {
+  background: #131A26;
+}
+
 .alerts-table__row:hover .alerts-table__analyze-btn {
   opacity: 1;
   transform: translateX(0);
-  border-color: var(--primary);
-  background: var(--primary-light);
 }
 
 .alerts-table__row--selected .alerts-table__analyze-btn {
   opacity: 1;
   transform: translateX(0);
-  background: var(--primary-gradient);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: var(--shadow-sm);
+  background: #0B0F19;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .alerts-table__row--selected .alerts-table__analyze-btn {
+  background: #131A26;
 }
 
 .alerts-table__analyze-btn:hover {
-  background: var(--primary-gradient) !important;
-  color: #fff !important;
-  border-color: transparent !important;
+  background: var(--primary) !important;
+  color: #0B0F19 !important;
+  border-color: var(--primary) !important;
   transform: translateX(0) scale(1.04);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  box-shadow: var(--shadow-glow);
+}
+
+[data-theme="dark"] .alerts-table__analyze-btn:hover {
+  color: #131A26 !important;
 }
 
 /* ── Hover Tooltip ───────────────────────────── */
