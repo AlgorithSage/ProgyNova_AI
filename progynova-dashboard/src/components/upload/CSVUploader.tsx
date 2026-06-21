@@ -101,28 +101,30 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
 
       {state === 'completed' && uploadResult ? (
         <div className="csv-uploader__result">
-          <div className="csv-uploader__result-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-              <polyline points="22 4 12 14.01 9 11.01" />
-            </svg>
+          <div className="csv-uploader__result-header">
+            <div className="csv-uploader__result-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <div className="csv-uploader__result-info">
+              <span className="csv-uploader__result-file mono">{fileName}</span>
+              <div className="csv-uploader__result-stats">
+                <span className="csv-uploader__stat">
+                  <strong>{uploadResult.rows.toLocaleString()}</strong> rows
+                </span>
+                <span className="csv-uploader__stat-divider">·</span>
+                <span className="csv-uploader__stat">
+                  <strong>{uploadResult.columns.length}</strong> columns
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="csv-uploader__result-details">
-            <span className="csv-uploader__result-file mono">{fileName}</span>
-            <div className="csv-uploader__result-stats">
-              <span className="csv-uploader__stat">
-                <strong>{uploadResult.rows.toLocaleString()}</strong> rows
-              </span>
-              <span className="csv-uploader__stat-divider">·</span>
-              <span className="csv-uploader__stat">
-                <strong>{uploadResult.columns.length}</strong> columns
-              </span>
-            </div>
-            <div className="csv-uploader__columns">
-              {uploadResult.columns.map((col) => (
-                <span key={col} className="csv-uploader__column-tag mono">{col}</span>
-              ))}
-            </div>
+          <div className="csv-uploader__columns">
+            {uploadResult.columns.map((col) => (
+              <span key={col} className="csv-uploader__column-tag mono">{col}</span>
+            ))}
           </div>
         </div>
       ) : (
