@@ -54,6 +54,11 @@
   background: var(--primary);
   color: #0B0F19;
   transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+[data-theme="dark"] .csv-uploader__reset:hover {
+  color: #131A26;
 }
 
 /* Dropzone */
@@ -162,17 +167,28 @@
 .csv-uploader__retry {
   font-size: var(--text-small);
   font-weight: 650;
-  color: #0B0F19;
-  background: var(--primary);
+  color: var(--primary);
+  background: #0B0F19;
+  border: 1.5px solid var(--primary);
   padding: 6px 16px;
   border-radius: var(--radius-full);
-  transition: background-color var(--transition-fast);
+  transition: all var(--transition-fast);
   cursor: pointer;
-  border: none;
+}
+
+[data-theme="dark"] .csv-uploader__retry {
+  background: #131A26;
 }
 
 .csv-uploader__retry:hover {
-  background: var(--primary-hover);
+  background: var(--primary);
+  color: #0B0F19;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+[data-theme="dark"] .csv-uploader__retry:hover {
+  color: #131A26;
 }
 
 /* Result */
@@ -181,11 +197,17 @@
   align-items: flex-start;
   gap: var(--space-md);
   padding: var(--space-md);
-  background: rgba(0, 230, 118, 0.08);
-  border: 1px solid var(--success);
+  background: #0B0F19;
+  border: 1.5px solid var(--success);
   border-radius: var(--radius-md);
   width: 100%;
   box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(0, 230, 118, 0.12);
+}
+
+[data-theme="dark"] .csv-uploader__result {
+  background: #131A26;
+  border-color: var(--success);
 }
 
 .csv-uploader__result-icon {
@@ -211,25 +233,39 @@
   align-items: center;
   gap: var(--space-xs);
   font-size: var(--text-body);
-  color: #B0BEC5;
+  color: #CBD5E1;
 }
 
 .csv-uploader__stat-divider {
-  color: #78909C;
+  color: #64748B;
 }
 
 .csv-uploader__columns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xxs);
-  margin-top: var(--space-xxs);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin-top: var(--space-xs);
 }
 
 .csv-uploader__column-tag {
-  padding: 2px var(--space-xs);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  background: #FFFFFF;
+  border: 1.5px solid #FFFFFF;
   border-radius: var(--radius-sm);
   font-size: var(--text-small);
-  color: #B0BEC5;
+  color: #0B0F19;
+  text-align: center;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.csv-uploader__column-tag:hover {
+  background: #FFFFFF;
+  border-color: var(--primary);
+  color: #0B0F19;
+  box-shadow: 0 0 10px rgba(255, 235, 59, 0.4);
 }

@@ -78,7 +78,6 @@
   text-align: center;
 }
 
-/* Download button */
 .reorder-card__button {
   display: flex;
   align-items: center;
@@ -88,16 +87,29 @@
   padding: 12px var(--space-md);
   font-size: var(--text-body);
   font-weight: 600;
-  color: #FFFFFF;
-  background: var(--primary-gradient);
+  color: var(--primary);
+  background: #0B0F19;
+  border: 1.5px solid var(--primary);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+[data-theme="dark"] .reorder-card__button {
+  background: #131A26;
 }
 
 .reorder-card__button:hover {
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.25);
+  background: var(--primary);
+  color: #0B0F19;
+  border-color: var(--primary);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+[data-theme="dark"] .reorder-card__button:hover {
+  color: #131A26;
 }
 
 /* Empty state */
@@ -203,15 +215,28 @@
   padding: 10px 20px;
   font-size: var(--text-body);
   font-weight: 600;
-  color: #FFFFFF;
-  background: var(--primary-gradient);
+  color: var(--primary);
+  background: #0B0F19;
+  border: 1.5px solid var(--primary);
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+[data-theme="dark"] .reorder-card__modal-confirm {
+  background: #131A26;
 }
 
 .reorder-card__modal-confirm:hover {
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  background: var(--primary);
+  color: #0B0F19;
+  border-color: var(--primary);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+[data-theme="dark"] .reorder-card__modal-confirm:hover {
+  color: #131A26;
 }
 
 /* Skeleton Loader for Reorder Card */

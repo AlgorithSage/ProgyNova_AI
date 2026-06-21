@@ -318,30 +318,39 @@
   padding: 8px 18px;
   font-size: var(--text-small);
   font-weight: 700;
-  color: var(--text-secondary);
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid var(--border);
+  color: var(--primary);
+  background: #0B0F19;
+  border: 1.5px solid var(--primary);
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all var(--transition-normal);
 }
 
 [data-theme="dark"] .shap-explainer__info-btn {
-  background: rgba(255, 255, 255, 0.02);
+  background: #131A26;
 }
 
 .shap-explainer__info-btn:hover {
-  color: var(--primary);
+  background: var(--primary);
+  color: #0B0F19;
   border-color: var(--primary);
-  background: var(--primary-light);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+[data-theme="dark"] .shap-explainer__info-btn:hover {
+  color: #131A26;
 }
 
 .shap-explainer__info-btn--active {
-  background: var(--primary-gradient) !important;
-  color: #FFFFFF !important;
-  border-color: transparent !important;
-  box-shadow: var(--shadow-sm);
+  background: var(--primary) !important;
+  color: #0B0F19 !important;
+  border-color: var(--primary) !important;
+  box-shadow: var(--shadow-glow);
+}
+
+[data-theme="dark"] .shap-explainer__info-btn--active {
+  color: #131A26 !important;
 }
 
 .shap-explainer__info-btn svg {
