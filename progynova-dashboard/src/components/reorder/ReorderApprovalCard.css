@@ -89,7 +89,7 @@
   font-weight: 600;
   color: var(--primary);
   background: #0B0F19;
-  border: 1.5px solid var(--primary);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
@@ -103,7 +103,7 @@
 .reorder-card__button:hover {
   background: var(--primary);
   color: #0B0F19;
-  border-color: var(--primary);
+  border-color: transparent;
   transform: translateY(-1px);
   box-shadow: var(--shadow-glow);
 }
@@ -217,7 +217,7 @@
   font-weight: 600;
   color: var(--primary);
   background: #0B0F19;
-  border: 1.5px solid var(--primary);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
   cursor: pointer;
@@ -230,7 +230,7 @@
 .reorder-card__modal-confirm:hover {
   background: var(--primary);
   color: #0B0F19;
-  border-color: var(--primary);
+  border-color: transparent;
   transform: translateY(-1px);
   box-shadow: var(--shadow-glow);
 }

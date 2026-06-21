@@ -169,7 +169,7 @@
   font-weight: 650;
   color: var(--primary);
   background: #0B0F19;
-  border: 1.5px solid var(--primary);
+  border: 1.5px solid transparent;
   padding: 6px 16px;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
