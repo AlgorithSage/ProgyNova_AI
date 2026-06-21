@@ -370,19 +370,35 @@
 }
 
 .shap-explainer__info-content {
+  position: relative;
   margin-top: var(--space-md);
-  padding: var(--space-lg);
-  background: #0B0F19; /* Black modal background */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-md);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  background: linear-gradient(165deg, #0B0F19 0%, #101824 100%);
+  border: 1px solid rgba(255, 235, 59, 0.12);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
   animation: info-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  color: rgba(255, 255, 255, 0.85); /* White base text */
+  color: rgba(255, 255, 255, 0.82);
+  overflow: hidden;
+}
+
+/* Accent top bar */
+.shap-explainer__info-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), rgba(255, 235, 59, 0.3), transparent);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 [data-theme="dark"] .shap-explainer__info-content {
-  background: #0B0F19;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(165deg, #0B0F19 0%, #101824 100%);
+  border-color: rgba(255, 235, 59, 0.12);
 }
 
 @keyframes info-slide-down {
@@ -396,72 +412,137 @@
   }
 }
 
+/* ── Title & Description ──────────────────────── */
+
 .shap-explainer__info-title {
-  font-size: var(--text-body);
-  font-weight: 700;
-  color: var(--primary); /* Yellow heading */
+  font-size: 1rem;
+  font-weight: 750;
+  color: var(--primary);
   margin-bottom: var(--space-xs);
+  letter-spacing: -0.01em;
 }
 
 .shap-explainer__info-desc {
   font-size: var(--text-small);
-  color: rgba(255, 255, 255, 0.85); /* White base text */
-  line-height: 1.6;
-  margin-bottom: var(--space-md);
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.7;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Style strong/important tags in the card to yellow */
+/* Yellow important text */
 .shap-explainer__info-content strong {
   color: var(--primary);
   font-weight: 700;
 }
 
+/* ── Guide Grid (inner cards) ─────────────────── */
+
 .shap-explainer__guide-grid {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: var(--space-md);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.shap-explainer__guide-col {
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shap-explainer__guide-col:hover {
+  background: rgba(255, 235, 59, 0.03);
+  border-color: rgba(255, 235, 59, 0.12);
+  box-shadow: 0 0 20px rgba(255, 235, 59, 0.04);
+  transform: translateY(-1px);
 }
 
 .shap-explainer__guide-header {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--primary); /* Yellow heading */
-  margin-bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 750;
+  color: var(--primary);
+  margin-bottom: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.07em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
+/* Yellow dot before each guide header */
+.shap-explainer__guide-header::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(255, 235, 59, 0.4);
+}
+
+/* ── Guide List (custom bullets) ──────────────── */
+
 .shap-explainer__guide-list {
-  padding-left: var(--space-md);
+  padding-left: 0;
   font-size: var(--text-small);
-  color: rgba(255, 255, 255, 0.85); /* White base text */
+  color: rgba(255, 255, 255, 0.78);
+  list-style: none;
 }
 
 .shap-explainer__guide-list li {
-  margin-bottom: 4px;
-  line-height: 1.5;
+  position: relative;
+  margin-bottom: 8px;
+  line-height: 1.6;
+  padding-left: 18px;
+}
+
+/* Custom yellow chevron bullet */
+.shap-explainer__guide-list li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .shap-explainer__guide-text {
   font-size: var(--text-small);
-  color: rgba(255, 255, 255, 0.85); /* White base text */
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.65;
 }
+
+/* ── Variable Definitions ─────────────────────── */
 
 .shap-explainer__terms {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 8px var(--space-md);
+  gap: 0;
   font-size: var(--text-small);
   line-height: 1.5;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
 .shap-explainer__terms dt {
   font-family: var(--font-mono);
   font-weight: 700;
-  color: var(--primary); /* Yellow term */
+  font-size: 0.7rem;
+  color: var(--primary);
   white-space: nowrap;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  background: rgba(255, 235, 59, 0.03);
 }
 
 [data-theme="dark"] .shap-explainer__terms dt {
@@ -469,8 +550,18 @@
 }
 
 .shap-explainer__terms dd {
-  color: rgba(255, 255, 255, 0.85); /* White base text */
+  color: rgba(255, 255, 255, 0.75);
   margin-left: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+}
+
+/* Remove bottom border from last row */
+.shap-explainer__terms dt:nth-last-of-type(1),
+.shap-explainer__terms dd:last-of-type {
+  border-bottom: none;
 }
 
 /* ── Responsive ──────────────────────────────── */
