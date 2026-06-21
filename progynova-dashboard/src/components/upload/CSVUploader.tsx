@@ -26,6 +26,7 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
   const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [fileName, setFileName] = useState('');
+  const [showAllColumns, setShowAllColumns] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleError = useCallback((message: string) => {
@@ -89,11 +90,30 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
     if (files.length > 0) processFiles(files);
   }, [processFiles]);
 
+  const handleUsePreloaded = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setState('uploading');
+    setErrorMessage('');
+    setFileName('Simulated Baseline Dataset');
+
+    const result = await uploadCSV([]);
+
+    if (result) {
+      setState('completed');
+      setUploadResult(result);
+      onUploadSuccess(result, []);
+    } else {
+      handleError('Backend not connected or failed to load preloaded dataset.');
+    }
+  }, [handleError, onUploadSuccess]);
+
   const handleReset = useCallback(() => {
     setState('default');
     setUploadResult(null);
     setErrorMessage('');
     setFileName('');
+    setShowAllColumns(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }, []);
 
@@ -112,6 +132,25 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
     }
     return map;
   }, [uploadResult]);
+
+  // Sort columns so that auto-mapped columns always appear at the top,
+  // then we limit the number of initially displayed columns to prevent
+  // vertical layout overflow and ensure parity with the Forecast Chart.
+  const sortedColumns = useMemo(() => {
+    if (!uploadResult?.columns) return [];
+    return [...uploadResult.columns].sort((a, b) => {
+      const hasA = roleByColumn[a] ? 1 : 0;
+      const hasB = roleByColumn[b] ? 1 : 0;
+      return hasB - hasA; // Mapped columns first
+    });
+  }, [uploadResult, roleByColumn]);
+
+  const DEFAULT_VISIBLE_COLUMNS = 8;
+
+  const visibleColumns = useMemo(() => {
+    if (showAllColumns) return sortedColumns;
+    return sortedColumns.slice(0, DEFAULT_VISIBLE_COLUMNS);
+  }, [sortedColumns, showAllColumns]);
 
   return (
     <div className="csv-uploader">
@@ -165,13 +204,13 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
             )}
           </div>
           <div className="csv-uploader__columns">
-            {uploadResult.columns.map((col, i) => {
+            {visibleColumns.map((col, i) => {
               const role = roleByColumn[col];
               return (
                 <span
                   key={col}
                   className="csv-uploader__column-tag mono"
-                  style={{ animationDelay: `${i * 25}ms` }}
+                  style={{ animationDelay: `${i * 20}ms` }}
                 >
                   {col}
                   {role && <span className="csv-uploader__column-role-badge">{role}</span>}
@@ -179,6 +218,31 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
               );
             })}
           </div>
+
+          {sortedColumns.length > DEFAULT_VISIBLE_COLUMNS && (
+            <button
+              type="button"
+              className="csv-uploader__see-more"
+              onClick={() => setShowAllColumns(!showAllColumns)}
+              title={showAllColumns ? "Show fewer fields" : "Show all columns"}
+            >
+              {showAllColumns ? (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="18 15 12 9 6 15" />
+                  </svg>
+                  Show Less
+                </>
+              ) : (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                  + see {sortedColumns.length - DEFAULT_VISIBLE_COLUMNS} more fields
+                </>
+              )}
+            </button>
+          )}
         </div>
       ) : (
         <div
@@ -232,6 +296,17 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
                 <strong>Drop CSV file here</strong> or click to browse
               </p>
               <p className="csv-uploader__hint">CSV files up to 10MB</p>
+              <div className="csv-uploader__divider">
+                <span>or</span>
+              </div>
+              <button 
+                type="button" 
+                className="btn-preloaded" 
+                onClick={handleUsePreloaded}
+                title="Run audit on the owner's preloaded synthetic dataset"
+              >
+                Use Preloaded Owner Dataset
+              </button>
             </>
           )}
         </div>

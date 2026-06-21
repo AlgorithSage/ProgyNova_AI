@@ -1,14 +1,20 @@
 import pandas as pd
 from typing import List, Dict, Any
 
-def detect_stockouts(features_df: pd.DataFrame, predictions: List[float]) -> List[Dict[str, Any]]:
-    """Determine stockout risks where forecast exceeds stock on hand and assign threat level severity."""
+def detect_stockouts(
+    features_df: pd.DataFrame, 
+    predictions: List[float], 
+    multiplier: float = 1.0, 
+    buffer: float = 0.0
+) -> List[Dict[str, Any]]:
+    """Determine stockout risks where forecast (adjusted by safety parameters) exceeds stock on hand and assign threat level severity."""
     # Wire the predicted values
     features_df = features_df.copy()
     features_df["forecast"] = predictions
     
-    # Find rows where forecasted demand is larger than current stock
-    at_risk = features_df[features_df["forecast"] > features_df["stock_on_hand"]]
+    # Find rows where adjusted forecasted demand is larger than current stock
+    adjusted_forecast = features_df["forecast"] * multiplier + buffer
+    at_risk = features_df[adjusted_forecast > features_df["stock_on_hand"]]
     
     alerts = []
     for idx, row in at_risk.iterrows():

@@ -9,8 +9,10 @@ import xgboost as xgb
 from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error, f1_score
 
 # Directory Setup
-DATA_DIR = Path("data")
-MODELS_DIR = Path("models")
+SCRIPT_DIR = Path(__file__).resolve().parent
+API_DIR = SCRIPT_DIR.parent
+DATA_DIR = API_DIR / "data"
+MODELS_DIR = API_DIR / "models"
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(MODELS_DIR/"checkpoints", exist_ok=True)
 
@@ -225,7 +227,7 @@ def build_context():
                     sev = base * np.exp(-(dd**2)/(2*width**2))
                 if rng.random() < 0.015:
                     sev += rng.uniform(0.15, 0.5)
-                row[f"sev_{disease}"] = round(float(np.clip(sev+rng.normal(0,0.025),0,None)),3)
+                row[f"sev_{disease}"] = round(float(np.clip(sev+rng.normal(0,0.01),0,None)),3)
 
             rows.append(row)
     return pd.DataFrame(rows)
@@ -255,7 +257,7 @@ def expected_demand(drug, store, week, ctx, region):
 
     return max(base * pop_mult * trend * seasonal * festival * weather * outbreak, 1.0)
 
-def sample_nb(mu, r=8.0):
+def sample_nb(mu, r=16.0):
     return int(rng.negative_binomial(r, r/(r+mu)))
 
 def simulate(drug, store, ctx, region):
@@ -290,42 +292,163 @@ def simulate(drug, store, ctx, region):
         })
     return records
 
+def enrich_disp_df(disp_df):
+    """Enrich the dispensing dataframe in-place with transactional fields."""
+    print("Enriching dispensing log with transaction-level metrics...")
+    if "batch_number" in disp_df.columns:
+        print("Dataset is already enriched. Skipping enrichment step.")
+        return disp_df
+        
+    rng = np.random.default_rng(42)
+    
+    prices = {
+        "D01": 120.0, "D02": 1350.0, "D03": 180.0, "D04": 95.0, "D05": 220.0,
+        "D06": 150.0, "D07": 110.0, "D08": 45.0, "D09": 80.0, "D10": 650.0,
+        "D11": 240.0, "D12": 320.0, "D13": 75.0, "D14": 160.0, "D15": 350.0,
+        "D16": 180.0, "D17": 90.0, "D18": 150.0, "D19": 110.0
+    }
+    
+    shelf_lives = {
+        "D01": 104, "D02": 52, "D03": 104, "D04": 104, "D05": 104,
+        "D06": 78, "D07": 104, "D08": 104, "D09": 78, "D10": 52,
+        "D11": 78, "D12": 78, "D13": 104, "D14": 78, "D15": 52,
+        "D16": 78, "D17": 78, "D18": 104, "D19": 78
+    }
+    
+    disp_df["unit_price_inr"] = disp_df["drug_id"].map(prices).fillna(100.0)
+    disp_df["total_amount_inr"] = (disp_df["units_dispensed"] * disp_df["unit_price_inr"]).round(2)
+    
+    dates_dt = pd.to_datetime(disp_df["date"])
+    years = dates_dt.dt.year.astype(str)
+    
+    disp_df["batch_number"] = "BAT-" + disp_df["drug_id"] + "-" + years + "-" + disp_df["store_id"]
+    
+    shelf_life_weeks = disp_df["drug_id"].map(shelf_lives).fillna(104)
+    offsets = rng.integers(-2, 4, size=len(disp_df))
+    expiry_deltas = pd.to_timedelta((shelf_life_weeks + offsets) * 7, unit="D")
+    disp_df["expiry_date"] = (dates_dt + expiry_deltas).dt.strftime("%Y-%m-%d")
+    
+    age_groups = ["Pediatric", "Adult", "Geriatric"]
+    chronic_drugs = {"D01", "D02", "D03", "D04", "D05", "D07"}
+    pediatric_drugs = {"D09", "D17"}
+    
+    age_choices = []
+    for drug in disp_df["drug_id"]:
+        if drug in chronic_drugs:
+            p = [0.05, 0.40, 0.55]
+        elif drug in pediatric_drugs:
+            p = [0.70, 0.25, 0.05]
+        else:
+            p = [0.25, 0.50, 0.25]
+        age_choices.append(rng.choice(age_groups, p=p))
+    disp_df["patient_age_group"] = age_choices
+    
+    disp_df["copay_type"] = rng.choice(["Cash", "Private Insurance", "CGHS Government Scheme"], size=len(disp_df), p=[0.40, 0.30, 0.30])
+    
+    specialty_map = {
+        "D01": (["Endocrinologist", "General Physician"], [0.60, 0.40]),
+        "D02": (["Endocrinologist", "General Physician"], [0.60, 0.40]),
+        "D03": (["Cardiologist", "General Physician"], [0.50, 0.50]),
+        "D04": (["Cardiologist", "General Physician"], [0.50, 0.50]),
+        "D05": (["Cardiologist", "General Physician"], [0.50, 0.50]),
+        "D06": (["Neurologist", "General Physician"], [0.70, 0.30]),
+        "D07": (["Endocrinologist", "General Physician"], [0.50, 0.50]),
+        "D08": (["General Physician", "Pediatrician"], [0.90, 0.10]),
+        "D09": (["Pediatrician", "General Physician"], [0.75, 0.25]),
+        "D10": (["General Physician", "Pulmonologist"], [0.80, 0.20]),
+        "D11": (["General Physician", "Pediatrician"], [0.70, 0.30]),
+        "D12": (["General Physician", "Pediatrician"], [0.70, 0.30]),
+        "D13": (["General Physician", "Pediatrician"], [0.90, 0.10]),
+        "D14": (["Pulmonologist", "General Physician"], [0.60, 0.40]),
+        "D15": (["General Physician", "Infectious Diseases"], [0.90, 0.10]),
+        "D16": (["General Physician", "Pediatrician"], [0.70, 0.30]),
+        "D17": (["Pediatrician", "General Physician"], [0.75, 0.25]),
+        "D18": (["General Physician", "Pediatrician"], [0.90, 0.10]),
+        "D19": (["General Physician", "Pediatrician"], [0.90, 0.10]),
+    }
+    
+    specialties = []
+    for drug in disp_df["drug_id"]:
+        opts, probs = specialty_map.get(drug, (["General Physician"], [1.0]))
+        specialties.append(rng.choice(opts, p=probs))
+    disp_df["prescriber_specialty"] = specialties
+    
+    status_conditions = [
+        (disp_df["demand"] == disp_df["units_dispensed"]) & (disp_df["demand"] > 0),
+        (disp_df["units_dispensed"] < disp_df["demand"]) & (disp_df["units_dispensed"] > 0),
+        (disp_df["units_dispensed"] == 0) & (disp_df["demand"] > 0),
+        (disp_df["demand"] == 0)
+    ]
+    status_choices = [
+        "Fully Dispensed",
+        "Partially Dispensed",
+        "OutOfStock_Cancelled",
+        "No Transaction"
+    ]
+    disp_df["dispense_status"] = np.select(status_conditions, status_choices, default="No Transaction")
+    
+    orig_cols = ["store_id","drug_id","city","state","region","week","date","demand","units_dispensed","stock_on_hand","units_ordered","stockout"]
+    new_cols = ["batch_number","expiry_date","unit_price_inr","total_amount_inr","patient_age_group","copay_type","prescriber_specialty","dispense_status"]
+    return disp_df[orig_cols + new_cols]
+
 def run_pipeline():
-    print("PHASE 1: Generating synthetic data...")
-    drugs_df = pd.DataFrame([{
-        "drug_id":d.drug_id,"name":d.name,"category":d.category,
-        "baseline_weekly_demand":d.baseline,"shelf_life_weeks":d.shelf_life_weeks,
-        "seasonal_amplitude":d.seasonal_amp,
-        "responds_to":";".join(d.disease_response.keys())
-    } for d in DRUGS])
+    disp_file = DATA_DIR / "dispensing.csv"
+    if disp_file.exists():
+        print("PHASE 1: Found existing dispensing.csv on server. Loading dataset directly from disk to preserve historical logs...")
+        disp_df = pd.read_csv(disp_file)
+        drugs_df = pd.read_csv(DATA_DIR / "drugs.csv")
+        stores_df = pd.read_csv(DATA_DIR / "stores.csv")
+        context_df = pd.read_csv(DATA_DIR / "context.csv")
+    else:
+        print("PHASE 1: Generating synthetic data...")
+        drugs_df = pd.DataFrame([{
+            "drug_id":d.drug_id,"name":d.name,"category":d.category,
+            "baseline_weekly_demand":d.baseline,"shelf_life_weeks":d.shelf_life_weeks,
+            "seasonal_amplitude":d.seasonal_amp,
+            "responds_to":";".join(d.disease_response.keys())
+        } for d in DRUGS])
 
-    stores_df = pd.DataFrame([{
-        "store_id":s.store_id,"name":s.name,"city":s.city,"state":s.state,
-        "region":STATE_TO_REGION[s.state],"catchment_population":s.population,
-        "supplier_lead_time_weeks":s.lead_time
-    } for s in STORES])
+        stores_df = pd.DataFrame([{
+            "store_id":s.store_id,"name":s.name,"city":s.city,"state":s.state,
+            "region":STATE_TO_REGION[s.state],"catchment_population":s.population,
+            "supplier_lead_time_weeks":s.lead_time
+        } for s in STORES])
 
-    context_df = build_context()
-    context_df["date"] = context_df["week"].apply(lambda w: pd.Timestamp(START_DATE)+pd.Timedelta(weeks=int(w)))
+        context_df = build_context()
+        context_df["date"] = context_df["week"].apply(lambda w: pd.Timestamp(START_DATE)+pd.Timedelta(weeks=int(w)))
 
-    ctx_by_region = {r: context_df[context_df["region"]==r].reset_index(drop=True) for r in REGIONS}
-    all_records = []
-    for store in STORES:
-        region = STATE_TO_REGION[store.state]
-        ctx = ctx_by_region[region]
-        for drug in DRUGS:
-            all_records.extend(simulate(drug, store, ctx, region))
+        ctx_by_region = {r: context_df[context_df["region"]==r].reset_index(drop=True) for r in REGIONS}
+        all_records = []
+        for store in STORES:
+            region = STATE_TO_REGION[store.state]
+            ctx = ctx_by_region[region]
+            for drug in DRUGS:
+                all_records.extend(simulate(drug, store, ctx, region))
 
-    disp_df = pd.DataFrame(all_records)
-    disp_df["date"] = disp_df["week"].apply(lambda w: pd.Timestamp(START_DATE)+pd.Timedelta(weeks=int(w)))
-    disp_df = disp_df[["store_id","drug_id","city","state","region","week","date",
-                        "demand","units_dispensed","stock_on_hand","units_ordered","stockout"]]
+        disp_df = pd.DataFrame(all_records)
+        disp_df["date"] = disp_df["week"].apply(lambda w: pd.Timestamp(START_DATE)+pd.Timedelta(weeks=int(w)))
+        disp_df = disp_df[["store_id","drug_id","city","state","region","week","date",
+                            "demand","units_dispensed","stock_on_hand","units_ordered","stockout"]]
 
+    # Enrich dispensing dataframe
+    disp_df = enrich_disp_df(disp_df)
+
+    # Sync and write files to both data folders
+    os.makedirs(DATA_DIR, exist_ok=True)
     drugs_df.to_csv(DATA_DIR/"drugs.csv", index=False)
     stores_df.to_csv(DATA_DIR/"stores.csv", index=False)
     context_df.to_csv(DATA_DIR/"context.csv", index=False)
     disp_df.to_csv(DATA_DIR/"dispensing.csv", index=False)
-    print("Raw tables written to data/.")
+    
+    # Also write to root data directory if it exists
+    root_data_dir = DATA_DIR.parent.parent / "data"
+    if root_data_dir.exists():
+        drugs_df.to_csv(root_data_dir/"drugs.csv", index=False)
+        stores_df.to_csv(root_data_dir/"stores.csv", index=False)
+        context_df.to_csv(root_data_dir/"context.csv", index=False)
+        disp_df.to_csv(root_data_dir/"dispensing.csv", index=False)
+
+    print("Raw tables written and verified in both data/ directories.")
 
     # ---------- FEATURE ENGINEERING ----------
     print("PHASE 2: Feature Engineering...")
@@ -405,7 +528,9 @@ def run_pipeline():
     
     # Drop non-numeric / reference string columns before writing features
     sev_drop = [c for c in df.columns if c.startswith("sev_")]
-    text_drop = ["city","state","name","responds_to","monsoon_phase","region","category","date"]
+    text_drop = ["city","state","name","responds_to","monsoon_phase","region","category","date",
+                 "batch_number","expiry_date","patient_age_group","copay_type","prescriber_specialty",
+                 "dispense_status","unit_price_inr","total_amount_inr"]
     df = df.drop(columns=[c for c in sev_drop+text_drop if c in df.columns], errors="ignore")
     
     df = df.fillna(0)

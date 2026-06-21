@@ -4,6 +4,7 @@ import type {
   StockoutAlert,
   ShapExplanation,
   HealthResponse,
+  MLMetricsResponse,
 } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
@@ -58,13 +59,23 @@ export async function getForecast(files: File[]): Promise<ForecastPoint[]> {
   return result ?? [];
 }
 
-export async function getAlerts(files: File[]): Promise<StockoutAlert[]> {
+export async function getAlerts(
+  files: File[],
+  multiplier?: number,
+  buffer?: number
+): Promise<StockoutAlert[]> {
   const formData = new FormData();
   files.forEach((file) => {
     formData.append('file', file);
   });
 
-  const result = await request<StockoutAlert[]>('/alerts', {
+  const params = new URLSearchParams();
+  if (multiplier !== undefined) params.append('multiplier', multiplier.toString());
+  if (buffer !== undefined) params.append('buffer', buffer.toString());
+  const queryString = params.toString();
+  const endpoint = `/alerts${queryString ? `?${queryString}` : ''}`;
+
+  const result = await request<StockoutAlert[]>(endpoint, {
     method: 'POST',
     body: formData,
   });
@@ -88,4 +99,26 @@ export async function getExplanation(
       body: formData,
     }
   );
+}
+
+export async function getMetrics(
+  files: File[],
+  multiplier?: number,
+  buffer?: number
+): Promise<MLMetricsResponse | null> {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append('file', file);
+  });
+
+  const params = new URLSearchParams();
+  if (multiplier !== undefined) params.append('multiplier', multiplier.toString());
+  if (buffer !== undefined) params.append('buffer', buffer.toString());
+  const queryString = params.toString();
+  const endpoint = `/metrics${queryString ? `?${queryString}` : ''}`;
+
+  return request<MLMetricsResponse>(endpoint, {
+    method: 'POST',
+    body: formData,
+  });
 }

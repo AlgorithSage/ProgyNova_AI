@@ -73,9 +73,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 104px;
-  height: 30px;
-  padding: 0 var(--space-sm);
+  min-width: 26px;
+  height: 26px;
+  padding: 0 var(--space-xs);
   font-family: var(--font-number);
   font-size: var(--text-small);
   font-weight: 700;
@@ -100,11 +100,8 @@
 .alerts-table__pill {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 4px;
-  min-width: 104px;
-  height: 30px;
-  padding: 0 var(--space-sm);
+  padding: 4px 12px;
   font-size: var(--text-small);
   font-weight: 600;
   border-radius: var(--radius-full);

@@ -12,6 +12,9 @@ interface AppLayoutProps {
   criticalCount?: number;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  currentView?: string;
+  onViewChange?: (view: string) => void;
+  onNavClick?: (sectionId: string) => void;
 }
 
 export function AppLayout({
@@ -23,6 +26,9 @@ export function AppLayout({
   criticalCount = 0,
   searchQuery = '',
   onSearchChange,
+  currentView = 'dashboard',
+  onViewChange,
+  onNavClick,
 }: AppLayoutProps) {
   return (
     <div className="app-layout">
@@ -46,7 +52,15 @@ export function AppLayout({
           <span className="app-layout__menu-title">Menu</span>
           <ul className="app-layout__menu-list">
             <li>
-              <a href="#dashboard" className="app-layout__menu-link app-layout__menu-link--active">
+              <a 
+                href="#dashboard" 
+                className={`app-layout__menu-link ${currentView === 'dashboard' ? 'app-layout__menu-link--active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onViewChange?.('dashboard');
+                  onNavClick?.('dashboard');
+                }}
+              >
                 <span className="app-layout__menu-label">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="3" width="7" height="9" />
@@ -59,7 +73,15 @@ export function AppLayout({
               </a>
             </li>
             <li>
-              <a href="#alerts" className="app-layout__menu-link">
+              <a 
+                href="#alerts" 
+                className="app-layout__menu-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onViewChange?.('dashboard');
+                  onNavClick?.('alerts');
+                }}
+              >
                 <span className="app-layout__menu-label">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -76,7 +98,15 @@ export function AppLayout({
               </a>
             </li>
             <li>
-              <a href="#forecast" className="app-layout__menu-link">
+              <a 
+                href="#forecast" 
+                className="app-layout__menu-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onViewChange?.('dashboard');
+                  onNavClick?.('forecast');
+                }}
+              >
                 <span className="app-layout__menu-label">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M3 3v18h18" />
@@ -87,7 +117,15 @@ export function AppLayout({
               </a>
             </li>
             <li>
-              <a href="#explain" className="app-layout__menu-link">
+              <a 
+                href="#explain" 
+                className="app-layout__menu-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onViewChange?.('dashboard');
+                  onNavClick?.('explain');
+                }}
+              >
                 <span className="app-layout__menu-label">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="10" />
@@ -95,6 +133,25 @@ export function AppLayout({
                     <line x1="12" y1="8" x2="12.01" y2="8" />
                   </svg>
                   Drivers
+                </span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="#metrics" 
+                className={`app-layout__menu-link ${currentView === 'metrics' ? 'app-layout__menu-link--active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onViewChange?.('metrics');
+                }}
+              >
+                <span className="app-layout__menu-label">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                  </svg>
+                  ML Metrics
                 </span>
               </a>
             </li>

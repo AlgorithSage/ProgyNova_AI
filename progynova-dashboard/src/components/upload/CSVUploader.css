@@ -270,7 +270,7 @@
 
 .csv-uploader__columns {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 8px;
   width: 100%;
   margin-top: var(--space-xxs);
@@ -316,3 +316,93 @@
   border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
+
+.csv-uploader__divider {
+  display: flex;
+  align-items: center;
+  width: 80%;
+  color: var(--card-text-tertiary);
+  font-family: var(--font-accent);
+  font-size: var(--text-small);
+  margin: var(--space-xs) 0;
+}
+
+.csv-uploader__divider::before,
+.csv-uploader__divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.csv-uploader__divider span {
+  padding: 0 var(--space-xs);
+  text-transform: uppercase;
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.btn-preloaded {
+  background: var(--card-surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--primary);
+  font-family: var(--font-accent);
+  font-size: var(--text-small);
+  font-weight: 600;
+  padding: 6px var(--space-md);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  z-index: 5;
+}
+
+.btn-preloaded:hover {
+  background: var(--primary);
+  color: var(--card-bg);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+/* See More / Show Less Button Styling */
+.csv-uploader__see-more {
+  align-self: center;
+  background: var(--card-surface);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--primary);
+  font-family: var(--font-accent);
+  font-size: var(--text-small);
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 5;
+}
+
+.csv-uploader__see-more:hover {
+  background: var(--primary);
+  color: var(--card-bg);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+.csv-uploader__see-more svg {
+  transition: transform var(--transition-fast);
+}
+
+.csv-uploader__see-more:hover svg {
+  transform: scale(1.1);
+}
+
+[data-theme="dark"] .csv-uploader__see-more {
+  border-color: var(--border);
+}
+

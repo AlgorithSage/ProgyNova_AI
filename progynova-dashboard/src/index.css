@@ -219,3 +219,13 @@ button:focus-visible {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* Global Recharts default tooltip overrides - Auto Adjustable Layout */
+.recharts-default-tooltip {
+  width: auto !important;
+  height: auto !important;
+  min-width: max-content !important;
+  max-width: 90vw !important;
+  white-space: nowrap;
+}
+

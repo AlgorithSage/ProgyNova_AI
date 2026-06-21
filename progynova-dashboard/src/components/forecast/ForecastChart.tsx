@@ -19,6 +19,32 @@ interface ForecastChartProps {
   isLoading?: boolean;
 }
 
+function CustomTooltip({ active, payload, label }: any) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="forecast-chart__tooltip">
+        <p className="forecast-chart__tooltip-label">Week {label}</p>
+        <div className="forecast-chart__tooltip-items">
+          {payload.map((item: any, idx: number) => {
+            const val = typeof item.value === 'number' ? item.value.toFixed(1) : item.value;
+            return (
+              <div key={idx} className="forecast-chart__tooltip-item">
+                <span 
+                  className="item-color-indicator" 
+                  style={{ backgroundColor: item.color || item.stroke }} 
+                />
+                <span className="item-name">{item.name}:</span>
+                <span className="item-value">{val}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
 export function ForecastChart({ data, onSelectItem, isLoading }: ForecastChartProps) {
   const [selectedEntity, setSelectedEntity] = useState<string>('all');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
@@ -157,18 +183,7 @@ export function ForecastChart({ data, onSelectItem, isLoading }: ForecastChartPr
               axisLine={{ stroke: 'var(--border)' }}
               tickLine={{ stroke: 'var(--border)' }}
             />
-            <Tooltip
-              contentStyle={{
-                background: '#FFFFFF',
-                border: '1px solid #E2E8F0',
-                borderRadius: '8px',
-                fontSize: '13px',
-                color: '#0B0F19',
-                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.12)',
-              }}
-              labelStyle={{ color: '#0B0F19', fontWeight: 600 }}
-              itemStyle={{ color: '#0B0F19' }}
-            />
+            <Tooltip content={<CustomTooltip />} />
 
             <Area
               type="monotone"

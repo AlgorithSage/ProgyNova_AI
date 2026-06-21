@@ -45,3 +45,51 @@ export interface HealthResponse {
 }
 
 export type Theme = 'light' | 'dark';
+
+export interface RegressionMetrics {
+  mae: number;
+  rmse: number;
+  mape: number;
+  stabilized_mape: number;
+}
+
+export interface ClassificationMetrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1_score: number;
+  roc_auc: number;
+}
+
+export interface ConfusionMatrix {
+  tp: number;
+  fp: number;
+  fn: number;
+  tn: number;
+}
+
+export interface ErrorBin {
+  bin: string;
+  count: number;
+}
+
+export interface ScatterPoint {
+  index: number;
+  actual: number;
+  predicted: number;
+}
+
+export interface MetricsSummary {
+  total_samples: number;
+  actual_stockouts: number;
+  predicted_alerts: number;
+}
+
+export interface MLMetricsResponse {
+  summary: MetricsSummary;
+  regression: RegressionMetrics;
+  classification: ClassificationMetrics;
+  confusion_matrix: ConfusionMatrix;
+  error_distribution: ErrorBin[];
+  actual_vs_predicted: ScatterPoint[];
+}

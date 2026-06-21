@@ -173,6 +173,8 @@ export function ShapExplainer({ explanation, selectedEntity, isLoading, isOpen, 
                       color: 'var(--text-primary)',
                       boxShadow: 'var(--shadow-xl)',
                       backdropFilter: 'blur(8px)',
+                      width: 'auto',
+                      minWidth: 'max-content',
                     }}
                     formatter={(value) => [Number(value).toFixed(4), 'Impact on Forecast']}
                     cursor={{ fill: 'var(--primary-light)', opacity: 0.3 }}
