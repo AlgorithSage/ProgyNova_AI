@@ -607,9 +607,11 @@ export function AlertsTable({
                   }
                 }}
               >
-                <td className="mono alerts-table__sku-cell">
-                  <span className={`alerts-table__severity-dot alerts-table__severity-dot--${alert.severity.toLowerCase()}`} />
-                  {alert.entity_id}
+                <td className="mono">
+                  <div className="alerts-table__sku-content">
+                    <span className={`alerts-table__severity-dot alerts-table__severity-dot--${alert.severity.toLowerCase()}`} />
+                    {alert.entity_id}
+                  </div>
                 </td>
                 <td className="mono">{alert.location_id}</td>
                 <td className="alerts-table__num">{alert.stock_on_hand.toFixed(0)}</td>

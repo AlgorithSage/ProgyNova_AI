@@ -208,7 +208,7 @@
 
 /* ── SKU cell with severity dot ───────────── */
 
-.alerts-table__sku-cell {
+.alerts-table__sku-content {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
