@@ -118,11 +118,31 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
   <meta charset="UTF-8">
   <title>Stockout Alerts - Full View | ProgyNovaAI</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap');
+    @font-face {
+      font-family: 'Vollkorn';
+      src: url('/fonts/VollkornSemibold-3zRaM.otf') format('opentype');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Zodiak';
+      src: url('/fonts/Zodiak-Bold.otf') format('opentype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Roundo';
+      src: url('/fonts/Roundo-SemiBold.otf') format('opentype');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
 
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-family: 'Vollkorn', Georgia, 'Times New Roman', serif;
       background: ${bg};
       color: ${textPrimary};
       padding: 40px;
@@ -226,10 +246,10 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
     }
     td {
       padding: 12px 20px; border-bottom: 1px solid ${border};
-      font-family: 'Google Sans', 'Product Sans', system-ui, sans-serif; font-size: 13px;
+      font-family: 'Zodiak', Georgia, serif; font-size: 13px;
     }
     .num {
-      font-family: 'Inter', system-ui, sans-serif !important;
+      font-family: 'Roundo', system-ui, sans-serif !important;
     }
     tr:hover { background: rgba(79, 70, 229, 0.02); }
     tr:last-child td { border-bottom: none; }
@@ -526,12 +546,12 @@ export function AlertsTable({
           <div className="alerts-table__summary-pills">
             {criticalCount > 0 && (
               <span className="alerts-table__pill alerts-table__pill--critical">
-                {criticalCount} Critical
+                <strong className="alerts-table__pill-count">{criticalCount}</strong> Critical
               </span>
             )}
             {highCount > 0 && (
               <span className="alerts-table__pill alerts-table__pill--high">
-                {highCount} High
+                <strong className="alerts-table__pill-count">{highCount}</strong> High
               </span>
             )}
           </div>
@@ -547,7 +567,7 @@ export function AlertsTable({
             </button>
           )}
           <button className="alerts-table__toolbar-btn" onClick={handleExport} title="Export to Excel (.csv)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -555,7 +575,7 @@ export function AlertsTable({
             Export
           </button>
           <button className="alerts-table__toolbar-btn alerts-table__toolbar-btn--accent" onClick={handleOpenFullView} title="Open all alerts in a new window">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
               <polyline points="15 3 21 3 21 9" />
               <line x1="10" y1="14" x2="21" y2="3" />
@@ -689,17 +709,22 @@ export function AlertsTable({
               <span className="alerts-table__tooltip-label">Forecasted</span>
               <span className="alerts-table__tooltip-value">{hoveredAlert.forecast.toFixed(1)}</span>
             </div>
-            <div className="alerts-table__tooltip-stat">
+            <div className="alerts-table__tooltip-stat alerts-table__tooltip-stat--danger">
               <span className="alerts-table__tooltip-label">Deficit</span>
               <span className="alerts-table__tooltip-value alerts-table__tooltip-value--danger">{hoveredAlert.deficit.toFixed(1)}</span>
             </div>
-            <div className="alerts-table__tooltip-stat">
+            <div className="alerts-table__tooltip-stat alerts-table__tooltip-stat--accent">
               <span className="alerts-table__tooltip-label">Reorder</span>
               <span className="alerts-table__tooltip-value alerts-table__tooltip-value--accent">{hoveredAlert.recommended_reorder.toFixed(0)}</span>
             </div>
           </div>
           <div className="alerts-table__tooltip-cta">
-            Click "Analyze" to see what's causing this
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 9V4.5a2.5 2.5 0 0 1 5 0v9" />
+              <path d="M14 13.5V8a2 2 0 1 1 4 0v6" />
+              <path d="M18 12a2 2 0 1 1 4 0v3a6 6 0 0 1-6 6h-2.5a5.5 5.5 0 0 1-4.5-2.5L5 12.5A1.8 1.8 0 0 1 7.8 10L9 11.5" />
+            </svg>
+            Click <strong>Analyze</strong> to see what&apos;s causing this
           </div>
         </div>
       )}

@@ -36,3 +36,7 @@ desktop.ini
 # Agent Workspace & Coworker Memories
 AI_COWORKER/
 shared_memory/
+node_modules/
+dist/
+build/
+.env

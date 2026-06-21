@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { AppLayout } from './components/layout/AppLayout';
 import { CSVUploader } from './components/upload/CSVUploader';
 import { ForecastChart } from './components/forecast/ForecastChart';
@@ -32,6 +32,7 @@ function App() {
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [isExplanationLoading, setIsExplanationLoading] = useState(false);
   const [isExplainerOpen, setIsExplainerOpen] = useState(false);
+  const alertsRowRef = useRef<HTMLDivElement>(null);
 
   // Apply theme dynamically using the theme manager
   useEffect(() => {
@@ -80,6 +81,10 @@ function App() {
   const handleSelectAlert = useCallback(async (originalIndex: number) => {
     setSelectedOriginalIndex(originalIndex);
     setIsExplainerOpen(true);
+
+    requestAnimationFrame(() => {
+      alertsRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     if (currentFiles.length > 0) {
       setIsExplanationLoading(true);
@@ -285,7 +290,10 @@ function App() {
         </section>
 
         {/* Stockout Alerts — Full dedicated section */}
-        <section className={`dashboard__row dashboard__row--alerts ${isExplainerOpen ? 'dashboard__row--alerts-split' : ''}`}>
+        <section
+          ref={alertsRowRef}
+          className={`dashboard__row dashboard__row--alerts ${isExplainerOpen ? 'dashboard__row--alerts-split' : ''}`}
+        >
           <div className={`dashboard__alerts-col ${isExplainerOpen ? 'dashboard__alerts-col--retracted' : ''}`}>
             <AlertsTable
               alerts={filteredAlerts}

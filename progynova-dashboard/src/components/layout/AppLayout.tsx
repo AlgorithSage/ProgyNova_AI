@@ -142,7 +142,7 @@ export function AppLayout({
         {/* Topbar Header */}
         <header className="app-layout__topbar" role="banner">
           <div className="app-layout__search-wrapper">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="2.5" style={{ position: 'absolute', left: '16px' }}>
+            <svg className="app-layout__search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
@@ -154,7 +154,7 @@ export function AppLayout({
               onChange={(e) => onSearchChange?.(e.target.value)}
               aria-label="Search items"
             />
-            <span className="app-layout__search-shortcut">⌘ F</span>
+            <span className="app-layout__search-shortcut">⌘F</span>
           </div>
 
           <div className="app-layout__actions">

@@ -1,5 +1,5 @@
 .csv-uploader {
-  background: var(--card-bg);
+  background: var(--card-elevated);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
@@ -190,7 +190,7 @@
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-md);
-  background: var(--card-elevated);
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
   width: 100%;
