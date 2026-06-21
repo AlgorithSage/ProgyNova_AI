@@ -3,10 +3,8 @@
    ============================================ */
 
 .alerts-table {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   box-shadow: var(--shadow-md);
@@ -16,7 +14,7 @@
 }
 
 .alerts-table:hover {
-  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Full-width dedicated space */
@@ -567,7 +565,7 @@
 .alerts-table__toolbar-btn--accent:hover {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+  box-shadow: var(--shadow-glow);
 }
 
 /* ── Pagination info ─────────────────────────── */

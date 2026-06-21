@@ -1,18 +1,18 @@
 /* ============================================
-   DASHBOARD LAYOUT — Animated split system
+   DONEZO DASHBOARD PAGE STYLES
    ============================================ */
 
 .dashboard {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  animation: dashboard-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: dashboard-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes dashboard-fade-in {
   from {
     opacity: 0;
-    transform: translateY(15px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -20,14 +20,240 @@
   }
 }
 
+/* ── Dashboard Header ───────────────────────── */
+
+.dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xs);
+}
+
+.dashboard__title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dashboard__title {
+  font-size: 1.625rem;
+  font-weight: 750;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.dashboard__subtitle {
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+}
+
+.dashboard__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* ── Pill Buttons ───────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: 10px 22px;
+  font-size: var(--text-body);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: #0B0F19;
+  border: 1.5px solid var(--primary);
+  box-shadow: var(--shadow-sm);
+  font-weight: 700;
+}
+
+.btn--primary:hover {
+  background: #0B0F19;
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .btn--primary:hover {
+  background: #131A26;
+}
+
+.btn--primary:active {
+  transform: translateY(0);
+}
+
+.btn--outline {
+  background: #0B0F19;
+  color: #F5F7FA;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .btn--outline {
+  background: #131A26;
+  color: var(--text-primary);
+  border: 1.5px solid var(--border);
+}
+
+.btn--outline:hover {
+  background: #FFFFFF;
+  color: #0B0F19;
+  border-color: #0B0F19;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .btn--outline:hover {
+  background: var(--text-primary);
+  color: #0B0F19;
+  border-color: var(--text-primary);
+}
+
+.btn--outline:active {
+  transform: translateY(0);
+}
+
+/* Disabled buttons */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Metrics Grid ───────────────────────────── */
+
+.dashboard__metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+.dashboard__metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.dashboard__metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-hover);
+}
+
+.dashboard__metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.dashboard__metric-label {
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dashboard__metric-icon-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: var(--text-small);
+}
+
+.dashboard__metric-value {
+  font-size: 2.25rem;
+  font-weight: 750;
+  color: var(--text-primary);
+  font-family: var(--font-number);
+  line-height: 1.1;
+  margin-top: var(--space-xs);
+}
+
+.dashboard__metric-footer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.dashboard__metric-trend--up {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.dashboard__metric-trend--down {
+  color: var(--error);
+  font-weight: 700;
+}
+
+/* Donezo primary-colored card style */
+.dashboard__metric-card--primary {
+  background: #0B0F19;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #F5F7FA;
+}
+
+[data-theme="dark"] .dashboard__metric-card--primary {
+  background: #131A26;
+  border: 1px solid var(--border);
+}
+
+.dashboard__metric-card--primary .dashboard__metric-label {
+  color: #B0BEC5;
+}
+
+.dashboard__metric-card--primary .dashboard__metric-value {
+  color: var(--primary);
+}
+
+.dashboard__metric-card--primary .dashboard__metric-icon-circle {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--primary);
+}
+
+.dashboard__metric-card--primary .dashboard__metric-footer {
+  color: #B0BEC5;
+}
+
+.dashboard__metric-card--primary .dashboard__metric-trend--up {
+  color: var(--primary);
+}
+
+/* ── Content Grid Rows ──────────────────────── */
+
 .dashboard__row {
   display: flex;
   gap: var(--space-lg);
   align-items: stretch;
-}
-
-.dashboard__row--upload {
-  display: block;
 }
 
 .dashboard__col--wide {
@@ -40,8 +266,7 @@
   min-width: 0;
 }
 
-/* ── Alerts section — Full dedicated width ──── */
-
+/* Split mode for Alerts + Explainer */
 .dashboard__row--alerts {
   display: flex;
   flex-direction: column;
@@ -49,18 +274,11 @@
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Alerts column — full width by default */
 .dashboard__alerts-col {
   width: 100%;
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Retracted state: no change to width, handled by alerts-table max-height */
-.dashboard__alerts-col--retracted {
-  width: 100%;
-}
-
-/* Explainer column — hidden by default */
 .dashboard__explainer-col {
   width: 100%;
   max-height: 0;
@@ -69,22 +287,19 @@
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Open state: expand explainer */
 .dashboard__explainer-col--open {
   max-height: 2500px;
   opacity: 1;
   overflow: visible;
 }
 
-/* ── Split mode active ───────────────────────── */
-
-.dashboard__row--alerts-split {
-  gap: var(--space-lg);
-}
-
 /* ── Responsive ──────────────────────────────── */
 
 @media (max-width: 1024px) {
+  .dashboard__metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .dashboard__row {
     flex-direction: column;
   }
@@ -93,16 +308,10 @@
   .dashboard__col--narrow {
     flex: 1;
   }
+}
 
-  .dashboard__row--alerts {
-    flex-direction: column;
-  }
-
-  .dashboard__alerts-col--retracted {
-    flex: 1;
-  }
-
-  .dashboard__explainer-col--open {
-    flex: 1;
+@media (max-width: 580px) {
+  .dashboard__metrics-grid {
+    grid-template-columns: 1fr;
   }
 }
