@@ -84,27 +84,56 @@ export function ShapExplainer({ explanation, selectedEntity, isLoading, isOpen, 
       )}
 
       {/* Content */}
-      {!isLoading && explanation && (
+      {!isLoading && explanation && (() => {
+        const diff = explanation.prediction - explanation.base_value;
+        const diffDirection = diff >= 0 ? 'positive' : 'negative';
+        return (
         <div className="shap-explainer__content">
           {/* Meta stats row */}
           <div className="shap-explainer__meta">
             <div className="shap-explainer__meta-card">
-              <span className="shap-explainer__meta-label">Typical Sales</span>
+              <div className="shap-explainer__meta-card-header">
+                <span className="shap-explainer__meta-label">Typical Sales</span>
+                <div className="shap-explainer__meta-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="9" />
+                    <polyline points="12 7 12 12 15.5 14" />
+                  </svg>
+                </div>
+              </div>
               <span className="shap-explainer__meta-value">{explanation.base_value.toFixed(2)}</span>
             </div>
             <div className="shap-explainer__meta-card shap-explainer__meta-card--primary">
-              <span className="shap-explainer__meta-label">Forecasted Need</span>
+              <div className="shap-explainer__meta-card-header">
+                <span className="shap-explainer__meta-label">Forecasted Need</span>
+                <div className="shap-explainer__meta-icon shap-explainer__meta-icon--primary">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="9" />
+                    <circle cx="12" cy="12" r="4.5" />
+                    <circle cx="12" cy="12" r="1" fill="currentColor" />
+                  </svg>
+                </div>
+              </div>
               <span className="shap-explainer__meta-value shap-explainer__meta-value--primary">
                 {explanation.prediction.toFixed(2)}
               </span>
             </div>
-            <div className="shap-explainer__meta-card">
-              <span className="shap-explainer__meta-label">Difference</span>
-              <span className={`shap-explainer__meta-value ${
-                explanation.prediction - explanation.base_value >= 0 ? 'shap-explainer__meta-value--positive' : 'shap-explainer__meta-value--negative'
-              }`}>
-                {explanation.prediction - explanation.base_value >= 0 ? '+' : ''}
-                {(explanation.prediction - explanation.base_value).toFixed(2)}
+            <div className={`shap-explainer__meta-card shap-explainer__meta-card--${diffDirection}`}>
+              <div className="shap-explainer__meta-card-header">
+                <span className="shap-explainer__meta-label">Difference</span>
+                <div className={`shap-explainer__meta-icon shap-explainer__meta-icon--${diffDirection}`}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    {diff >= 0 ? (
+                      <><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" /></>
+                    ) : (
+                      <><line x1="12" y1="5" x2="12" y2="19" /><polyline points="5 12 12 19 19 12" /></>
+                    )}
+                  </svg>
+                </div>
+              </div>
+              <span className={`shap-explainer__meta-value shap-explainer__meta-value--${diffDirection}`}>
+                {diff >= 0 ? '+' : ''}
+                {diff.toFixed(2)}
               </span>
             </div>
           </div>
@@ -231,7 +260,8 @@ export function ShapExplainer({ explanation, selectedEntity, isLoading, isOpen, 
             )}
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* No explanation selected yet */}
       {!isLoading && !explanation && (

@@ -80,14 +80,10 @@
 }
 
 .btn--primary:hover {
-  background: #0B0F19;
+  background: var(--card-surface);
   color: var(--primary);
   border-color: var(--primary);
   transform: translateY(-1px);
-}
-
-[data-theme="dark"] .btn--primary:hover {
-  background: #131A26;
 }
 
 .btn--primary:active {
@@ -95,14 +91,13 @@
 }
 
 .btn--outline {
-  background: #0B0F19;
+  background: var(--card-surface);
   color: #F5F7FA;
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   box-shadow: var(--shadow-sm);
 }
 
 [data-theme="dark"] .btn--outline {
-  background: #131A26;
   color: var(--text-primary);
   border: 1.5px solid var(--border);
 }
@@ -110,7 +105,7 @@
 .btn--outline:hover {
   background: #FFFFFF;
   color: #0B0F19;
-  border-color: #0B0F19;
+  border-color: var(--card-surface);
   transform: translateY(-1px);
 }
 
@@ -217,13 +212,12 @@
 
 /* Donezo primary-colored card style */
 .dashboard__metric-card--primary {
-  background: #0B0F19;
+  background: var(--card-bg);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #F5F7FA;
 }
 
 [data-theme="dark"] .dashboard__metric-card--primary {
-  background: #131A26;
   border: 1px solid var(--border);
 }
 

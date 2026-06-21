@@ -1,9 +1,18 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import type { UploadResponse } from '../../types';
 import { uploadCSV } from '../../services/api';
 import './CSVUploader.css';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+const ROLE_LABELS: Record<string, string> = {
+  entity_id: 'SKU',
+  location_id: 'LOCATION',
+  time_index: 'TIME',
+  target: 'TARGET',
+  stock_on_hand: 'STOCK',
+  lead_time: 'LEAD',
+};
 
 interface CSVUploaderProps {
   onUploadSuccess: (response: UploadResponse, files: File[]) => void;
@@ -88,10 +97,35 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
     if (fileInputRef.current) fileInputRef.current.value = '';
   }, []);
 
+  // Map column name -> short role label (e.g. "drug_id" -> "SKU"), using the
+  // schema roles the backend already auto-detected, so the uploader surfaces
+  // *why* a column matters instead of just listing names.
+  const roleByColumn = useMemo(() => {
+    const map: Record<string, string> = {};
+    const roles = uploadResult?.detected_schema?.detected_roles;
+    if (!roles) return map;
+    for (const [role, column] of Object.entries(roles)) {
+      const label = ROLE_LABELS[role];
+      if (label && uploadResult?.columns.includes(column)) {
+        map[column] = label;
+      }
+    }
+    return map;
+  }, [uploadResult]);
+
   return (
     <div className="csv-uploader">
       <div className="csv-uploader__header">
-        <h2 className="csv-uploader__title">Upload Dataset</h2>
+        <div className="csv-uploader__header-left">
+          <div className="csv-uploader__header-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+          </div>
+          <h2 className="csv-uploader__title">Upload Dataset</h2>
+        </div>
         {state === 'completed' && (
           <button className="csv-uploader__reset" onClick={handleReset}>
             Upload New
@@ -103,7 +137,7 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
         <div className="csv-uploader__result">
           <div className="csv-uploader__result-header">
             <div className="csv-uploader__result-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2.5">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
@@ -121,10 +155,29 @@ export function CSVUploader({ onUploadSuccess, onUploadError }: CSVUploaderProps
               </div>
             </div>
           </div>
+
+          <div className="csv-uploader__columns-eyebrow">
+            <span>Detected Fields</span>
+            {Object.keys(roleByColumn).length > 0 && (
+              <span className="csv-uploader__columns-eyebrow-hint">
+                {Object.keys(roleByColumn).length} auto-mapped
+              </span>
+            )}
+          </div>
           <div className="csv-uploader__columns">
-            {uploadResult.columns.map((col) => (
-              <span key={col} className="csv-uploader__column-tag mono">{col}</span>
-            ))}
+            {uploadResult.columns.map((col, i) => {
+              const role = roleByColumn[col];
+              return (
+                <span
+                  key={col}
+                  className="csv-uploader__column-tag mono"
+                  style={{ animationDelay: `${i * 25}ms` }}
+                >
+                  {col}
+                  {role && <span className="csv-uploader__column-role-badge">{role}</span>}
+                </span>
+              );
+            })}
           </div>
         </div>
       ) : (

@@ -88,16 +88,12 @@
   font-size: var(--text-body);
   font-weight: 600;
   color: var(--primary);
-  background: #0B0F19;
+  background: var(--card-surface);
   border: 1.5px solid transparent;
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
   cursor: pointer;
-}
-
-[data-theme="dark"] .reorder-card__button {
-  background: #131A26;
 }
 
 .reorder-card__button:hover {
@@ -216,15 +212,11 @@
   font-size: var(--text-body);
   font-weight: 600;
   color: var(--primary);
-  background: #0B0F19;
+  background: var(--card-surface);
   border: 1.5px solid transparent;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
   cursor: pointer;
-}
-
-[data-theme="dark"] .reorder-card__modal-confirm {
-  background: #131A26;
 }
 
 .reorder-card__modal-confirm:hover {

@@ -38,6 +38,13 @@ export interface ThemeVariables {
   fontSans: string;
   fontNumber: string;
   fontMono: string;
+  cardBg: string;
+  cardSurface: string;
+  cardElevated: string;
+  cardBorder: string;
+  cardText: string;
+  cardTextSecondary: string;
+  cardTextTertiary: string;
 }
 
 export const lightTheme: ThemeVariables = {
@@ -80,12 +87,23 @@ export const lightTheme: ThemeVariables = {
   fontSans: "'Space Grotesk', system-ui, -apple-system, sans-serif",
   fontNumber: "'Inter', system-ui, -apple-system, sans-serif",
   fontMono: "'Google Sans', 'Product Sans', system-ui, -apple-system, sans-serif",
+  // Premium black-and-yellow surface — used by spotlight cards (uploader, SHAP panel)
+  // that intentionally stay dark regardless of light/dark mode. Fixed hierarchy,
+  // not theme-dependent: cardBg = prominent cards, cardSurface = buttons/secondary
+  // widgets, cardElevated = content nested inside a card.
+  cardBg: '#181818',
+  cardSurface: '#303030',
+  cardElevated: '#494949',
+  cardBorder: 'rgba(255, 255, 255, 0.08)',
+  cardText: '#F5F7FA',
+  cardTextSecondary: '#B0BEC5',
+  cardTextTertiary: '#78909C',
 };
 
 export const darkTheme: ThemeVariables = {
-  bg: '#0B0F19', // Obsidian Black
-  surface: '#131A26', // Dark Slate
-  surfaceElevated: '#1B2433', // Carbon Grey
+  bg: '#181818', // Obsidian Black
+  surface: '#303030', // Dark Slate
+  surfaceElevated: '#494949', // Carbon Grey
   border: '#263238', // Slate Blue Grey
   borderHover: '#37474F',
   textPrimary: '#F5F7FA', // Soft White
@@ -122,6 +140,13 @@ export const darkTheme: ThemeVariables = {
   fontSans: "'Space Grotesk', system-ui, -apple-system, sans-serif",
   fontNumber: "'Inter', system-ui, -apple-system, sans-serif",
   fontMono: "'Google Sans', 'Product Sans', system-ui, -apple-system, sans-serif",
+  cardBg: '#181818',
+  cardSurface: '#303030',
+  cardElevated: '#494949',
+  cardBorder: 'rgba(255, 255, 255, 0.08)',
+  cardText: '#F5F7FA',
+  cardTextSecondary: '#B0BEC5',
+  cardTextTertiary: '#78909C',
 };
 
 export const themes = {
@@ -172,4 +197,11 @@ export function applyTheme(themeName: 'light' | 'dark') {
   root.style.setProperty('--font-sans', t.fontSans);
   root.style.setProperty('--font-number', t.fontNumber);
   root.style.setProperty('--font-mono', t.fontMono);
+  root.style.setProperty('--card-bg', t.cardBg);
+  root.style.setProperty('--card-surface', t.cardSurface);
+  root.style.setProperty('--card-elevated', t.cardElevated);
+  root.style.setProperty('--card-border', t.cardBorder);
+  root.style.setProperty('--card-text', t.cardText);
+  root.style.setProperty('--card-text-secondary', t.cardTextSecondary);
+  root.style.setProperty('--card-text-tertiary', t.cardTextTertiary);
 }

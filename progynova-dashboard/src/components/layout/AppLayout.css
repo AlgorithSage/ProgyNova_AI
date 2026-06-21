@@ -41,12 +41,8 @@
 }
 
 .app-layout__logo-rect {
-  fill: #0B0F19;
+  fill: var(--card-bg);
   transition: fill var(--transition-normal);
-}
-
-[data-theme="dark"] .app-layout__logo-rect {
-  fill: #131A26;
 }
 
 .app-layout__logo-path {
@@ -105,13 +101,15 @@
 
 /* Active sidebar item indicator — Donezo style vertical amber bar */
 .app-layout__menu-link--active {
-  background: #0B0F19;
+  background: var(--card-surface);
   color: var(--primary) !important;
   font-weight: 600;
 }
 
-[data-theme="dark"] .app-layout__menu-link--active {
-  background: #131A26;
+.app-layout__menu-link--active:hover {
+  background: var(--card-elevated);
+  color: var(--primary) !important;
+  box-shadow: var(--shadow-sm);
 }
 
 
@@ -137,7 +135,7 @@
 /* Bottom banner card — Donezo promo block */
 .app-layout__promo-card {
   margin-top: auto;
-  background: #0B0F19;
+  background: var(--card-surface);
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: var(--space-md);
   border-radius: var(--radius-md);
@@ -148,7 +146,6 @@
 }
 
 [data-theme="dark"] .app-layout__promo-card {
-  background: #131A26;
   border: 1px solid var(--border);
 }
 

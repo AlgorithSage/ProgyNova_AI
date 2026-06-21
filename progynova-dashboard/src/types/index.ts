@@ -1,8 +1,14 @@
+export interface DetectedSchema {
+  is_wide: boolean;
+  detected_roles: Record<string, string>;
+  column_types: Record<string, string>;
+}
+
 export interface UploadResponse {
   status: string;
   rows: number;
   columns: string[];
-  detected_schema: Record<string, string>;
+  detected_schema: DetectedSchema;
 }
 
 export interface ForecastPoint {
