@@ -7,11 +7,11 @@ $ErrorActionPreference = "Stop"
 $ROOT = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 # -- Paths ----------------------------------------------------
-$API_DIR   = Join-Path $ROOT "progynova-api"
-$DASH_DIR  = Join-Path $ROOT "progynova-dashboard"
-$VENV_DIR  = Join-Path $API_DIR ".venv"
-$VENV_PY   = Join-Path $VENV_DIR "Scripts\python.exe"
-$REQ_FILE  = Join-Path $API_DIR "requirements.txt"
+$API_DIR = Join-Path $ROOT "progynova-api"
+$DASH_DIR = Join-Path $ROOT "progynova-dashboard"
+$VENV_DIR = Join-Path $API_DIR ".venv"
+$VENV_PY = Join-Path $VENV_DIR "Scripts\python.exe"
+$REQ_FILE = Join-Path $API_DIR "requirements.txt"
 
 # -- Helpers --------------------------------------------------
 function Write-Banner($msg) {
@@ -34,7 +34,8 @@ if (-not (Test-Path $VENV_PY)) {
     Write-Step "VENV" "Creating Python virtual environment..."
     if (Get-Command uv -ErrorAction SilentlyContinue) {
         uv venv $VENV_DIR
-    } else {
+    }
+    else {
         python -m venv $VENV_DIR
     }
 }
@@ -47,10 +48,12 @@ if ($depsOkStr -ne "ok") {
     Write-Step "PIP" "Installing Python dependencies..."
     if (Get-Command uv -ErrorAction SilentlyContinue) {
         uv pip install -r $REQ_FILE --python $VENV_PY
-    } else {
+    }
+    else {
         & $VENV_PY -m pip install -q -r $REQ_FILE
     }
-} else {
+}
+else {
     Write-Step "PIP" "All Python dependencies already installed."
 }
 
