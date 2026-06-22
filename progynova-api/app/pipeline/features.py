@@ -73,6 +73,13 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     
     # 6. Infinite and NaN backstop cleaning
     df = df.replace([np.inf, -np.inf], np.nan)
+    
+    # Drop first year with incomplete lag references to avoid NaN model error if we have enough data
+    # (Do this before filling NaNs so dropna actually works!)
+    unique_weeks = df["time_index"].nunique()
+    if unique_weeks >= 53:
+        df = df.dropna(subset=["target_lag_52"]).copy()
+        
     base_numeric_features = [c for c in df.select_dtypes(include=[np.number]).columns if c not in ["stockout"]]
     for col in base_numeric_features:
         if "momentum" in col:
@@ -82,29 +89,91 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df[base_numeric_features] = np.clip(df[base_numeric_features], -1e6, 1e6)
     
     df_clean = df.fillna(0.0).copy()
-    
-    # Drop first year with incomplete lag references to avoid NaN model error if we have enough data
-    unique_weeks = df_clean["time_index"].nunique()
-    if unique_weeks >= 53:
-        df_clean = df_clean.dropna(subset=["target_lag_52"]).copy()
         
     unique_drugs = df_clean['entity_id'].unique()
     drug_mapping = {d: extract_digit_or_hash(d) for d in unique_drugs}
     
     unique_stores = df_clean['location_id'].unique()
     store_mapping = {s: extract_digit_or_hash(s) for s in unique_stores}
+
+    # Dynamically compute outbreak lags if sev_ columns exist in df_clean
+    diseases = ["chikungunya", "dengue", "diarrhoeal", "flu", "leptospirosis", "malaria", "respiratory", "typhoid"]
+    sev_cols = [c for c in df_clean.columns if c.startswith("sev_")]
+    has_outbreak_cols = any(f"outbreak_{diseases[0]}_lag" in c for c in df_clean.columns)
+    
+    if not has_outbreak_cols:
+        if sev_cols:
+            for disease in diseases:
+                sev_col = f"sev_{disease}"
+                if sev_col in df_clean.columns:
+                    for lag in [0, 1, 2]:
+                        df_clean[f"outbreak_{disease}_lag{lag}"] = df_clean.groupby(group_keys)[sev_col].shift(lag).fillna(0.0)
+                else:
+                    for lag in [0, 1, 2]:
+                        df_clean[f"outbreak_{disease}_lag{lag}"] = 0.0
+            df_clean["outbreak_any_active"] = (df_clean[sev_cols].max(axis=1) > 0.3).astype(float)
+            df_clean["outbreak_count"] = (df_clean[sev_cols] > 0.3).sum(axis=1).astype(float)
+        else:
+            for disease in diseases:
+                for lag in [0, 1, 2]:
+                    df_clean[f"outbreak_{disease}_lag{lag}"] = 0.0
+            df_clean["outbreak_any_active"] = 0.0
+            df_clean["outbreak_count"] = 0.0
+
+    if "monsoon_phase_enc" not in df_clean.columns:
+        if "monsoon_phase" in df_clean.columns:
+            phase_map = {"winter":0,"pre-monsoon":1,"summer":2,"monsoon":3,
+                         "post-monsoon":4,"NE-monsoon":5,"SW-brief":6,"dry":7}
+            unique_phases = sorted(df_clean['monsoon_phase'].unique())
+            for idx, p in enumerate(unique_phases):
+                if p not in phase_map:
+                    phase_map[p] = len(phase_map)
+            df_clean["monsoon_phase_enc"] = df_clean["monsoon_phase"].map(phase_map).fillna(0.0).astype(float)
+        else:
+            df_clean["monsoon_phase_enc"] = 0.0
+
+    if "region_enc" not in df_clean.columns:
+        if "region" in df_clean.columns:
+            region_map = {
+                'East': 0, 'East-Central': 1, 'North': 2, 'North-West': 3,
+                'South': 4, 'South-East': 5, 'South-West': 6, 'West': 7
+            }
+            unique_regions = sorted(df_clean['region'].unique())
+            for idx, r in enumerate(unique_regions):
+                if r not in region_map:
+                    region_map[r] = len(region_map)
+            df_clean["region_enc"] = df_clean["region"].map(region_map).fillna(0.0).astype(float)
+        else:
+            df_clean["region_enc"] = 0.0
+
+    if "category_enc" not in df_clean.columns:
+        if "category" in df_clean.columns:
+            category_map = {
+                'Analgesic/Antipyretic': 0, 'Antibiotic': 1, 'Antidiabetic': 2,
+                'Antiepileptic': 3, 'Antihistamine': 4, 'Antihypertensive': 5,
+                'Antimalarial': 6, 'Antiviral': 7, 'Bronchodilator': 8,
+                'Cough Suppressant': 9, 'Lipid-lowering': 10, 'Proton Pump Inhibitor': 11,
+                'Rehydration': 12, 'Supplement': 13, 'Thyroid': 14
+            }
+            unique_cats = sorted(df_clean['category'].unique())
+            for idx, c in enumerate(unique_cats):
+                if c not in category_map:
+                    category_map[c] = len(category_map)
+            df_clean["category_enc"] = df_clean["category"].map(category_map).fillna(0.0).astype(float)
+        else:
+            df_clean["category_enc"] = 0.0
     
     # ---- 7. Model Feature Signature Adapter Mapping (56 features) ----
     model_df = pd.DataFrame(index=df_clean.index)
     
     mapping = {
-        'catchment_population': 50000.0,
-        'supplier_lead_time_weeks': df_clean['lead_time'],
-        'baseline_weekly_demand': df_clean['target_roll_mean_12'],
-        'shelf_life_weeks': 104.0,
+        'catchment_population': df_clean['catchment_population'] if 'catchment_population' in df_clean.columns else 50000.0,
+        'supplier_lead_time_weeks': df_clean['supplier_lead_time_weeks'] if 'supplier_lead_time_weeks' in df_clean.columns else df_clean['lead_time'],
+        'baseline_weekly_demand': df_clean['baseline_weekly_demand'] if 'baseline_weekly_demand' in df_clean.columns else df_clean['target_roll_mean_12'],
+        'shelf_life_weeks': df_clean['shelf_life_weeks'] if 'shelf_life_weeks' in df_clean.columns else 104.0,
         'week_of_year': df_clean['week_of_year'],
-        'rainfall_anomaly': 0.0,
-        'festival_intensity': 0.0,
+        'rainfall_anomaly': df_clean['rainfall_anomaly'] if 'rainfall_anomaly' in df_clean.columns else 0.0,
+        'festival_intensity': df_clean['festival_intensity'] if 'festival_intensity' in df_clean.columns else 0.0,
         'demand_lag_1': df_clean['target_lag_1'],
         'demand_lag_2': df_clean['target_lag_2'],
         'demand_lag_4': df_clean['target_lag_4'],
@@ -121,35 +190,35 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
         'sin_week': df_clean['sin_time'],
         'cos_week': df_clean['cos_time'],
         'month': df_clean['month'],
-        'outbreak_chikungunya_lag0': 0.0,
-        'outbreak_chikungunya_lag1': 0.0,
-        'outbreak_chikungunya_lag2': 0.0,
-        'outbreak_dengue_lag0': 0.0,
-        'outbreak_dengue_lag1': 0.0,
-        'outbreak_dengue_lag2': 0.0,
-        'outbreak_diarrhoeal_lag0': 0.0,
-        'outbreak_diarrhoeal_lag1': 0.0,
-        'outbreak_diarrhoeal_lag2': 0.0,
-        'outbreak_flu_lag0': 0.0,
-        'outbreak_flu_lag1': 0.0,
-        'outbreak_flu_lag2': 0.0,
-        'outbreak_leptospirosis_lag0': 0.0,
-        'outbreak_leptospirosis_lag1': 0.0,
-        'outbreak_leptospirosis_lag2': 0.0,
-        'outbreak_malaria_lag0': 0.0,
-        'outbreak_malaria_lag1': 0.0,
-        'outbreak_malaria_lag2': 0.0,
-        'outbreak_respiratory_lag0': 0.0,
-        'outbreak_respiratory_lag1': 0.0,
-        'outbreak_respiratory_lag2': 0.0,
-        'outbreak_typhoid_lag0': 0.0,
-        'outbreak_typhoid_lag1': 0.0,
-        'outbreak_typhoid_lag2': 0.0,
-        'outbreak_any_active': 0.0,
-        'outbreak_count': 0.0,
-        'monsoon_phase_enc': 0.0,
-        'region_enc': df_clean.get('region_enc', 0.0),
-        'category_enc': df_clean.get('category_enc', 0.0),
+        'outbreak_chikungunya_lag0': df_clean['outbreak_chikungunya_lag0'],
+        'outbreak_chikungunya_lag1': df_clean['outbreak_chikungunya_lag1'],
+        'outbreak_chikungunya_lag2': df_clean['outbreak_chikungunya_lag2'],
+        'outbreak_dengue_lag0': df_clean['outbreak_dengue_lag0'],
+        'outbreak_dengue_lag1': df_clean['outbreak_dengue_lag1'],
+        'outbreak_dengue_lag2': df_clean['outbreak_dengue_lag2'],
+        'outbreak_diarrhoeal_lag0': df_clean['outbreak_diarrhoeal_lag0'],
+        'outbreak_diarrhoeal_lag1': df_clean['outbreak_diarrhoeal_lag1'],
+        'outbreak_diarrhoeal_lag2': df_clean['outbreak_diarrhoeal_lag2'],
+        'outbreak_flu_lag0': df_clean['outbreak_flu_lag0'],
+        'outbreak_flu_lag1': df_clean['outbreak_flu_lag1'],
+        'outbreak_flu_lag2': df_clean['outbreak_flu_lag2'],
+        'outbreak_leptospirosis_lag0': df_clean['outbreak_leptospirosis_lag0'],
+        'outbreak_leptospirosis_lag1': df_clean['outbreak_leptospirosis_lag1'],
+        'outbreak_leptospirosis_lag2': df_clean['outbreak_leptospirosis_lag2'],
+        'outbreak_malaria_lag0': df_clean['outbreak_malaria_lag0'],
+        'outbreak_malaria_lag1': df_clean['outbreak_malaria_lag1'],
+        'outbreak_malaria_lag2': df_clean['outbreak_malaria_lag2'],
+        'outbreak_respiratory_lag0': df_clean['outbreak_respiratory_lag0'],
+        'outbreak_respiratory_lag1': df_clean['outbreak_respiratory_lag1'],
+        'outbreak_respiratory_lag2': df_clean['outbreak_respiratory_lag2'],
+        'outbreak_typhoid_lag0': df_clean['outbreak_typhoid_lag0'],
+        'outbreak_typhoid_lag1': df_clean['outbreak_typhoid_lag1'],
+        'outbreak_typhoid_lag2': df_clean['outbreak_typhoid_lag2'],
+        'outbreak_any_active': df_clean['outbreak_any_active'],
+        'outbreak_count': df_clean['outbreak_count'],
+        'monsoon_phase_enc': df_clean['monsoon_phase_enc'],
+        'region_enc': df_clean['region_enc'],
+        'category_enc': df_clean['category_enc'],
         'drug_enc': df_clean['entity_id'].map(drug_mapping),
         'store_enc': df_clean['location_id'].map(store_mapping),
         'demand_wow_change': df_clean['target_wow_change'],

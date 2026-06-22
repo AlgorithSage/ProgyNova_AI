@@ -18,27 +18,27 @@ import './MLMetricsPage.css';
 const BASELINE_METRICS_STRICT: MLMetricsResponse = {
   summary: {
     total_samples: 3952,
-    actual_stockouts: 34,
-    predicted_alerts: 33
+    actual_stockouts: 48,
+    predicted_alerts: 46
   },
   regression: {
-    mae: 15.30,
-    rmse: 51.94,
-    mape: 4.55,
-    stabilized_mape: 4.50
+    mae: 14.31,
+    rmse: 64.10,
+    mape: 4.37,
+    stabilized_mape: 4.32
   },
   classification: {
-    accuracy: 0.9992,
-    precision: 0.9697,
-    recall: 0.9412,
-    f1_score: 0.9552,
-    roc_auc: 0.9998
+    accuracy: 0.9985,
+    precision: 0.9565,
+    recall: 0.9167,
+    f1_score: 0.9362,
+    roc_auc: 0.9991
   },
   confusion_matrix: {
-    tp: 32,
-    fp: 1,
-    fn: 2,
-    tn: 3917
+    tp: 44,
+    fp: 2,
+    fn: 4,
+    tn: 3902
   },
   error_distribution: [
     { bin: "-15 to -10", count: 2 },
@@ -68,27 +68,27 @@ const BASELINE_METRICS_STRICT: MLMetricsResponse = {
 const BASELINE_METRICS_BALANCED: MLMetricsResponse = {
   summary: {
     total_samples: 3952,
-    actual_stockouts: 34,
-    predicted_alerts: 37
+    actual_stockouts: 48,
+    predicted_alerts: 47
   },
   regression: {
-    mae: 15.30,
-    rmse: 51.94,
-    mape: 4.55,
-    stabilized_mape: 4.50
+    mae: 14.31,
+    rmse: 64.10,
+    mape: 4.37,
+    stabilized_mape: 4.32
   },
   classification: {
-    accuracy: 0.9992,
-    precision: 0.9189,
-    recall: 1.0,
-    f1_score: 0.9577,
-    roc_auc: 0.9998
+    accuracy: 0.9982,
+    precision: 0.9362,
+    recall: 0.9167,
+    f1_score: 0.9263,
+    roc_auc: 0.9991
   },
   confusion_matrix: {
-    tp: 34,
+    tp: 44,
     fp: 3,
-    fn: 0,
-    tn: 3915
+    fn: 4,
+    tn: 3901
   },
   error_distribution: [
     { bin: "-15 to -10", count: 2 },
@@ -118,27 +118,27 @@ const BASELINE_METRICS_BALANCED: MLMetricsResponse = {
 const BASELINE_METRICS_SAFE: MLMetricsResponse = {
   summary: {
     total_samples: 3952,
-    actual_stockouts: 34,
-    predicted_alerts: 40
+    actual_stockouts: 48,
+    predicted_alerts: 56
   },
   regression: {
-    mae: 15.30,
-    rmse: 51.94,
-    mape: 4.55,
-    stabilized_mape: 4.50
+    mae: 14.31,
+    rmse: 64.10,
+    mape: 4.37,
+    stabilized_mape: 4.32
   },
   classification: {
-    accuracy: 0.9985,
-    precision: 0.8500,
+    accuracy: 0.9980,
+    precision: 0.8571,
     recall: 1.0,
-    f1_score: 0.9189,
-    roc_auc: 0.9997
+    f1_score: 0.9231,
+    roc_auc: 1.0000
   },
   confusion_matrix: {
-    tp: 34,
-    fp: 6,
+    tp: 48,
+    fp: 8,
     fn: 0,
-    tn: 3912
+    tn: 3896
   },
   error_distribution: [
     { bin: "-15 to -10", count: 2 },

@@ -392,7 +392,20 @@ def enrich_disp_df(disp_df):
     return disp_df[orig_cols + new_cols]
 
 def run_pipeline():
+    # If the file exists in the root data directory but not in the API data directory, copy it over to avoid synthetic regeneration
+    root_data_dir = DATA_DIR.parent.parent / "data"
+    root_disp = root_data_dir / "dispensing.csv"
     disp_file = DATA_DIR / "dispensing.csv"
+    
+    if root_disp.exists() and not disp_file.exists():
+        import shutil
+        print(f"PHASE 1: Found existing dispensing.csv in root directory ({root_disp}). Copying to API directory...")
+        os.makedirs(DATA_DIR, exist_ok=True)
+        shutil.copy(str(root_disp), str(disp_file))
+        for table in ["drugs.csv", "stores.csv", "context.csv"]:
+            if (root_data_dir / table).exists():
+                shutil.copy(str(root_data_dir / table), str(DATA_DIR / table))
+
     if disp_file.exists():
         print("PHASE 1: Found existing dispensing.csv on server. Loading dataset directly from disk to preserve historical logs...")
         disp_df = pd.read_csv(disp_file)
