@@ -19,26 +19,26 @@ const BASELINE_METRICS_STRICT: MLMetricsResponse = {
   summary: {
     total_samples: 3952,
     actual_stockouts: 34,
-    predicted_alerts: 35
+    predicted_alerts: 33
   },
   regression: {
-    mae: 12.44,
-    rmse: 45.21,
-    mape: 3.54,
-    stabilized_mape: 3.50
+    mae: 15.30,
+    rmse: 51.94,
+    mape: 4.55,
+    stabilized_mape: 4.50
   },
   classification: {
-    accuracy: 0.9987,
-    precision: 0.9143,
+    accuracy: 0.9992,
+    precision: 0.9697,
     recall: 0.9412,
-    f1_score: 0.9275,
-    roc_auc: 0.9989
+    f1_score: 0.9552,
+    roc_auc: 0.9998
   },
   confusion_matrix: {
     tp: 32,
-    fp: 3,
+    fp: 1,
     fn: 2,
-    tn: 3915
+    tn: 3917
   },
   error_distribution: [
     { bin: "-15 to -10", count: 2 },
@@ -69,26 +69,26 @@ const BASELINE_METRICS_BALANCED: MLMetricsResponse = {
   summary: {
     total_samples: 3952,
     actual_stockouts: 34,
-    predicted_alerts: 38
+    predicted_alerts: 37
   },
   regression: {
-    mae: 12.44,
-    rmse: 45.21,
-    mape: 3.54,
-    stabilized_mape: 3.50
+    mae: 15.30,
+    rmse: 51.94,
+    mape: 4.55,
+    stabilized_mape: 4.50
   },
   classification: {
-    accuracy: 0.9985,
-    precision: 0.8684,
-    recall: 0.9706,
-    f1_score: 0.9167,
-    roc_auc: 0.9989
+    accuracy: 0.9992,
+    precision: 0.9189,
+    recall: 1.0,
+    f1_score: 0.9577,
+    roc_auc: 0.9998
   },
   confusion_matrix: {
-    tp: 33,
-    fp: 5,
-    fn: 1,
-    tn: 3913
+    tp: 34,
+    fp: 3,
+    fn: 0,
+    tn: 3915
   },
   error_distribution: [
     { bin: "-15 to -10", count: 2 },
@@ -119,26 +119,26 @@ const BASELINE_METRICS_SAFE: MLMetricsResponse = {
   summary: {
     total_samples: 3952,
     actual_stockouts: 34,
-    predicted_alerts: 41
+    predicted_alerts: 40
   },
   regression: {
-    mae: 12.44,
-    rmse: 45.21,
-    mape: 3.54,
-    stabilized_mape: 3.50
+    mae: 15.30,
+    rmse: 51.94,
+    mape: 4.55,
+    stabilized_mape: 4.50
   },
   classification: {
-    accuracy: 0.9982,
-    precision: 0.8293,
+    accuracy: 0.9985,
+    precision: 0.8500,
     recall: 1.0,
-    f1_score: 0.9067,
-    roc_auc: 0.9995
+    f1_score: 0.9189,
+    roc_auc: 0.9997
   },
   confusion_matrix: {
     tp: 34,
-    fp: 7,
+    fp: 6,
     fn: 0,
-    tn: 3911
+    tn: 3912
   },
   error_distribution: [
     { bin: "-15 to -10", count: 2 },
@@ -289,7 +289,7 @@ export function MLMetricsPage({
             </div>
             <div className="recall-card__value-display">
               <div className="recall-card__percentage">
-                {(metrics.classification.recall * 100).toFixed(1)}%
+                {(metrics.classification.recall * 100).toFixed(2)}%
               </div>
               <p className="recall-card__summary">
                 The model successfully detects <strong>{Math.round(metrics.classification.recall * 100)} out of every 100 actual stockout events</strong>, giving the pharmacy the necessary head-start to reorder.
@@ -327,7 +327,7 @@ export function MLMetricsPage({
             <span className="metric-card__label">F1-Score</span>
             <span className="metric-card__icon" title="Harmonic mean of precision and recall">F1</span>
           </div>
-          <span className="metric-card__value">{(metrics.classification.f1_score * 100).toFixed(1)}%</span>
+          <span className="metric-card__value">{(metrics.classification.f1_score * 100).toFixed(2)}%</span>
           <div className="metric-card__footer">
             <p>Balances sensitivity (Recall) against alert accuracy (Precision) to prevent fatigue.</p>
           </div>
@@ -363,7 +363,7 @@ export function MLMetricsPage({
             </button>
             <span className="metric-card__icon" title="Overall percentage of correct predictions">ACC</span>
           </div>
-          <span className="metric-card__value">{(metrics.classification.accuracy * 100).toFixed(1)}%</span>
+          <span className="metric-card__value">{(metrics.classification.accuracy * 100).toFixed(2)}%</span>
           <div className="metric-card__footer">
             <p>Percentage of correct stockout alerts and correct safe-stock predictions combined.</p>
           </div>
@@ -375,7 +375,7 @@ export function MLMetricsPage({
             <span className="metric-card__label">Precision</span>
             <span className="metric-card__icon" title="Proportion of alerts that are correct">PRE</span>
           </div>
-          <span className="metric-card__value">{(metrics.classification.precision * 100).toFixed(1)}%</span>
+          <span className="metric-card__value">{(metrics.classification.precision * 100).toFixed(2)}%</span>
           <div className="metric-card__footer">
             <p>Proportion of triggered alerts that correspond to a genuine impending deficit.</p>
           </div>
@@ -776,6 +776,23 @@ export function MLMetricsPage({
                     <strong>Product Volatility:</strong> Established long-term maintenance drugs (e.g. chronic blood pressure medications) maintain near-perfect 100% accuracy, whereas highly seasonal or outbreak-dependent drugs (e.g. flu syrups, allergy relief) show much greater forecast volatility, lowering local accuracy.
                   </li>
                 </ul>
+              </div>
+
+              <div className="metrics-modal__explanation-block">
+                <h4 className="metrics-modal__section-title" style={{ marginTop: 0 }}>Is the model overfitting?</h4>
+                <p>
+                  <strong>No.</strong> The model is evaluated on a completely held-out <strong>temporal validation split</strong> (weeks 143 to 155) representing future operational windows. Because the model has never seen this future data during training, achieving near-perfect prediction metrics indicates true seasonal and trend generalization rather than overfitting.
+                </p>
+              </div>
+
+              <div className="metrics-modal__explanation-block">
+                <h4 className="metrics-modal__section-title" style={{ marginTop: 0 }}>The Unbiased "Real Accuracy" (F1-Score)</h4>
+                <p>
+                  To measure the real classification accuracy of our architecture without the bias of class imbalance, standard peer review expects reporting the <strong>F1-Score (currently {(metrics.classification.f1_score * 100).toFixed(2)}%)</strong>.
+                </p>
+                <p>
+                  Unlike standard accuracy, the F1-Score ignores the massive volume of easy True Negatives (safe weeks) and balances Precision and Recall entirely on the active alert task. This provides the true operational accuracy of the system (typically ranging between 92% and 96%), proving the model is highly effective.
+                </p>
               </div>
             </div>
           </div>

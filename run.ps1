@@ -29,6 +29,27 @@ function Write-Step($label, $msg) {
 # -- Pre-flight checks ----------------------------------------
 Write-Banner "ProgyNovaAI - Starting up..."
 
+# -- Release ports and clean existing processes ---------------
+Write-Step "CLEAN" "Checking and releasing ports 8000 & 5173..."
+$portsToKill = @(8000, 5173)
+foreach ($port in $portsToKill) {
+    $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
+    if ($connections) {
+        foreach ($conn in $connections) {
+            $pidToKill = $conn.OwningProcess
+            if ($pidToKill -and $pidToKill -ne 0 -and $pidToKill -ne $PID) {
+                $proc = Get-Process -Id $pidToKill -ErrorAction SilentlyContinue
+                if ($proc) {
+                    Write-Step "CLEAN" "Killing process $($proc.Name) ($pidToKill) on port $port..."
+                    Stop-Process -Id $pidToKill -Force -ErrorAction SilentlyContinue
+                }
+            }
+        }
+    }
+}
+Get-Job | Stop-Job -ErrorAction SilentlyContinue
+Get-Job | Remove-Job -Force -ErrorAction SilentlyContinue
+
 # 1. Python venv
 if (-not (Test-Path $VENV_PY)) {
     Write-Step "VENV" "Creating Python virtual environment..."

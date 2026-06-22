@@ -389,6 +389,13 @@ X_train, y_train = train[feature_cols].values, train[TARGET].values
 X_val, y_val = val[feature_cols].values, val[TARGET].values
 X_test, y_test = test[feature_cols].values, test[TARGET].values
 
+# Calculate sample weights to balance the loss for stockout events (minority class)
+train_stockout = (train[TARGET] > train["stock_on_hand"]).astype(float)
+n_neg = (train_stockout == 0).sum()
+n_pos = (train_stockout == 1).sum()
+pos_weight = n_neg / n_pos if n_pos > 0 else 1.0
+sample_weights = np.where(train_stockout == 1, pos_weight, 1.0)
+
 print(f"  Training: {X_train.shape[0]:,} samples, {X_train.shape[1]} features")
 
 t0 = time.time()
@@ -398,7 +405,7 @@ model = xgb.XGBRegressor(
     reg_alpha=0.1, reg_lambda=1.0, random_state=42,
     n_jobs=-1, tree_method="hist", early_stopping_rounds=30)
 
-model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
+model.fit(X_train, y_train, sample_weight=sample_weights, eval_set=[(X_val, y_val)], verbose=False)
 elapsed = time.time() - t0
 print(f"  Trained in {elapsed:.1f}s | Best iteration: {model.best_iteration}")
 
