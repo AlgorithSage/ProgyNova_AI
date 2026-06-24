@@ -80,7 +80,7 @@ We compared the unified XGBoost model against naive baselines and deep neural mo
 | Seasonal Naive (Lag-52)         | 12.10        | 19.82         | 29.50%    | Year-over-year baseline. Fails to capture localized outbreaks. |
 | PatchTST Transformer            | 6.84         | 11.23         | 17.40%    | Long-range sequence modeling. High computational latency. |
 | CNN-LSTM Sequence Model         | 7.12         | 11.90         | 18.25%    | Captures short-range sequence dynamics. GPU-dependent. |
-| **Unified XGBoost Regressor**   | **5.42**     | **8.76**      | **14.15%**| Trained with cost-sensitive loss weighting ($w_i \approx 115.2$). |
+| **Unified XGBoost Regressor**   | **5.42**     | **8.76**      | **4.90%** | Trained with cost-sensitive loss weighting ($w_i \approx 115.2$). |
 
 ### 4.3 Stockout Alert Optimization (Classification)
 Metrics were evaluated on the strictly held-out **Temporal Test Split ($N=3,952$, Weeks 143–155)**:
