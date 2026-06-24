@@ -6,8 +6,10 @@ This integrated reference document compiles the mathematical formulation, design
 
 # Part 1: Design, Formal Validation, and Mathematical Formulation of a Cost-Sensitive Demand Forecasting Architecture
 
+# ProgyNovaAI: Design, Formal Validation, and Mathematical Formulation of a Cost-Sensitive Demand Forecasting Architecture
+
 ## Abstract
-This section delineates the mathematical formulation, design logic, and validation outcomes of the ProgyNovaAI forecasting architecture. We outline the transitions from a conceptual multi-branch stacked ensemble to a unified, cost-sensitive gradient boosted regressor integrated with a post-hoc asymmetric threshold optimizer. The architecture addresses the critical challenge of severe class imbalance in clinical demand forecasting, wherein stockout events constitute a rare minority class ($\approx 1.21\%$ of observations).
+This document delineates the mathematical formulation, design logic, and validation outcomes of the ProgyNovaAI forecasting architecture. We outline the transitions from a conceptual multi-branch stacked ensemble to a unified, cost-sensitive gradient boosted regressor integrated with a post-hoc asymmetric threshold optimizer. The architecture addresses the critical challenge of severe class imbalance in clinical demand forecasting, wherein stockout events constitute a rare minority class ($\approx 1.21\%$ of observations).
 
 ---
 
@@ -116,11 +118,13 @@ The ProgyNovaAI cost-sensitive framework resolves this paradox. By applying grad
 
 # Part 2: Empirical Results and System Conclusions
 
-## Chapter 6: Results
+# Chapter 6   Results
 
-This section details the outcomes of the ProgyNovaAI project, including a description of the evaluation datasets, model performance metrics, observations on sensitivity optimization, and visual outputs demonstrating the overall effectiveness of the system.
+<br>
 
-### 6.1 Dataset Profile and Ingestion Outcomes
+This chapter details the outcomes of the ProgyNovaAI project, including a description of the evaluation datasets, model performance metrics, observations on sensitivity optimization, and visual outputs demonstrating the overall effectiveness of the system.
+
+## 6.1 Dataset Profile and Ingestion Outcomes
 
 The evaluation was performed using a publication-grade, temporally enriched pharmacy dataset containing **47,425 weekly pharmacy dispensing logs**. To mirror real-world operational challenges, the dataset exhibits an extreme class imbalance, where actual stockouts (defined as weeks where demand exceeded stock-on-hand, resulting in a deficit) occur in less than 1% of the total observations.
 
@@ -132,9 +136,9 @@ The dynamic ingestion engine automatically resolved columns and structured the d
 
 ---
 
-### 6.2 System Performance Evaluation
+## 6.2 System Performance Evaluation
 
-#### 6.2.1 Forecasting Model Accuracy (Regression)
+### 6.2.1 Forecasting Model Accuracy (Regression)
 The core forecasting pipeline predicts continuous demand. We compared multiple model architectures on the strictly held-out temporal validation split (weeks 143 to 155). 
 
 Standard regression metrics—Mean Absolute Error (MAE), Root Mean Squared Error (RMSE), and Mean Absolute Percentage Error (MAPE)—were computed:
@@ -147,7 +151,7 @@ Standard regression metrics—Mean Absolute Error (MAE), Root Mean Squared Error
 | **CNN-LSTM Seq Model** | 7.12 | 11.90 | 18.25% | Captures short-term local spikes and momentum. Requires GPU resources. |
 | **Unified XGBoost Regressor** | **5.42** | **8.76** | **4.90%** | Trained using **Cost-Sensitive Loss Balancing** ($w_{\text{stockout}} \approx 115.2$). Programmatically split trees to isolate rare stockouts. |
 
-#### 6.2.2 Stockout Alert Optimization (Classification)
+### 6.2.2 Stockout Alert Optimization (Classification)
 To convert continuous forecasts into binary stockout warnings, predictions were checked against the current stock-on-hand. In real-world pharmacy logs, missing a stockout (False Negative) has a high clinical cost (untreated patients), while triggering a false alarm (False Positive) is merely a minor operational nuisance. 
 
 Using grid search on the validation dataset (3,952 observations containing 34 actual stockouts), we evaluated the classification performance under three distinct sensitivity profiles defined by:
@@ -162,7 +166,7 @@ where $\hat{y}$ is the predicted demand, $S$ is the stock-on-hand, $\alpha$ is t
 
 ---
 
-### 6.3 Observations on Decision Boundaries
+## 6.3 Observations on Decision Boundaries
 
 1. **The Class Imbalance Trap**: If we optimize solely for overall Accuracy, a model that predicts "No Stockout" for every single row achieves **99.14% Accuracy** because stockouts are rare ($<1\%$). However, it misses 100% of actual stockouts (Recall = 0.0%), making it useless.
 2. **Cost-Sensitive Training**: By applying a sample weight of 115.2 (ratio of safe weeks to stockout weeks) to the XGBoost loss function, the model was forced to splits on features that isolate rare stockouts. This dramatically improved the baseline Recall from 0% to over 91% before threshold tuning.
@@ -172,7 +176,7 @@ where $\hat{y}$ is the predicted demand, $S$ is the stock-on-hand, $\alpha$ is t
 
 ---
 
-### 6.4 Visual Outputs and Verification
+## 6.4 Visual Outputs and Verification
 
 To validate the model's performance for academic and clinical review, four publication-grade figures were generated:
 1. **Demand Scatter Plot**: Composing Actual vs. Predicted weekly units. It shows tight alignment along the $45^\circ$ line of perfect prediction, particularly for high-volume demand channels.
@@ -180,13 +184,16 @@ To validate the model's performance for academic and clinical review, four publi
 3. **Confusion Matrices**: Three matrices demonstrating the migration of errors from False Negatives (FN) to False Positives (FP) as the operator transitions the dashboard from Strict to Clinical Safe.
 4. **ROC-AUC Curve**: A plot showing an Area Under the Curve (AUC) of **0.998**, confirming the model's exceptional capability to distinguish between safe weeks and stockout risk.
 
----
+<br>
+<br>
 
-## Chapter 7: Conclusion
+# Chapter 7   Conclusion
 
-This section summarizes the key findings, achievements, and clinical impact of the ProgyNovaAI system. It reflects on the technical insights gained, outlines the operational limitations, and proposes directions for future research.
+<br>
 
-### 7.1 Key Findings and Achievements
+This chapter summarizes the key findings, achievements, and clinical impact of the ProgyNovaAI system. It reflects on the technical insights gained, outlines the operational limitations, and proposes directions for future research.
+
+## 7.1 Key Findings and Achievements
 
 The ProgyNovaAI project successfully developed and validated a robust, cost-sensitive demand-forecasting and stockout prediction pipeline for pharmacy networks. The key technical findings include:
 - **Ensemble vs. Unified Cost-Sensitive Models**: While stacked neural ensembles (CNN-LSTM + Transformer) look elegant on paper, they suffer from high inference latency, GPU dependence, and failure to handle extreme class imbalance natively. In contrast, a unified XGBoost Regressor combined with gradient sample-weight balancing ($\approx 115.2$) achieved better accuracy (4.90% MAPE) while consuming significantly fewer resources (completing inference on 47,425 rows in under 200 milliseconds).
@@ -195,7 +202,7 @@ The ProgyNovaAI project successfully developed and validated a robust, cost-sens
 
 ---
 
-### 7.2 Clinical and Operational Impact
+## 7.2 Clinical and Operational Impact
 
 The implementation of ProgyNovaAI bridges the gap between machine learning and healthcare logistics:
 - **Patient Safety**: In Clinical Safe mode, the system guarantees that pharmacies do not run out of critical, life-saving drugs. This directly reduces emergency room visits or complications arising from patient non-compliance due to unavailable medication.
@@ -204,7 +211,7 @@ The implementation of ProgyNovaAI bridges the gap between machine learning and h
 
 ---
 
-### 7.3 Limitations Faced
+## 7.3 Limitations Faced
 
 Despite its performance, the current implementation has several limitations:
 - **Cold-Start Problem**: The feature engineering pipeline relies relies heavily on temporal lags (up to 52 weeks). For newly opened pharmacy locations or newly launched drug categories, the model lacks historical sequences and must fall back on default global averages, reducing initial forecast precision.
@@ -213,7 +220,7 @@ Despite its performance, the current implementation has several limitations:
 
 ---
 
-### 7.4 Suggestions for Future Work
+## 7.4 Suggestions for Future Work
 
 To build upon the successes of ProgyNovaAI, the following research directions are proposed:
 1. **Dynamic Lead Time Forecasting**: Integrating natural language processing (NLP) to analyze supplier communication emails and shipment tracking notes to predict transport delays dynamically.
@@ -225,11 +232,13 @@ To build upon the successes of ProgyNovaAI, the following research directions ar
 
 # Part 3: Technical Specifications and Code Reference Documentation
 
-This section compiles the formal system layout, API routing architecture, directory structure, and backend code reference for the ProgyNovaAI forecasting and stockout prevention platform.
+# ProgyNovaAI: Technical Specifications and Code Reference Documentation
+
+This document compiles the formal system layout, API routing architecture, directory structure, and backend code reference for the ProgyNovaAI forecasting and stockout prevention platform.
 
 ---
 
-## 8. System Layout and Endpoints
+## 1. System Architecture
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -272,7 +281,7 @@ This section compiles the formal system layout, API routing architecture, direct
 
 ---
 
-## 9. Directory Structure
+## 2. Directory Structure
 
 ```
 ProgyNovaAI/
@@ -306,7 +315,7 @@ ProgyNovaAI/
 
 ---
 
-## 10. Backend Reference Implementation (`app/main.py`)
+## 3. Backend Reference Implementation (`app/main.py`)
 
 Below is the production implementation of the FastAPI entry point, demonstrating auto-schema merging, predictive caching, forecasting, stockout detection, SHAP explainability, and evaluation metrics:
 
