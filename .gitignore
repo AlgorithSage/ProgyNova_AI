@@ -50,3 +50,6 @@ reproduction_results/
 
 # Research script models
 /models/
+
+# Dump folder for archived files
+dump/
