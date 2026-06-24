@@ -185,9 +185,10 @@ def generate_plots(data_dir, output_dir):
     print("Saved Figure 3 to benchmark_model_comparison.png")
 
 if __name__ == "__main__":
+    script_dir = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", type=str, default=".")
-    parser.add_argument("--output_dir", type=str, default=".")
+    parser.add_argument("--data_dir", type=str, default=str(script_dir.parent / "data"))
+    parser.add_argument("--output_dir", type=str, default=str(script_dir.parent / "visualizations"))
     args = parser.parse_args()
     
     generate_plots(Path(args.data_dir), Path(args.output_dir))

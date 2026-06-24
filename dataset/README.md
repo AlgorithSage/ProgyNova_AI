@@ -27,16 +27,28 @@ This dataset was originally created to power the **ProgyNova AI** demand forecas
 
 ## 📁 Dataset Structure
 
-This dataset contains **4 interrelated CSV files** that can be joined using shared keys:
+This dataset is organized into logical subdirectories for datasets, documentation, scripts, and visualizations:
 
 ```
 dataset/
-├── dispensing.csv      # Core transactional data (47,424 rows × 20 columns)
-├── drugs.csv           # Drug catalog and properties (19 rows × 7 columns)
-├── stores.csv          # Pharmacy outlet metadata (16 rows × 7 columns)
-├── context.csv         # Regional epidemiological context (1,248 rows × 15 columns)
+├── data/
+│   ├── dispensing.csv      # Core transactional data (47,424 rows × 20 columns)
+│   ├── drugs.csv           # Drug catalog and properties (19 rows × 7 columns)
+│   ├── stores.csv          # Pharmacy outlet metadata (16 rows × 7 columns)
+│   └── context.csv         # Regional epidemiological context (1,248 rows × 15 columns)
+├── docs/
+│   ├── dataset_overview_section.md   # Extra dataset metadata details
+│   └── dataset_overview_section.docx  # Full format draft report
+├── scripts/
+│   ├── benchmark.py                  # Auditing and baseline model training script
+│   └── generate_dataset_plots.py     # Figure generation script
+├── visualizations/
+│   ├── benchmark_model_comparison.png
+│   ├── demographic_demand_coupling.png
+│   └── outbreak_demand_alignment.png
 ├── README.md           # This file
-└── LICENSE             # CC BY 4.0 License
+├── LICENSE             # CC BY 4.0 License
+└── dataset_benchmark_results.json # Execution telemetry results
 ```
 
 ### Relationships
@@ -184,10 +196,10 @@ This dataset was **synthetically generated** using a domain-informed simulation 
 ```python
 import pandas as pd
 
-dispensing = pd.read_csv("dispensing.csv")
-drugs = pd.read_csv("drugs.csv")
-stores = pd.read_csv("stores.csv")
-context = pd.read_csv("context.csv")
+dispensing = pd.read_csv("data/dispensing.csv")
+drugs = pd.read_csv("data/drugs.csv")
+stores = pd.read_csv("data/stores.csv")
+context = pd.read_csv("data/context.csv")
 
 # Join all tables
 df = dispensing.merge(stores[["store_id", "catchment_population", "supplier_lead_time_weeks"]], on="store_id")
@@ -247,10 +259,10 @@ print(f"Test MAPE: {mape:.2f}%")
 
 ### 🔬 Validation & Benchmarking Suite
 
-To guarantee the reliability, scientific rigor, and learnability of this synthetic dataset, we have developed a comprehensive validation and benchmarking suite. You can run the audit and baseline model training locally using the provided [benchmark.py](./benchmark.py) script:
+To guarantee the reliability, scientific rigor, and learnability of this synthetic dataset, we have developed a comprehensive validation and benchmarking suite. You can run the audit and baseline model training locally using the provided [benchmark.py](./scripts/benchmark.py) script:
 
 ```bash
-python benchmark.py
+python scripts/benchmark.py
 ```
 
 Running this script performs a 3-tier validation workflow, logging full diagnostic telemetry to `dataset_benchmark_results.json`. Below are the established outcomes:

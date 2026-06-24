@@ -54,10 +54,11 @@ def main():
     # Setup Paths and Files
     # --------------------------------------------------------------------------
     script_dir = Path(__file__).resolve().parent
-    dispensing_path = script_dir / "dispensing.csv"
-    drugs_path = script_dir / "drugs.csv"
-    stores_path = script_dir / "stores.csv"
-    context_path = script_dir / "context.csv"
+    data_dir = script_dir.parent / "data"
+    dispensing_path = data_dir / "dispensing.csv"
+    drugs_path = data_dir / "drugs.csv"
+    stores_path = data_dir / "stores.csv"
+    context_path = data_dir / "context.csv"
 
     print_header("PROGYNOVA AI: KAGGLER DATASET INTEGRITY & BENCHMARKING SUITE")
     print(f"Dataset Folder Location: {script_dir}")
@@ -436,7 +437,7 @@ def main():
         "machine_learning_benchmarks": ml_log
     }
     
-    results_path = script_dir / "dataset_benchmark_results.json"
+    results_path = script_dir.parent / "dataset_benchmark_results.json"
     with open(results_path, "w") as f:
         json.dump(output_payload, f, indent=4)
         
