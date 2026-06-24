@@ -71,21 +71,20 @@ for i, (mape, color, status) in enumerate(zip(mapes, colors, statuses)):
         badge_label = "Alternative Model"
         
     # Draw badge box
-    ax.text(23.8, y_pos[i], badge_label,
+    ax.text(26.0, y_pos[i], badge_label,
             va='center', ha='center', fontsize=9.5, fontweight='bold',
             color=badge_text_color,
             bbox=dict(boxstyle='round,pad=0.4', facecolor=badge_color, edgecolor='none'),
             zorder=4)
 
-# Set x limits to give space for labels
-ax.set_xlim(0, 27.5)
+# Set x limits to give space for labels and badges
+ax.set_xlim(0, 29.5)
 
-# Title and subtitle headers
-plt.title("ProgyNova AI — Forecasting Model Comparison", fontsize=15, fontweight='bold', color='#0F172A', pad=24, loc='left')
-
-# Subtitle explanation
-ax.text(0, -0.65, "Benchmarking continuous demand forecasting accuracy across architectures (lower MAPE is better)", 
-        fontsize=10, color='#475569', transform=ax.get_xaxis_transform())
+# Title and subtitle headers stacked at the top left using axis-relative coordinates
+ax.text(0, 1.15, "ProgyNova AI — Forecasting Model Comparison", 
+        fontsize=15, fontweight='bold', color='#0F172A', transform=ax.transAxes)
+ax.text(0, 1.06, "Benchmarking continuous demand forecasting accuracy across architectures (lower MAPE is better)", 
+        fontsize=10, color='#475569', transform=ax.transAxes)
 
 # Ensure clean directory exists and save
 os.makedirs("progynova-dashboard/public/logos", exist_ok=True)
