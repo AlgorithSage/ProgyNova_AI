@@ -1,0 +1,254 @@
+@font-face {
+  font-family: 'DocsFont';
+  src: url('/fonts/VollkornSemibold-3zRaM.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DocsFont';
+  src: url('/fonts/Roundo-SemiBold.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0030-0039, U+0025, U+002E, U+002C, U+002D, U+003A, U+002F, U+002B, U+007E, U+003E, U+003C; /* 0-9, %, ., ,, -, :, /, +, ~, >, < */
+}
+
+@font-face {
+  font-family: 'DocsFont';
+  src: url('/fonts/VollkornSemibold-3zRaM.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DocsFont';
+  src: url('/fonts/Roundo-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0030-0039, U+0025, U+002E, U+002C, U+002D, U+003A, U+002F, U+002B, U+007E, U+003E, U+003C;
+}
+
+@font-face {
+  font-family: 'DocsFont';
+  src: url('/fonts/VollkornSemibold-3zRaM.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DocsFont';
+  src: url('/fonts/Satoshi-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0030-0039, U+0025, U+002E, U+002C, U+002D, U+003A, U+002F, U+002B, U+007E, U+003E, U+003C;
+}
+
+@font-face {
+  font-family: 'DocsFont';
+  src: url('/fonts/VollkornSemibold-3zRaM.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DocsFont';
+  src: url('/fonts/Satoshi-Bold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0030-0039, U+0025, U+002E, U+002C, U+002D, U+003A, U+002F, U+002B, U+007E, U+003E, U+003C;
+}
+
+.docs-page {
+  padding: var(--space-xl);
+  max-width: 900px;
+  margin: 0 auto;
+  animation: dashboard-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Hero Banner (h1) --- */
+.docs-page__content h1 {
+  background: var(--card-elevated);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  margin-bottom: 2.5rem; /* Increased space below the banner */
+  border: 1px solid rgba(255, 255, 255, 0.12); /* Slightly more visible border */
+  box-shadow: var(--shadow-md);
+  color: #FFFFFF !important; /* Pure white text for max contrast */
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 0;
+  display: block;
+}
+
+[data-theme="dark"] .docs-page__content h1 {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.docs-page__content {
+  font-family: 'DocsFont', var(--font-sans);
+  color: var(--text-primary);
+  line-height: 1.8;
+  font-size: 1.05rem;
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+}
+
+.docs-page__content h1,
+.docs-page__content h2,
+.docs-page__content h3 {
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* --- Section Headers (h2) --- */
+.docs-page__content h2 { 
+  background: var(--surface-elevated);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin-top: 2.5em;
+  margin-bottom: 1.2em;
+  font-size: 1.6em; 
+}
+.docs-page__content h3 { 
+  font-size: 1.35rem; 
+  color: var(--text-primary); 
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.docs-page__content h3::before {
+  content: "";
+  display: block;
+  width: 5px;
+  height: 1.1em;
+  background: #0B0F19;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] .docs-page__content h3::before {
+  background: var(--text-primary);
+}
+
+.docs-page__content p {
+  margin-top: 0;
+  margin-bottom: 1.2em;
+}
+
+.docs-page__content ul,
+.docs-page__content ol {
+  margin-top: 0;
+  margin-bottom: 1.5em;
+  padding-left: 1.5em;
+}
+
+.docs-page__content li {
+  margin-bottom: 0.5em;
+}
+
+.docs-page__content code {
+  background-color: var(--surface-elevated);
+  padding: 0.2em 0.4em;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-number);
+  font-size: 0.9em;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.docs-page__content pre {
+  background-color: var(--surface-elevated);
+  padding: 1.2em;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  margin-bottom: 1.5em;
+}
+
+.docs-page__content pre code {
+  background-color: transparent;
+  padding: 0;
+  color: var(--text-primary);
+  border: none;
+}
+
+/* Stunning Tables */
+.docs-page__content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1.5em;
+  margin-bottom: 2em;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  font-family: var(--font-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-page__content th,
+.docs-page__content td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.docs-page__content tr:last-child td {
+  border-bottom: none;
+}
+
+.docs-page__content td {
+  font-family: var(--font-number);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.docs-page__content th {
+  background-color: var(--surface-elevated);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  font-family: var(--font-accent);
+}
+
+.docs-page__content tbody tr {
+  background-color: var(--surface);
+  transition: background-color var(--transition-fast);
+}
+
+.docs-page__content tbody tr:hover {
+  background-color: var(--surface-hover);
+}
+
+.docs-page__content blockquote {
+  border: none;
+  margin: 1.5em 0;
+  padding: 1.2em 1.5em;
+  color: #F5F7FA;
+  background-color: var(--card-elevated);
+  border-radius: var(--radius-lg);
+  font-style: normal;
+  font-weight: 500;
+  box-shadow: 0 0 16px rgba(255, 235, 59, 0.25);
+}
+
+[data-theme="dark"] .docs-page__content blockquote {
+  border: none;
+}

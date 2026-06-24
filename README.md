@@ -96,12 +96,18 @@ Evaluated on the strictly held-out **Temporal Test Split ($N=3,952$, Weeks 143�
 
 ```
 ProgyNovaAI/
-├── dump/                       # Ignored folder for archived source documents
+├── AI_COWORKER/                # Agent playbooks and prompts
 ├── dataset/                    # Comprehensive Research Dataset Folder
 │   ├── data/                   # Raw CSV transaction files (git-ignored)
 │   ├── docs/                   # Original MS Word report drafts & PDFs
 │   ├── scripts/                # Verification & dataset plotting scripts
 │   └── visualizations/         # Generated dataset profiling plots (PNGs)
+│
+├── docs/                       # Unified documentation
+│   ├── architecture.md         # System architecture diagram and notes
+│   ├── model_details.md        # Consolidated technical design & reference
+│   ├── report.md               # Summary report
+│   └── ...                     
 │
 ├── progynova-api/              # Python FastAPI Backend
 │   ├── app/
@@ -130,9 +136,14 @@ ProgyNovaAI/
 │   ├── package.json            # Node scripts and dependencies
 │   └── vite.config.ts          # Vite build manager
 │
-├── reproduce.py                # Scientific reproducibility & validation script
-├── generate_comparison.py      # Simple comparison chart generator script
-└── model_details.md            # Consolidated technical design & reference
+├── reproduction_results/       # Generated plots and metric outputs
+│
+├── scripts/                    # Scripts for models and reproduction
+│   ├── generate_comparison.py  # Simple comparison chart generator script
+│   ├── progynova_ai.py         # Main AI script
+│   └── reproduce.py            # Scientific reproducibility & validation script
+│
+└── training_artifacts/         # Training checkpoints
 ```
 
 ---
@@ -169,14 +180,7 @@ ProgyNovaAI/
    pip install -r requirements.txt
    ```
 
-4. **Run Synthetic Data Simulation & Train Model:**
-   Execute the generator script to build the datasets and train the baseline regressor:
-   ```bash
-   python scripts/generate_data.py
-   ```
-   *(This generates the raw tables in `data/` and saves the model parameters to `models/xgboost_baseline.json`).*
-
-5. **Start the FastAPI backend service:**
+4. **Start the FastAPI backend service:**
    ```bash
    uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
    ```
@@ -226,13 +230,36 @@ To evaluate model performance and output publication-grade figures locally:
 
 * **Evaluate Test Split Metrics (Weeks 143-155, $N = 3,952$):**
   ```bash
-  python reproduce.py
+  python scripts/reproduce.py
   ```
 * **Evaluate Full Horizon Metrics (Weeks 52-155, $N = 31,616$):**
   ```bash
-  python reproduce.py --full
+  python scripts/reproduce.py --full
   ```
   *(PNG outputs and metrics reports are generated inside `reproduction_results/`).*
+
+---
+
+## Testing on Custom Datasets
+
+ProgyNova AI is equipped with an `AutoSchemaEngine` that allows you to easily test the model on your own pharmacy or retail transaction datasets without writing new ingestion code.
+
+### 1. Prepare your Data
+Your custom dataset should be a CSV file containing at minimum:
+- **Temporal Index:** A date or week column.
+- **Entity & Location:** Unique IDs for the product/drug and the store/location.
+- **Demand/Target:** The historical sales or dispensed quantities.
+- **Inventory Context (Optional):** Current stock-on-hand for stockout evaluation.
+
+*Note: The `AutoSchemaEngine` will automatically attempt to map your custom column names (e.g., `item_code`, `qty_sold`, `inventory_level`) to the system's internal schema.*
+
+### 2. Upload and Forecast
+1. **Via Dashboard:** Open the React dashboard (`http://localhost:5173`), navigate to the data upload section, and drop your CSV file. The frontend will automatically route it to the backend and render the forecasts and metrics.
+2. **Via API:** You can programmatically post your dataset directly to the backend:
+   ```bash
+   curl -X POST "http://localhost:8000/upload" -F "file=@your_custom_data.csv"
+   curl -X POST "http://localhost:8000/forecast" -F "file=@your_custom_data.csv"
+   ```
 
 ---
 
@@ -264,7 +291,7 @@ This is the core performance summary plot shown on the web dashboard landing pag
 *   **[model_comparison.png](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-dashboard/public/logos/model_comparison.png):** Compares XGBoost (4.90% MAPE) against Transformers and CNN-LSTMs.
 
 ### 3. Scientific Validation & Reproducibility Plots
-Generated dynamically by running `reproduce.py` and saved in the [reproduction_results/](file:///c:/Users/USER/Desktop/ProgyNovaAI/reproduction_results) folder:
+Generated dynamically by running `scripts/reproduce.py` and saved in the [reproduction_results/](file:///c:/Users/USER/Desktop/ProgyNovaAI/reproduction_results) folder:
 *   **`fig1_demand_scatter.png` / `full_fig1_demand_scatter.png`:** Scatter plot of actual vs. predicted demand showing perfect fit alignment.
 *   **`fig2_residuals_histogram.png` / `full_fig2_residuals_histogram.png`:** Bell-curve distribution of residuals, confirming unbiased forecasting errors.
 *   **`fig3_confusion_matrices.png` / `full_fig3_confusion_matrices.png`:** Grid showing migration of False Negatives (FN) and False Positives (FP) across Strict, Balanced, and Clinical Safe Modes.

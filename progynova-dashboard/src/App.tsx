@@ -5,6 +5,7 @@ import { ForecastChart } from './components/forecast/ForecastChart';
 import { AlertsTable } from './components/alerts/AlertsTable';
 import { ShapExplainer } from './components/explain/ShapExplainer';
 import { MLMetricsPage } from './components/metrics/MLMetricsPage';
+import { DocsPage } from './components/docs/DocsPage';
 import { getForecast, getAlerts, getExplanation, checkHealth, getMetrics } from './services/api';
 import { applyTheme } from './mtheme';
 import type { Theme, ForecastPoint, StockoutAlert, ShapExplanation, UploadResponse, MLMetricsResponse } from './types';
@@ -36,7 +37,7 @@ function App() {
   const alertsRowRef = useRef<HTMLDivElement>(null);
 
   // View & ML Metrics states
-  const [currentView, setCurrentView] = useState<'dashboard' | 'metrics'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'metrics' | 'docs'>('dashboard');
   const [uploadedMetrics, setUploadedMetrics] = useState<MLMetricsResponse | null>(null);
   const [sensitivityMode, setSensitivityMode] = useState<'strict' | 'balanced' | 'safe'>('balanced');
 
@@ -216,7 +217,7 @@ function App() {
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
       currentView={currentView}
-      onViewChange={(view) => setCurrentView(view as 'dashboard' | 'metrics')}
+      onViewChange={(view) => setCurrentView(view as 'dashboard' | 'metrics' | 'docs')}
       onNavClick={handleNavClick}
     >
       {currentView === 'dashboard' ? (
@@ -373,13 +374,15 @@ function App() {
             </div>
           </section>
         </div>
-      ) : (
+      ) : currentView === 'metrics' ? (
         <MLMetricsPage 
           uploadedMetrics={uploadedMetrics} 
           hasUploaded={currentFiles.length > 0 || uploadedMetrics !== null} 
           sensitivityMode={sensitivityMode}
           onSensitivityModeChange={setSensitivityMode}
         />
+      ) : (
+        <DocsPage />
       )}
     </AppLayout>
   );

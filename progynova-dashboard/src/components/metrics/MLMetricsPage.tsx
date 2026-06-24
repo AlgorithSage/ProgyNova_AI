@@ -596,18 +596,18 @@ export function MLMetricsPage({
       </section>
 
       {/* CHARTS LAYER: SCATTER & RESIDUALS HISTOGRAM */}
-      <section className="metrics-page__row">
+      <section className="metrics-page__row" style={{ fontFamily: 'var(--font-number)' }}>
         {/* Actual vs Predicted Scatter */}
         <div className="metrics-page__col metrics-page__col--half">
           <div className="card chart-card">
-            <h3 className="card__title">Actual vs. Predicted Demand Scatter</h3>
-            <p className="card__subtitle">Proximity to the diagonal reference line indicates prediction precision.</p>
+            <h3 className="card__title" style={{ fontFamily: 'var(--font-sans)' }}>Actual vs. Predicted Demand Scatter</h3>
+            <p className="card__subtitle" style={{ fontFamily: 'var(--font-sans)' }}>Proximity to the diagonal reference line indicates prediction precision.</p>
             <div className="chart-wrapper">
               <ResponsiveContainer width="100%" height={300}>
                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 10 }}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                  <XAxis type="number" dataKey="actual" name="Actual Demand" unit=" boxes" stroke="var(--color-text-muted)" fontSize={11} />
-                  <YAxis type="number" dataKey="predicted" name="Predicted Demand" unit=" boxes" stroke="var(--color-text-muted)" fontSize={11} />
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} stroke="var(--text-tertiary)" />
+                  <XAxis type="number" dataKey="actual" name="Actual Demand" unit=" boxes" stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />
+                  <YAxis type="number" dataKey="predicted" name="Predicted Demand" unit=" boxes" stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />
                   <Tooltip 
                     cursor={{ strokeDasharray: '3 3' }} 
                     contentStyle={{ 
@@ -621,8 +621,8 @@ export function MLMetricsPage({
                       minWidth: 'max-content',
                     }} 
                   />
-                  <Scatter name="Demand Observations" data={metrics.actual_vs_predicted} fill="var(--color-primary)" opacity={0.6} />
-                  <Legend verticalAlign="top" height={36} />
+                  <Scatter name="Demand Observations" data={metrics.actual_vs_predicted} fill="#0B0F19" opacity={0.8} />
+                  <Legend verticalAlign="top" height={36} wrapperStyle={{ fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)' }} />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
@@ -632,14 +632,14 @@ export function MLMetricsPage({
         {/* Residuals Error Histogram */}
         <div className="metrics-page__col metrics-page__col--half">
           <div className="card chart-card">
-            <h3 className="card__title">Residuals Error Distribution</h3>
-            <p className="card__subtitle">Histogram of (Actual - Predicted) errors. Normal distribution around 0 indicates unbiased forecasts.</p>
+            <h3 className="card__title" style={{ fontFamily: 'var(--font-sans)' }}>Residuals Error Distribution</h3>
+            <p className="card__subtitle" style={{ fontFamily: 'var(--font-sans)' }}>Histogram of (Actual - Predicted) errors. Normal distribution around 0 indicates unbiased forecasts.</p>
             <div className="chart-wrapper">
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={metrics.error_distribution} margin={{ top: 20, right: 20, bottom: 20, left: 10 }}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                  <XAxis dataKey="bin" stroke="var(--color-text-muted)" fontSize={10} angle={-15} textAnchor="end" height={50} />
-                  <YAxis stroke="var(--color-text-muted)" fontSize={11} />
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} stroke="var(--text-tertiary)" />
+                  <XAxis dataKey="bin" stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} angle={-15} textAnchor="end" height={50} />
+                  <YAxis stroke="var(--text-tertiary)" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'var(--surface-elevated)', 
@@ -652,8 +652,8 @@ export function MLMetricsPage({
                       minWidth: 'max-content',
                     }} 
                   />
-                  <Bar dataKey="count" name="Frequency" fill="var(--color-warning)" radius={[4, 4, 0, 0]} />
-                  <Legend verticalAlign="top" height={36} />
+                  <Bar dataKey="count" name="Frequency" fill="#0B0F19" radius={[4, 4, 0, 0]} />
+                  <Legend verticalAlign="top" height={36} wrapperStyle={{ fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)' }} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

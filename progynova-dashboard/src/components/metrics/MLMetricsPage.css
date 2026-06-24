@@ -499,6 +499,8 @@
   flex-direction: column;
   gap: var(--space-md);
   transition: background-color var(--transition-normal), border-color var(--transition-normal);
+  height: 100%;
+  flex: 1;
 }
 
 .card__title {
