@@ -11,7 +11,7 @@ ax.set_facecolor('#0B0F19')
 
 # Actual performance results (MAPE % - lower is better)
 models = ["Transformer", "LSTM", "CNN-LSTM", "XGBoost"]
-mapes = [17.40, 19.10, 18.25, 14.15]
+mapes = [17.40, 19.10, 18.25, 4.90]
 statuses = ["Tested", "Tested", "Tested", "Best Performing"]
 
 # Modern UI dashboard colors (representing each model class)
