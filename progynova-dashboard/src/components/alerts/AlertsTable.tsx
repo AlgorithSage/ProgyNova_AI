@@ -633,7 +633,7 @@ export function AlertsTable({
                     {alert.entity_id}
                   </div>
                 </td>
-                <td className="mono">{alert.location_id}</td>
+                <td className="alerts-table__location-content">{alert.location_id}</td>
                 <td className="alerts-table__num">{alert.stock_on_hand.toFixed(0)}</td>
                 <td className="alerts-table__num">{alert.forecast.toFixed(1)}</td>
                 <td className="alerts-table__num alerts-table__deficit">{alert.deficit.toFixed(1)}</td>

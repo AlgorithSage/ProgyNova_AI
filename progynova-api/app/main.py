@@ -62,6 +62,27 @@ def load_drug_names():
 # Pre-load on startup
 load_drug_names()
 
+# Global store ID to "City, State" map loaded from data/stores.csv
+_store_location_map = {}
+
+def load_store_locations():
+    """Load store ID to city/state mapping from data/stores.csv."""
+    global _store_location_map
+    stores_csv_path = MODEL_PATH.parent.parent / "data" / "stores.csv"
+    if stores_csv_path.exists():
+        try:
+            df_stores = pd.read_csv(stores_csv_path)
+            labels = df_stores["city"].astype(str) + ", " + df_stores["state"].astype(str)
+            _store_location_map = dict(zip(df_stores["store_id"].astype(str), labels))
+            print(f"[API] Loaded {len(_store_location_map)} store location mappings successfully.")
+        except Exception as e:
+            print(f"[API] Failed to parse store location map: {e}")
+    else:
+        print(f"[API] WARNING: stores.csv not found at {stores_csv_path}.")
+
+# Pre-load on startup
+load_store_locations()
+
 # In-memory cache for processed dataframes and predictions to prevent redundant feature engineering
 # Key: SHA-256 hash of the uploaded CSV file(s)
 # Value: Dictionary containing features_df, X feature matrix, predictions array, and feature column names.
@@ -222,7 +243,11 @@ async def forecast(file: List[UploadFile] = File(None)):
                 lambda x: f"{x} - {_drug_name_map[x]}" if x in _drug_name_map else x
             )
             
-        features_df["location_id"] = features_df["store_id"]
+        features_df["location_id"] = features_df["store_id"].astype(str)
+        if _store_location_map:
+            features_df["location_id"] = features_df["location_id"].apply(
+                lambda x: f"{x} - {_store_location_map[x]}" if x in _store_location_map else x
+            )
         features_df["time_index"] = features_df["week"]
         features_df["target"] = features_df["demand"]
         features_df["original_index"] = features_df.index
@@ -253,13 +278,17 @@ async def alerts(
         
         alerts_list = detect_stockouts(features_df, predictions, multiplier=multiplier, buffer=buffer)
         
-        # Map drug names in the stockout alerts (e.g. "D01 - Metformin 500mg")
-        if _drug_name_map:
-            for a in alerts_list:
-                d_id = str(a["entity_id"])
-                if d_id in _drug_name_map:
-                    a["entity_id"] = f"{d_id} - {_drug_name_map[d_id]}"
-                    
+        # Map drug names and store locations into the stockout alerts
+        # (e.g. "D01 - Metformin 500mg", "S06 - Pune, Maharashtra")
+        for a in alerts_list:
+            d_id = str(a["entity_id"])
+            if _drug_name_map and d_id in _drug_name_map:
+                a["entity_id"] = f"{d_id} - {_drug_name_map[d_id]}"
+
+            loc_id = str(a["location_id"])
+            if _store_location_map and loc_id in _store_location_map:
+                a["location_id"] = f"{loc_id} - {_store_location_map[loc_id]}"
+
         return alerts_list
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

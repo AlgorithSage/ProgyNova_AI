@@ -40,11 +40,14 @@ export function AppLayout({
       {/* ── Left Sidebar ────────────────────────── */}
       <aside className="app-layout__sidebar" role="complementary">
         <div className="app-layout__brand">
-          <svg className="app-layout__logo" width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="7" className="app-layout__logo-rect" />
-            <path d="M8 20V8h3.5c1.4 0 2.5.4 3.3 1.1.8.8 1.2 1.8 1.2 3.1s-.4 2.3-1.2 3.1c-.8.7-1.9 1.1-3.3 1.1H10.5V20H8z" className="app-layout__logo-path" />
-            <path d="M17 20V8h2.5v12H17z" className="app-layout__logo-path" opacity="0.7" />
-          </svg>
+          <img 
+            className="app-layout__logo" 
+            src="/logos/i2.png" 
+            alt="ProgyNovaAI Logo" 
+            width="28" 
+            height="28"
+            style={{ borderRadius: '6px', objectFit: 'contain' }}
+          />
           <span className="app-layout__brand-title">ProgyNovaAI</span>
         </div>
 

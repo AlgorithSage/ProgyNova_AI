@@ -271,8 +271,7 @@ function App() {
               </div>
               <span className="dashboard__metric-value">{alerts.length}</span>
               <div className="dashboard__metric-footer">
-                <span className="dashboard__metric-trend--up">↗ 12%</span>
-                <span>Increased from last month</span>
+                <span>Total alerts detected</span>
               </div>
             </div>
 

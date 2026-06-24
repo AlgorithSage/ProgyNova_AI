@@ -44,9 +44,3 @@ build/
 # Large Document files & Reports
 *.docx
 *.pdf
-
-# Reproduction full/temporary results
-reproduction_results/full_*
-
-# Unused large image assets
-progynova-dashboard/public/logos/i.png

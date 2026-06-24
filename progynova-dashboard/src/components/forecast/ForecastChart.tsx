@@ -149,7 +149,7 @@ export function ForecastChart({ data, onSelectItem, isLoading }: ForecastChartPr
       </div>
 
       <div className="forecast-chart__container">
-        <ResponsiveContainer width="100%" height={320}>
+        <ResponsiveContainer width="100%" height="100%" minHeight={280}>
           <AreaChart
             data={sampledData}
             onClick={(state) => {

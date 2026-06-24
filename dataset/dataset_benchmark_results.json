@@ -1,0 +1,51 @@
+{
+    "data_integrity_audit": {
+        "dimensions_ok": true,
+        "nulls_audit": {
+            "dispensing": 0,
+            "drugs": 0,
+            "stores": 0,
+            "context": 0
+        },
+        "duplicates_audit": {
+            "dispensing": 0,
+            "drugs": 0,
+            "stores": 0,
+            "context": 0
+        },
+        "referential_integrity_ok": true,
+        "passed_all_integrity": true
+    },
+    "statistical_realism_tests": {
+        "temporal_continuity_ok": true,
+        "population_demand_correlation": 0.9974244709539913,
+        "paracetamol_dengue_corr": 0.585703706570689,
+        "paracetamol_flu_corr": 0.009201030686437617,
+        "ors_diarrhoeal_corr": 0.22920405833856258,
+        "antimalarial_malaria_corr": 0.4521225903376977,
+        "outbreak_alignment_ok": true,
+        "passed_all_stats": true
+    },
+    "machine_learning_benchmarks": {
+        "naive_baseline": {
+            "MAE": 112.5122,
+            "RMSE": 200.9792,
+            "MAPE_Pct": 46.26
+        },
+        "regression_benchmark": {
+            "model_type": "XGBoost",
+            "MAE": 72.9133,
+            "RMSE": 129.65,
+            "MAPE_Pct": 32.2
+        },
+        "classification_benchmark": {
+            "model_type": "XGBoost",
+            "Accuracy": 0.983,
+            "Precision": 0.3745,
+            "Recall": 0.7642,
+            "F1_Score": 0.5027,
+            "ROC_AUC": 0.9781,
+            "imbalance_ratio_used": 133.6
+        }
+    }
+}

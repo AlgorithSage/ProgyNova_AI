@@ -6,6 +6,10 @@
   box-shadow: var(--shadow-md);
   transition: all var(--transition-normal);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
   min-width: 0;
 }
 
@@ -68,15 +72,18 @@
 .forecast-chart__container {
   width: 100%;
   min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .forecast-chart__empty {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-md);
-  padding: var(--space-xxl) 0;
   color: var(--text-tertiary);
   font-size: var(--text-body);
 }
@@ -90,6 +97,7 @@
 
 /* Skeleton Loader Styles */
 .forecast-chart__skeleton {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
@@ -126,7 +134,8 @@
 
 .forecast-chart__skeleton-body {
   width: 100%;
-  height: 320px;
+  flex: 1;
+  min-height: 200px;
   background: var(--border);
   border-radius: var(--radius-lg);
   opacity: 0.6;
@@ -137,9 +146,11 @@
   0% {
     opacity: 0.6;
   }
+
   50% {
     opacity: 0.3;
   }
+
   100% {
     opacity: 0.6;
   }
@@ -199,7 +210,8 @@
   flex-direction: column;
   gap: var(--space-xxs);
   width: auto;
-  min-width: max-content; /* Auto adjust width based on content */
+  min-width: max-content;
+  /* Auto adjust width based on content */
   pointer-events: none;
   transition: all var(--transition-fast);
 }
@@ -245,5 +257,3 @@
   color: var(--text-primary);
   margin-left: auto;
 }
-
-

@@ -75,15 +75,24 @@ def check_env():
         print("[ERROR] Could not locate or train the XGBoost model at models/xgboost_baseline.json.")
         sys.exit(1)
 
-def run_evaluation():
+def run_evaluation(evaluate_full=False):
     # Load dataset
     print("\n[1/4] Loading features matrix...")
     df = pd.read_csv(DATA_DIR / "features.csv")
     
-    # Validation Split matching generate_data.py test window (week >= 143)
-    test_df = df[df["week"] >= 143].copy()
-    print(f"      - Loaded {len(df)} total rows.")
-    print(f"      - Filtered Test Set: {len(test_df)} rows (weeks 143 to 155).")
+    # Validation Split
+    if evaluate_full:
+        test_df = df.copy()
+        print(f"      - Loaded {len(df)} total rows.")
+        print("      - Running evaluation on the FULL dataset (operational audit).")
+        img_prefix = "full_fig"
+        title_suffix = " (Full Horizon)"
+    else:
+        test_df = df[df["week"] >= 143].copy()
+        print(f"      - Loaded {len(df)} total rows.")
+        print(f"      - Filtered Test Set: {len(test_df)} rows (weeks 143 to 155).")
+        img_prefix = "fig"
+        title_suffix = " (Validation Window)"
     
     # Extract features
     exclude = {"store_id", "drug_id", "week", "date", "demand", "units_dispensed",
@@ -142,7 +151,10 @@ def run_evaluation():
         f1 = f1_score(actual_stockouts, predicted_alerts, zero_division=0)
         
         try:
-            auc = roc_auc_score(actual_stockouts, risk_scores)
+            if len(np.unique(actual_stockouts)) > 1:
+                auc = roc_auc_score(actual_stockouts, risk_scores)
+            else:
+                auc = 1.0 if np.all(actual_stockouts == predicted_alerts) else 0.5
         except Exception:
             auc = 0.5
             
@@ -161,22 +173,23 @@ def run_evaluation():
         }
     
     # Print Markdown table to stdout
-    print("\n[CLASSIFICATION] Alert Optimization Metrics Matrix (Validation Window):")
+    print(f"\n[CLASSIFICATION] Alert Optimization Metrics Matrix{title_suffix}:")
     print("| Sensitivity Mode | Multiplier | Buffer | Accuracy | Precision | Recall (Sens.) | F1-Score | TP / FN (Missed) | FP (Over-order) |")
     print("| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |")
     for mode_name, metrics in results.items():
         params = SENSITIVITY_MODES[mode_name]
         print(f"| **{mode_name}** | {params['multiplier']:.2f} | {params['buffer']:.1f} | {metrics['Accuracy']*100:.2f}% | {metrics['Precision']*100:.2f}% | {metrics['Recall']*100:.2f}% | {metrics['F1-Score']*100:.2f}% | {metrics['TP']} / {metrics['FN']} | {metrics['FP']} |")
-
+ 
     # Save metrics JSON
-    with open(OUTPUT_DIR / "metrics_report.json", "w") as f:
+    report_name = "full_metrics_report.json" if evaluate_full else "metrics_report.json"
+    with open(OUTPUT_DIR / report_name, "w") as f:
         json.dump({
             "regression": {
                 "mae": mae, "rmse": rmse, "mape": mape, "stabilized_mape": s_mape
             },
             "classification": results
         }, f, indent=4)
-    print(f"\n[+] Saved metrics JSON to {OUTPUT_DIR / 'metrics_report.json'}")
+    print(f"\n[+] Saved metrics JSON to {OUTPUT_DIR / report_name}")
     
     # --------------------------------------------------------------------------
     # [4/4] Generate Academic Figures
@@ -188,13 +201,13 @@ def run_evaluation():
     plt.scatter(y_test, y_pred, alpha=0.4, color='#3949AB', edgecolors='none', label='Observations')
     max_val = max(np.max(y_test), np.max(y_pred))
     plt.plot([0, max_val], [0, max_val], 'r--', alpha=0.8, label='Ideal ($y=x$)')
-    plt.title('Actual vs. Predicted Pharmaceutical Demand Scatter Plot', fontsize=12, fontweight='bold', pad=10)
+    plt.title(f'Actual vs. Predicted Pharmaceutical Demand Scatter Plot{title_suffix}', fontsize=12, fontweight='bold', pad=10)
     plt.xlabel('Actual Demand (units)', fontsize=10)
     plt.ylabel('Predicted Demand (units)', fontsize=10)
     plt.legend(frameon=True)
     plt.grid(True, linestyle=':', alpha=0.5)
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "fig1_demand_scatter.png", dpi=300)
+    plt.savefig(OUTPUT_DIR / f"{img_prefix}1_demand_scatter.png", dpi=300)
     plt.close()
     
     # Figure 2: Residuals Error Histogram
@@ -202,15 +215,15 @@ def run_evaluation():
     residuals = y_test - y_pred
     plt.hist(residuals, bins=40, color='#F57F17', edgecolor='white', alpha=0.85)
     plt.axvline(0, color='red', linestyle='--', alpha=0.8, label='Zero Error')
-    plt.title('Residuals Error Distribution ($y_{true} - y_{pred}$)', fontsize=12, fontweight='bold', pad=10)
+    plt.title(f'Residuals Error Distribution ($y_{{true}} - y_{{pred}}$){title_suffix}', fontsize=12, fontweight='bold', pad=10)
     plt.xlabel('Prediction Residual (units)', fontsize=10)
     plt.ylabel('Frequency', fontsize=10)
     plt.legend()
     plt.grid(True, linestyle=':', alpha=0.5)
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "fig2_residuals_histogram.png", dpi=300)
+    plt.savefig(OUTPUT_DIR / f"{img_prefix}2_residuals_histogram.png", dpi=300)
     plt.close()
-
+ 
     # Figure 3: Grid of Confusion Matrices for publication
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5))
     for idx, (mode_name, metrics) in enumerate(results.items()):
@@ -237,11 +250,11 @@ def run_evaluation():
         if idx == 0:
             ax.set_ylabel('Actual Outcome', fontsize=9)
             
-    plt.suptitle('Operational Confusion Matrices Across Alert Sensitivity Configurations', fontsize=13, fontweight='bold', y=1.02)
+    plt.suptitle(f'Operational Confusion Matrices Across Alert Sensitivity Configurations{title_suffix}', fontsize=13, fontweight='bold', y=1.02)
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "fig3_confusion_matrices.png", dpi=300, bbox_inches='tight')
+    plt.savefig(OUTPUT_DIR / f"{img_prefix}3_confusion_matrices.png", dpi=300, bbox_inches='tight')
     plt.close()
-
+ 
     # Figure 4: Receiver Operating Characteristic (ROC) Curve
     plt.figure(figsize=(8, 6))
     for mode_name, params in SENSITIVITY_MODES.items():
@@ -254,20 +267,21 @@ def run_evaluation():
         plt.plot(fpr, tpr, label=f'{mode_name} (AUC = {auc_score:.4f})')
         
     plt.plot([0, 1], [0, 1], 'k--', alpha=0.5, label='Random Guess (AUC = 0.50)')
-    plt.title('Receiver Operating Characteristic (ROC) Curve comparison', fontsize=12, fontweight='bold', pad=10)
+    plt.title(f'Receiver Operating Characteristic (ROC) Curve comparison{title_suffix}', fontsize=12, fontweight='bold', pad=10)
     plt.xlabel('False Positive Rate (FPR)', fontsize=10)
     plt.ylabel('True Positive Rate (TPR)', fontsize=10)
     plt.legend(frameon=True)
     plt.grid(True, linestyle=':', alpha=0.5)
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "fig4_roc_curve.png", dpi=300)
+    plt.savefig(OUTPUT_DIR / f"{img_prefix}4_roc_curve.png", dpi=300)
     plt.close()
     
     print(f"[+] Saved four validation figures to directory: {OUTPUT_DIR}/")
     print("=" * 70)
     print("[SUCCESS] REPRODUCIBILITY CHECK PASSED SUCCESSFULLY!")
     print("=" * 70)
-
+ 
 if __name__ == "__main__":
     check_env()
-    run_evaluation()
+    evaluate_full = "--full" in sys.argv
+    run_evaluation(evaluate_full=evaluate_full)

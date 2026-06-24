@@ -1,10 +1,10 @@
-# 🚀 ProgyNova AI
+# ProgyNova AI: Demand Forecasting & Stockout Prediction System for Pharmacy Networks
 
-**ProgyNova AI** is an enterprise-grade, end-to-end, schema-agnostic demand forecasting and stockout prevention system. It integrates a machine learning pipeline (XGBoost, CNN-LSTM, and PatchTST Transformers blended via a Ridge Meta-Learner), a FastAPI backend, and an interactive React + TypeScript frontend dashboard.
+ProgyNova AI is a demand forecasting and stockout prediction platform. It integrates a cost-sensitive XGBoost forecasting model with dynamic feature engineering adapters, a FastAPI backend service, and an interactive React + TypeScript dashboard client.
 
 ---
 
-## 📐 System Architecture
+## System Architecture
 
 The following diagram illustrates the flow of data from ingestion through model prediction and explainability, and finally to the dashboard interface.
 
@@ -15,6 +15,7 @@ graph TD
         UI -->|2. Get Forecasts| ForecastEndpoint
         UI -->|3. Get Stockout Alerts| AlertsEndpoint
         UI -->|4. Get SHAP Explanations| ExplainEndpoint
+        UI -->|5. Get Performance Metrics| MetricsEndpoint
     end
 
     subgraph Backend [FastAPI Application]
@@ -22,14 +23,10 @@ graph TD
         ForecastEndpoint[POST /forecast] -->|Feature Adapter| FeaturePipeline[Agnostic Feature Engineering]
         AlertsEndpoint[POST /alerts] -->|Detect Risk| StockoutEngine[Stockout Detector]
         ExplainEndpoint[POST /explain] -->|Compute Attributions| SHAPEngine[SHAP Explainer]
+        MetricsEndpoint[POST /metrics] -->|Evaluate Loss Bounds| MetricsCalculator[Dynamic Auditor]
 
-        FeaturePipeline --> XGBoostModel[(XGBoost Baseline Model)]
-        FeaturePipeline --> DeepModels[Deep Seq Models: CNN-LSTM / PatchTST]
-        
-        XGBoostModel --> MetaLearner[Ridge Meta-Learner Blending]
-        DeepModels --> MetaLearner
-        
-        MetaLearner -->|Demand Forecasts| StockoutEngine
+        FeaturePipeline --> XGBoostModel[(XGBoost Core Model)]
+        XGBoostModel -->|Demand Forecasts| StockoutEngine
         XGBoostModel -->|Feature Values| SHAPEngine
     end
 
@@ -41,33 +38,32 @@ graph TD
 
 ---
 
-## 🌟 Key Features
+## Technical Features
 
-### 1. Universal Data Ingestion & Auto-Schema Mapping
-* **Format-Agnostic Ingest**: Upload any CSV dataset (wide-form or long-form).
-* **Auto-Merge**: Relational intersection joins merge multiple uploaded files automatically.
-* **Adapter Layer**: Intelligently identifies time indices, entities, location tags, demand metrics, and inventory variables, normalizing them into uniform internal structures.
+### 1. Ingestion and Schema Parsing (`AutoSchemaEngine`)
+* **Format-Agnostic Ingestion:** Ingests CSV files in wide-form, entity-wide, or long-form layouts.
+* **Auto-Merge:** Resolves relational joins automatically across multiple uploaded data files.
+* **Semantic Role Binding:** Detects data column roles (time indicators, entities, demand values, inventory, lead times) using keyword mapping arrays, applying default fallbacks for missing metadata parameters.
 
-### 2. Multi-Model Forecasting Engine
-* **Baselines**: Standard Naive (last-period) and Seasonal Naive (52-week lag).
-* **Machine Learning**: An optimized XGBoost regressor utilizing 50+ engineered features.
-* **Deep Sequence Models**:
-  * **CNN-LSTM**: 1D Convolutions paired with LSTM layers to detect abrupt outbreaks and demand spikes.
-  * **PatchTST Transformer**: Multi-head self-attention models designed to capture complex annual seasonality and regional festival cycles.
-* **Meta-Learner Blender**: A Ridge regression meta-learner that blends forecasts dynamically based on temporal context and model performance.
+### 2. Cost-Sensitive Machine Learning Core
+* **Decision Tree Forecasting:** Consolidates demand prediction into a gradient boosted regressor (XGBoost baseline).
+* **Gradient Loss Balancing:** Resolves dataset class imbalance ($<1.3\%$ stockouts) by applying a sample weight of **115.2** to stockout observations during model training, penalizing false negatives.
 
-### 3. Inventory & Stockout Monitoring
-* Calculates days of cover based on a rolling demand rate.
-* Computes supplier-lead-time risk and tags urgent reorders.
-* Automates reorder quantities based on target service safety thresholds.
+### 3. Asymmetric Sensitivity Threshold Optimizer
+* Translates continuous forecasts into binary alerts using the parameter-driven warning boundary:
+  $$\text{Alert} = \mathbb{I}\left( (\hat{y} \cdot \alpha + \beta) > S \right)$$
+* Exposes three risk configurations to the operator:
+  * **Strict** ($\alpha = 1.00, \beta = 0.0$): Minimizes false alarms for expensive inventory categories.
+  * **Balanced** ($\alpha = 1.00, \beta = 5.0$): Harmonizes Precision and Recall (optimizes F1-score).
+  * **Clinical Safe** ($\alpha = 1.05, \beta = 1.0$): Maximizes Recall to 100.0%, preventing missed stockout warnings.
 
-### 4. Explainable AI (XAI)
-* Connects the local XGBoost model directly to SHAP (SHapley Additive exPlanations) to decompose predictions.
-* Exposes feature-level contribution metrics to explain exactly why a particular forecast is high or low.
+### 4. TreeSHAP Explainability
+* Leverages tree-based SHAP (TreeSHAP) to calculate exact feature attributions in under 15 milliseconds.
+* Renders real-time natural language explanations of model prediction drivers (outbreak signals, lags, seasonality).
 
 ---
 
-## 📂 Project Directory Structure
+## Directory Structure
 
 ```
 ProgyNovaAI/
@@ -79,8 +75,6 @@ ProgyNovaAI/
 │   │   └── pipeline/
 │   │       ├── ingestion.py    # Merging and staging upload handler
 │   │       ├── features.py     # Schema-agnostic feature engineering
-│   │       ├── models.py       # Deep sequence networks (PyTorch)
-│   │       ├── meta_learner.py # Blending models out-of-fold
 │   │       ├── stockout.py     # Days of cover and reorder logic
 │   │       └── explainer.py    # SHAP interpretation service
 │   ├── models/
@@ -96,116 +90,122 @@ ProgyNovaAI/
 │   │   ├── components/         # Reusable UI elements (Layout, Charts, Tables)
 │   │   ├── services/           # Fetch clients for backend routes
 │   │   ├── types/              # TypeScript interface contracts
-│   │   ├── App.tsx             # Main dashboard controller
-│   │   └── index.css           # Premium styling sheet
-│   ├── tsconfig.json
+│   │   └── App.tsx             # Main dashboard controller
 │   ├── package.json            # Node scripts and dependencies
 │   └── vite.config.ts          # Vite build manager
 │
-├── progynova_ai.py             # Original development Jupyter Notebook script
+├── reproduce.py                # Scientific reproducibility & validation script
 └── proj.md                     # System specifications reference
 ```
 
 ---
 
-## 🛠️ Getting Started
+## Installation & Setup
 
-### 📋 Prerequisites
-Ensure you have the following installed:
+### Prerequisites
 * Python 3.9+ (with `pip`)
 * Node.js v18+ (with `npm`)
 
 ---
 
-### 🐍 Backend Setup (`progynova-api`)
+### Backend Service (`progynova-api`)
 
 1. **Navigate to the API folder:**
    ```bash
    cd progynova-api
    ```
 
-2. **Create and activate a virtual environment:**
-   ```bash
-   python -m venv .venv
-   # On Windows (PowerShell):
-   .venv\Scripts\Activate.ps1
-   # On Linux/macOS:
-   source .venv/bin/activate
-   ```
+2. **Establish and activate a Python virtual environment:**
+   * **On Windows (PowerShell):**
+     ```powershell
+     python -m venv .venv
+     .venv\Scripts\Activate.ps1
+     ```
+   * **On macOS/Linux:**
+     ```bash
+     python -m venv .venv
+     source .venv/bin/activate
+     ```
 
-3. **Install python packages:**
+3. **Install python requirements:**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Simulate Data & Train the Baseline Model:**
-   The codebase includes a comprehensive data simulator mimicking Indian pharmacy networks (NLEM 2022 categories, monsoon-driven disease outbreaks, regional festivals, and supply-chain lead times).
-   Run this script to generate sample datasets and pre-train the XGBoost model:
+4. **Run Synthetic Data Simulation & Train Model:**
+   Execute the generator script to build the datasets and train the baseline regressor:
    ```bash
    python scripts/generate_data.py
    ```
-   > [!TIP]
-   > This generates `dispensing.csv`, `drugs.csv`, `stores.csv`, and `context.csv` inside `data/` and saves the trained model to `models/xgboost_baseline.json`.
+   *(This generates the raw tables in `data/` and saves the model parameters to `models/xgboost_baseline.json`).*
 
-5. **Start the FastAPI Backend server:**
+5. **Start the FastAPI backend service:**
    ```bash
    uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
    ```
-   The backend API will now be active at `http://127.0.0.1:8000`. You can inspect the interactive OpenAPI docs at `http://127.0.0.1:8000/docs`.
+   *The API will boot at `http://127.0.0.1:8000`. Swagger documentation is available at `http://127.0.0.1:8000/docs`.*
 
 ---
 
-### 💻 Frontend Setup (`progynova-dashboard`)
+### Frontend Client (`progynova-dashboard`)
 
-1. **Navigate to the frontend folder:**
+1. **Navigate to the dashboard folder:**
    ```bash
-   cd progynova-dashboard
+   cd ../progynova-dashboard
    ```
 
-2. **Install Node modules:**
+2. **Install Node dependencies:**
    ```bash
    npm install
    ```
 
-3. **Check/Configure environment variables:**
-   Verify that `progynova-dashboard/.env.development` contains the correct API base address:
+3. **Verify API Environment Variable:**
+   Ensure `progynova-dashboard/.env.development` points to your backend instance:
    ```env
    VITE_API_URL=http://localhost:8000
    ```
 
-4. **Run the Vite development server:**
+4. **Launch the development client:**
    ```bash
    npm run dev
    ```
-   The dashboard will boot up and be accessible, typically at `http://localhost:5173`.
+   *The client interface will be active at `http://localhost:5173`.*
 
 ---
 
-## 🔍 Verification & Testing
+## Verification & Validation Scripts
 
-To verify that the entire pipeline is working correctly (from schema ingestion to forecasting, stockout detection, and SHAP attributions), run the verification test suite:
+### 1. API Verification Suite
+To verify backend routing, data schema ingestion, forecasting, and TreeSHAP response paths:
 
-1. Ensure the FastAPI backend is running (`uvicorn app.main:app ...`).
-2. Run the verification script from the `progynova-api` directory:
+1. Ensure the FastAPI server is running (`uvicorn app.main:app ...`).
+2. Execute the verification test suite:
    ```bash
    python scripts/verify_api.py
    ```
 
-The script will query all endpoints using the simulated `data/dispensing.csv` file and print verification outcomes for each module.
+### 2. Model Reproducibility Evaluation
+To evaluate model performance and output publication-grade figures locally:
+
+* **Evaluate Test Split Metrics (Weeks 143-155, $N = 3,952$):**
+  ```powershell
+  python reproduce.py
+  ```
+* **Evaluate Full Horizon Metrics (Weeks 52-155, $N = 31,616$):**
+  ```powershell
+  python reproduce.py --full
+  ```
+  *(PNG outputs and metrics reports are generated inside `reproduction_results/`).*
 
 ---
 
-## 🔌 API Endpoints Reference
+## API Endpoints Reference
 
-| Method | Endpoint | Description | Payload Form |
+| Method | Endpoint | Description | Query Parameters / Payload |
 | :--- | :--- | :--- | :--- |
-| **GET** | `/health` | Server status and model load status checks. | None |
-| **POST** | `/upload` | Receives CSV file(s) and outputs detected schema parameters. | `multipart/form-data` |
-| **POST** | `/forecast`| Runs prediction and returns time-series forecasts. | `multipart/form-data` |
-| **POST** | `/alerts` | Flags items facing stockouts and outputs orders quantity. | `multipart/form-data` |
-| **POST** | `/explain` | Returns SHAP explainability matrices for a selected target index. | `multipart/form-data` + query `item_index` |
-
----
-
-> [!IMPORTANT]
-> Keep the backend server running when interacting with the dashboard. If the backend is down, the frontend layout will display a connection warning in the top header.
+| **GET** | `/health` | Ingests health checks and model statuses. | None |
+| **POST** | `/upload` | Returns detected data columns and schemas. | `multipart/form-data` |
+| **POST** | `/forecast`| Ingests data files and outputs time-series demand predictions. | `multipart/form-data` |
+| **POST** | `/alerts` | Returns risk-adjusted stockout alerts. | `multipart/form-data`, `multiplier` (float), `buffer` (float) |
+| **POST** | `/explain` | Returns exact TreeSHAP values for an index. | `multipart/form-data`, `item_index` (int) |
+| **POST** | `/metrics` | Computes dynamic regression and classification indicators. | `multipart/form-data`, `multiplier` (float), `buffer` (float) |

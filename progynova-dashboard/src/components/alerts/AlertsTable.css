@@ -218,6 +218,13 @@
   font-family: var(--font-accent);
 }
 
+.alerts-table__location-content {
+  font-family: var(--font-accent);
+  font-size: var(--text-body);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
 .alerts-table__severity-dot {
   width: 8px;
   height: 8px;
