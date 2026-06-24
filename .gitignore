@@ -44,3 +44,6 @@ build/
 # Large Document files & Reports
 *.docx
 *.pdf
+
+# Reproduction results
+reproduction_results/
