@@ -47,3 +47,6 @@ build/
 
 # Reproduction results
 reproduction_results/
+
+# Research script models
+/models/
