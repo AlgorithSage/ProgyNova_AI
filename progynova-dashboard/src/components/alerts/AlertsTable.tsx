@@ -82,14 +82,16 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
         LOW: { color: '#1E8E3E', bg: '#E6F4EA' },
       };
 
-  const bg = isDark ? '#090D16' : '#F8FAFC';
-  const surface = isDark ? 'rgba(15, 23, 42, 0.6)' : '#FFFFFF';
-  const surfaceElevated = isDark ? 'rgba(30, 41, 59, 0.7)' : '#FFFFFF';
-  const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
-  const textSecondary = isDark ? '#CBD5E1' : '#475569';
-  const border = isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0';
-  const primary = isDark ? '#818CF8' : '#4F46E5';
-  const primaryGradient = isDark ? 'linear-gradient(135deg, #818CF8, #6366F1)' : 'linear-gradient(135deg, #6366F1, #4F46E5)';
+  const bg = isDark ? '#000000' : '#FFE6D8';
+  const surface = isDark ? '#545454' : '#FFFFFF';
+  const textPrimary = isDark ? '#FFFFFF' : '#000000';
+  const textSecondary = isDark ? '#FFE6D8' : '#545454';
+  const border = isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(84, 84, 84, 0.25)';
+  const primary = '#c1ff72';
+  const primaryGradient = isDark
+    ? 'linear-gradient(135deg, #c1ff72, rgba(193, 255, 114, 0.5))'
+    : 'linear-gradient(135deg, #c1ff72, rgba(193, 255, 114, 0.55))';
+  const onPrimaryText = '#000000';
   const errorColor = isDark ? '#F87171' : '#EF4444';
 
   const critCount = sorted.filter((a) => a.severity === 'CRITICAL').length;
@@ -189,16 +191,16 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 10px 20px; font-size: 13px; font-weight: 600;
       border-radius: 999px; cursor: pointer; border: 1px solid ${border};
-      background: ${surfaceElevated}; color: ${textPrimary};
+      background: ${surface}; color: ${textPrimary};
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .btn:hover {
       background: ${primary};
-      color: #fff;
+      color: ${onPrimaryText};
       border-color: ${primary};
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+      box-shadow: 0 4px 12px rgba(193, 255, 114, 0.3);
     }
     .btn svg {
       transition: transform 0.2s;
@@ -215,14 +217,14 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
     }
     .search-input {
       padding: 10px 18px; border-radius: 999px;
-      border: 1px solid ${border}; background: ${surfaceElevated};
+      border: 1px solid ${border}; background: ${surface};
       color: ${textPrimary}; font-size: 14px; font-family: inherit;
       min-width: 320px; outline: none; transition: all 0.2s;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .search-input:focus {
       border-color: ${primary};
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      box-shadow: 0 0 0 3px rgba(193, 255, 114, 0.18);
     }
     .search-input::placeholder { color: ${textSecondary}; opacity: 0.7; }
 
@@ -234,7 +236,7 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
 
     table {
       width: 100%; border-collapse: collapse; font-size: 14px;
-      background: ${surfaceElevated}; border-radius: 16px; overflow: hidden;
+      background: ${surface}; border-radius: 16px; overflow: hidden;
       box-shadow: 0 10px 30px rgba(0,0,0,0.03);
       border: 1px solid ${border};
     }
@@ -251,7 +253,7 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
     .num {
       font-family: 'Roundo', system-ui, sans-serif !important;
     }
-    tr:hover { background: rgba(79, 70, 229, 0.02); }
+    tr:hover { background: rgba(193, 255, 114, 0.05); }
     tr:last-child td { border-bottom: none; }
 
     .footer {

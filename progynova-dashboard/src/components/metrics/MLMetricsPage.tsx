@@ -621,7 +621,7 @@ export function MLMetricsPage({
                       minWidth: 'max-content',
                     }} 
                   />
-                  <Scatter name="Demand Observations" data={metrics.actual_vs_predicted} fill="#0B0F19" opacity={0.8} />
+                  <Scatter name="Demand Observations" data={metrics.actual_vs_predicted} fill="var(--chart-secondary)" opacity={0.8} />
                   <Legend verticalAlign="top" height={36} wrapperStyle={{ fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)' }} />
                 </ScatterChart>
               </ResponsiveContainer>
@@ -652,7 +652,7 @@ export function MLMetricsPage({
                       minWidth: 'max-content',
                     }} 
                   />
-                  <Bar dataKey="count" name="Frequency" fill="#0B0F19" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" name="Frequency" fill="var(--chart-secondary)" radius={[4, 4, 0, 0]} />
                   <Legend verticalAlign="top" height={36} wrapperStyle={{ fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)' }} />
                 </BarChart>
               </ResponsiveContainer>

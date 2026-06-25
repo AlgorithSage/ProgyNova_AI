@@ -276,11 +276,11 @@
 }
 
 .alerts-table__row:hover {
-  background: rgba(79, 70, 229, 0.03) !important;
+  background: rgba(193, 255, 114, 0.06) !important;
 }
 
 [data-theme="dark"] .alerts-table__row:hover {
-  background: rgba(129, 140, 248, 0.04) !important;
+  background: rgba(193, 255, 114, 0.08) !important;
 }
 
 .alerts-table__row--selected {
@@ -345,10 +345,19 @@
 .alerts-table__action-col {
   text-align: center;
   width: 120px;
+  position: sticky;
+  right: 0;
+  z-index: 3;
+  border-left: 1px solid var(--border);
 }
 
 .alerts-table__action-cell {
   text-align: center;
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
 }
 
 .alerts-table__analyze-btn {
@@ -384,14 +393,14 @@
 
 .alerts-table__analyze-btn:hover {
   background: var(--primary) !important;
-  color: #0B0F19 !important;
+  color: #000000 !important;
   border-color: transparent !important;
   transform: translateX(0) scale(1.04);
   box-shadow: var(--shadow-glow);
 }
 
 [data-theme="dark"] .alerts-table__analyze-btn:hover {
-  color: #131A26 !important;
+  color: #000000 !important;
 }
 
 /* ── Hover Tooltip ───────────────────────────── */
@@ -461,7 +470,7 @@
 
 .alerts-table__tooltip-stat--accent {
   background: var(--primary-light);
-  border-color: rgba(255, 235, 59, 0.3);
+  border-color: rgba(193, 255, 114, 0.3);
 }
 
 .alerts-table__tooltip-label {
@@ -643,13 +652,13 @@
 
 .alerts-table__load-more-btn:hover {
   background: var(--primary);
-  color: #0B0F19;
+  color: #000000;
   transform: translateY(-2px);
   box-shadow: var(--shadow-glow);
 }
 
 [data-theme="dark"] .alerts-table__load-more-btn:hover {
-  color: #131A26;
+  color: #000000;
 }
 
 .alerts-table__load-more-btn:active {

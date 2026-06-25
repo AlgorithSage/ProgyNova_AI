@@ -35,49 +35,49 @@
    ============================================ */
 
 :root {
-  /* Warm White (Light Mode Fallback) — Driven dynamically by mtheme.ts */
-  --bg: #FAFAF7;
-  --surface: #FFFFFF;
-  --surface-elevated: #F5F5F5;
-  --border: #E0E0E0;
-  --border-hover: #D5D5D5;
-  --text-primary: #1A1A1A;
-  --text-secondary: #616161;
-  --text-tertiary: #9E9E9E;
-  --primary: #FFEB3B;
-  --primary-hover: #FFF176;
-  --primary-light: rgba(255, 235, 59, 0.08);
-  --primary-gradient: linear-gradient(135deg, #FFEB3B, #FFF59D);
-  --secondary: #3949AB;
-  --accent: #29B6F6;
+  /* 5-Color Palette (Light Mode fallback) — Driven dynamically by theme.tsx/mtheme.ts */
+  --bg: #FFE6D8; /* Peach canvas */
+  --surface: #FFFFFF; /* White card surfaces */
+  --surface-elevated: rgba(84, 84, 84, 0.05);
+  --border: rgba(84, 84, 84, 0.25);
+  --border-hover: rgba(84, 84, 84, 0.4);
+  --text-primary: #000000; /* Black typography */
+  --text-secondary: #545454; /* Dark Grey */
+  --text-tertiary: rgba(0, 0, 0, 0.45);
+  --primary: #c1ff72; /* Lime Green accent */
+  --primary-hover: rgba(193, 255, 114, 0.8);
+  --primary-light: rgba(193, 255, 114, 0.15);
+  --primary-gradient: linear-gradient(135deg, #c1ff72, rgba(193, 255, 114, 0.55));
+  --secondary: #545454;
+  --accent: #000000;
   --success: #2E7D32;
   --success-light: rgba(46, 125, 50, 0.08);
   --warning: #F57F17;
   --warning-light: rgba(245, 127, 23, 0.08);
   --error: #C62828;
   --error-light: rgba(198, 40, 40, 0.08);
-  --info: #3949AB;
-  --info-light: rgba(57, 73, 171, 0.08);
+  --info: #545454;
+  --info-light: rgba(84, 84, 84, 0.08);
 
   /* Glassmorphism Tokens */
   --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(0, 0, 0, 0.08);
   --glass-blur: 16px;
 
   /* Chart Colors */
-  --chart-primary: #FFEB3B;
-  --chart-secondary: #29B6F6;
-  --chart-gradient-start: rgba(255, 235, 59, 0.15);
-  --chart-gradient-end: rgba(255, 235, 59, 0.0);
-  --chart-positive: #29B6F6;
-  --chart-negative: #E0E0E0;
+  --chart-primary: #c1ff72;
+  --chart-secondary: #000000;
+  --chart-gradient-start: rgba(193, 255, 114, 0.2);
+  --chart-gradient-end: rgba(193, 255, 114, 0.0);
+  --chart-positive: #c1ff72;
+  --chart-negative: #545454;
 
-  /* Shadows — Donezo's soft, diffuse shadows */
-  --shadow-sm: 0 2px 8px rgba(97, 97, 97, 0.02);
-  --shadow-md: 0 10px 30px rgba(97, 97, 97, 0.04);
-  --shadow-lg: 0 20px 40px rgba(97, 97, 97, 0.06);
-  --shadow-xl: 0 30px 60px rgba(97, 97, 97, 0.09);
-  --shadow-glow: 0 0 15px rgba(255, 235, 59, 0.2);
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.09);
+  --shadow-xl: 0 30px 60px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 15px rgba(193, 255, 114, 0.3);
 
   /* Spacing */
   --space-xxs: 4px;
@@ -101,14 +101,14 @@
   --font-mono: 'Zodiak', Georgia, 'Times New Roman', serif;
   --font-accent: 'Satoshi', system-ui, -apple-system, sans-serif;
 
-  /* Premium black-and-yellow card surface (theme-independent spotlight cards) */
-  --card-bg: #181818;
-  --card-surface: #303030;
-  --card-elevated: #494949;
+  /* Premium spotlight card surface (theme-independent — Dark Grey panel, Black wells) */
+  --card-bg: #000000;
+  --card-surface: #000000;
+  --card-elevated: #545454;
   --card-border: rgba(255, 255, 255, 0.08);
-  --card-text: #F5F7FA;
-  --card-text-secondary: #B0BEC5;
-  --card-text-tertiary: #78909C;
+  --card-text: #FFFFFF;
+  --card-text-secondary: #FFE6D8;
+  --card-text-tertiary: rgba(255, 255, 255, 0.55);
 
   --text-page-title: 1.75rem;
   --text-section-heading: 1.25rem;

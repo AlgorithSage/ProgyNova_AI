@@ -68,7 +68,7 @@
 
 .reorder-card__stat-value--primary {
   color: var(--primary);
-  text-shadow: 0 0 10px rgba(99, 102, 241, 0.1);
+  text-shadow: 0 0 10px rgba(193, 255, 114, 0.25);
 }
 
 .reorder-card__stat-label {
@@ -98,14 +98,14 @@
 
 .reorder-card__button:hover {
   background: var(--primary);
-  color: #0B0F19;
+  color: #000000;
   border-color: transparent;
   transform: translateY(-1px);
   box-shadow: var(--shadow-glow);
 }
 
 [data-theme="dark"] .reorder-card__button:hover {
-  color: #131A26;
+  color: #000000;
 }
 
 /* Empty state */
@@ -222,14 +222,14 @@
 
 .reorder-card__modal-confirm:hover {
   background: var(--primary);
-  color: #0B0F19;
+  color: #000000;
   border-color: transparent;
   transform: translateY(-1px);
   box-shadow: var(--shadow-glow);
 }
 
 [data-theme="dark"] .reorder-card__modal-confirm:hover {
-  color: #131A26;
+  color: #000000;
 }
 
 /* Skeleton Loader for Reorder Card */

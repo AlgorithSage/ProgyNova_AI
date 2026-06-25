@@ -6,6 +6,7 @@ import { AlertsTable } from './components/alerts/AlertsTable';
 import { ShapExplainer } from './components/explain/ShapExplainer';
 import { MLMetricsPage } from './components/metrics/MLMetricsPage';
 import { DocsPage } from './components/docs/DocsPage';
+import { LandingPage } from './components/landing/LandingPage';
 import { getForecast, getAlerts, getExplanation, checkHealth, getMetrics } from './services/api';
 import { applyTheme } from './mtheme';
 import type { Theme, ForecastPoint, StockoutAlert, ShapExplanation, UploadResponse, MLMetricsResponse } from './types';
@@ -37,7 +38,7 @@ function App() {
   const alertsRowRef = useRef<HTMLDivElement>(null);
 
   // View & ML Metrics states
-  const [currentView, setCurrentView] = useState<'dashboard' | 'metrics' | 'docs'>('dashboard');
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'metrics' | 'docs'>('landing');
   const [uploadedMetrics, setUploadedMetrics] = useState<MLMetricsResponse | null>(null);
   const [sensitivityMode, setSensitivityMode] = useState<'strict' | 'balanced' | 'safe'>('balanced');
 
@@ -207,6 +208,10 @@ function App() {
     ? selectedAlert.entity_id
     : (selectedForecast ? selectedForecast.entity_id : '');
 
+  if (currentView === 'landing') {
+    return <LandingPage onViewChange={setCurrentView} />;
+  }
+
   return (
     <AppLayout
       theme={theme}
@@ -217,7 +222,7 @@ function App() {
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
       currentView={currentView}
-      onViewChange={(view) => setCurrentView(view as 'dashboard' | 'metrics' | 'docs')}
+      onViewChange={(view) => setCurrentView(view as 'landing' | 'dashboard' | 'metrics' | 'docs')}
       onNavClick={handleNavClick}
     >
       {currentView === 'dashboard' ? (

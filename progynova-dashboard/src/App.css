@@ -73,7 +73,7 @@
 
 .btn--primary {
   background: var(--primary);
-  color: #0B0F19;
+  color: var(--card-bg);
   border: 1.5px solid var(--primary);
   box-shadow: var(--shadow-sm);
   font-weight: 700;
@@ -92,7 +92,7 @@
 
 .btn--outline {
   background: var(--card-surface);
-  color: #F5F7FA;
+  color: var(--card-text);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   box-shadow: var(--shadow-sm);
 }
@@ -104,14 +104,14 @@
 
 .btn--outline:hover {
   background: #FFFFFF;
-  color: #0B0F19;
+  color: var(--card-bg);
   border-color: var(--card-surface);
   transform: translateY(-1px);
 }
 
 [data-theme="dark"] .btn--outline:hover {
   background: var(--text-primary);
-  color: #0B0F19;
+  color: var(--card-bg);
   border-color: var(--text-primary);
 }
 
@@ -214,7 +214,7 @@
 .dashboard__metric-card--primary {
   background: var(--card-elevated);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #F5F7FA;
+  color: var(--card-text);
 }
 
 [data-theme="dark"] .dashboard__metric-card--primary {
@@ -222,7 +222,7 @@
 }
 
 .dashboard__metric-card--primary .dashboard__metric-label {
-  color: #B0BEC5;
+  color: var(--card-text-secondary);
 }
 
 .dashboard__metric-card--primary .dashboard__metric-value {
@@ -235,7 +235,7 @@
 }
 
 .dashboard__metric-card--primary .dashboard__metric-footer {
-  color: #B0BEC5;
+  color: var(--card-text-secondary);
 }
 
 .dashboard__metric-card--primary .dashboard__metric-trend--up {

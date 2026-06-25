@@ -39,7 +39,12 @@ export function AppLayout({
 
       {/* ── Left Sidebar ────────────────────────── */}
       <aside className="app-layout__sidebar" role="complementary">
-        <div className="app-layout__brand">
+        <div 
+          className="app-layout__brand"
+          onClick={() => onViewChange?.('landing')}
+          style={{ cursor: 'pointer' }}
+          title="Return to Landing Page"
+        >
           <img 
             className="app-layout__logo" 
             src="/logos/i2.png" 

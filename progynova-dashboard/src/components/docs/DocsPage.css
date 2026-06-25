@@ -136,12 +136,8 @@
   display: block;
   width: 5px;
   height: 1.1em;
-  background: #0B0F19;
-  border-radius: 4px;
-}
-
-[data-theme="dark"] .docs-page__content h3::before {
   background: var(--text-primary);
+  border-radius: 4px;
 }
 
 .docs-page__content p {
@@ -241,12 +237,12 @@
   border: none;
   margin: 1.5em 0;
   padding: 1.2em 1.5em;
-  color: #F5F7FA;
+  color: var(--card-text);
   background-color: var(--card-elevated);
   border-radius: var(--radius-lg);
   font-style: normal;
   font-weight: 500;
-  box-shadow: 0 0 16px rgba(255, 235, 59, 0.25);
+  box-shadow: 0 0 16px rgba(193, 255, 114, 0.25);
 }
 
 [data-theme="dark"] .docs-page__content blockquote {

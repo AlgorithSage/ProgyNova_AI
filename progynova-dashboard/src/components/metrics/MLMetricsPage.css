@@ -79,23 +79,23 @@
 }
 
 .sensitivity-btn--active {
-  color: #1A1A1A;
+  color: #000000;
   background-color: var(--primary) !important;
   font-weight: 600;
   box-shadow: var(--shadow-sm);
 }
 
 [data-theme='dark'] .sensitivity-selector {
-  background-color: #262626;
-  border-color: #383838;
+  background-color: var(--surface-elevated);
+  border-color: var(--border);
 }
 
 [data-theme='dark'] .sensitivity-btn:hover {
-  background-color: #333333;
+  background-color: var(--bg);
 }
 
 [data-theme='dark'] .sensitivity-btn--active {
-  color: #1A1A1A;
+  color: #000000;
   background-color: var(--primary) !important;
 }
 
@@ -819,30 +819,30 @@
 
 [data-theme='dark'] .card,
 [data-theme='dark'] .metric-card {
-  background-color: #1E1E1E;
-  border-color: #333333;
+  background-color: var(--surface);
+  border-color: var(--border);
 }
 
 [data-theme='dark'] .metric-card:hover,
 [data-theme='dark'] .card:hover {
-  border-color: #444444;
+  border-color: var(--border-hover);
 }
 
 [data-theme='dark'] .metric-card__icon {
-  background-color: #121212;
+  background-color: var(--bg);
 }
 
 [data-theme='dark'] .matrix-cell {
-  background-color: #262626;
-  border-color: #383838;
+  background-color: var(--surface-elevated);
+  border-color: var(--border);
 }
 
 [data-theme='dark'] .matrix-cell--tn {
-  border-bottom-color: #555;
+  border-bottom-color: var(--text-tertiary);
 }
 [data-theme='dark'] .matrix-cell--tn:hover,
 [data-theme='dark'] .matrix-cell--tn.matrix-cell--active {
-  border-color: #888;
+  border-color: var(--text-secondary);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -871,7 +871,7 @@
 }
 
 [data-theme='dark'] .interpretation-badge--tn {
-  background-color: #2c2c2c;
+  background-color: var(--surface-elevated);
 }
 
 /* ==========================================================================
@@ -976,8 +976,8 @@
 }
 
 [data-theme='dark'] .metrics-modal {
-  background-color: #1A1A1A;
-  border-color: #333333;
+  background-color: var(--surface);
+  border-color: var(--border);
 }
 
 .metrics-modal__header {
@@ -1064,8 +1064,8 @@
 }
 
 [data-theme='dark'] .metrics-modal__term-card {
-  background-color: #242424;
-  border-color: #333;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: var(--border);
 }
 
 .metrics-modal__term-name-row {
@@ -1119,8 +1119,8 @@
 }
 
 [data-theme='dark'] .metrics-modal__explanation-block {
-  background-color: #242424;
-  border-color: #333;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: var(--border);
 }
 
 .metrics-modal__bullet-list {

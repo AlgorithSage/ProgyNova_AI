@@ -69,7 +69,7 @@
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
-  background: rgba(255, 235, 59, 0.14);
+  background: rgba(193, 255, 114, 0.14);
   color: var(--primary);
   flex-shrink: 0;
 }
@@ -88,10 +88,10 @@
   font-size: var(--text-small);
   font-weight: 700;
   color: var(--primary);
-  background: rgba(255, 235, 59, 0.16);
+  background: rgba(193, 255, 114, 0.16);
   padding: 4px 12px;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(255, 235, 59, 0.3);
+  border: 1px solid rgba(193, 255, 114, 0.3);
 }
 
 .shap-explainer__close-btn {
@@ -193,8 +193,8 @@
 }
 
 .shap-explainer__meta-icon--primary {
-  background: rgba(255, 235, 59, 0.18);
-  color: #0B0F19;
+  background: rgba(193, 255, 114, 0.18);
+  color: #000000;
 }
 
 [data-theme="dark"] .shap-explainer__meta-icon--primary {
@@ -227,7 +227,7 @@
 }
 
 .shap-explainer__meta-value--primary {
-  color: #0B0F19;
+  color: #000000;
 }
 
 [data-theme="dark"] .shap-explainer__meta-value--primary {
@@ -385,25 +385,25 @@
 
 .shap-explainer__info-btn:hover {
   background: var(--primary);
-  color: #0B0F19;
+  color: #000000;
   border-color: transparent;
   transform: translateY(-1px);
   box-shadow: var(--shadow-glow);
 }
 
 [data-theme="dark"] .shap-explainer__info-btn:hover {
-  color: #131A26;
+  color: #000000;
 }
 
 .shap-explainer__info-btn--active {
   background: var(--primary) !important;
-  color: #0B0F19 !important;
+  color: #000000 !important;
   border-color: transparent !important;
   box-shadow: var(--shadow-glow);
 }
 
 [data-theme="dark"] .shap-explainer__info-btn--active {
-  color: #131A26 !important;
+  color: #000000 !important;
 }
 
 .shap-explainer__info-btn svg {
@@ -419,7 +419,7 @@
   margin-top: var(--space-md);
   padding: var(--space-lg) var(--space-lg) var(--space-md);
   background: linear-gradient(165deg, var(--card-surface) 0%, var(--card-elevated) 100%);
-  border: 1px solid rgba(255, 235, 59, 0.12);
+  border: 1px solid rgba(193, 255, 114, 0.12);
   border-radius: var(--radius-lg);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.35),
@@ -476,16 +476,16 @@
 
 .shap-explainer__guide-col {
   padding: var(--space-md);
-  background: rgba(255, 235, 59, 0.06);
-  border: 1px solid rgba(255, 235, 59, 0.15);
+  background: rgba(193, 255, 114, 0.06);
+  border: 1px solid rgba(193, 255, 114, 0.15);
   border-radius: var(--radius-md);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .shap-explainer__guide-col:hover {
-  background: rgba(255, 235, 59, 0.09);
-  border-color: rgba(255, 235, 59, 0.22);
-  box-shadow: 0 0 24px rgba(255, 235, 59, 0.06);
+  background: rgba(193, 255, 114, 0.09);
+  border-color: rgba(193, 255, 114, 0.22);
+  box-shadow: 0 0 24px rgba(193, 255, 114, 0.06);
   transform: translateY(-1px);
 }
 
@@ -509,7 +509,7 @@
   border-radius: 50%;
   background: var(--primary);
   flex-shrink: 0;
-  box-shadow: 0 0 6px rgba(255, 235, 59, 0.4);
+  box-shadow: 0 0 6px rgba(193, 255, 114, 0.4);
 }
 
 /* ── Guide List (custom bullets) ──────────────── */
@@ -554,8 +554,8 @@
   gap: 0;
   font-size: var(--text-small);
   line-height: 1.5;
-  background: rgba(255, 235, 59, 0.05);
-  border: 1px solid rgba(255, 235, 59, 0.15);
+  background: rgba(193, 255, 114, 0.05);
+  border: 1px solid rgba(193, 255, 114, 0.15);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -567,10 +567,10 @@
   color: var(--primary);
   white-space: nowrap;
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(255, 235, 59, 0.08);
+  border-bottom: 1px solid rgba(193, 255, 114, 0.08);
   display: flex;
   align-items: center;
-  background: rgba(255, 235, 59, 0.08);
+  background: rgba(193, 255, 114, 0.08);
 }
 
 [data-theme="dark"] .shap-explainer__terms dt {
@@ -581,7 +581,7 @@
   color: rgba(255, 255, 255, 0.75);
   margin-left: 0;
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(255, 235, 59, 0.08);
+  border-bottom: 1px solid rgba(193, 255, 114, 0.08);
   display: flex;
   align-items: center;
 }
@@ -635,10 +635,10 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md);
-  background: rgba(255, 235, 59, 0.15);
+  background: rgba(193, 255, 114, 0.15);
   color: var(--primary);
   flex-shrink: 0;
-  box-shadow: 0 0 12px rgba(255, 235, 59, 0.2);
+  box-shadow: 0 0 12px rgba(193, 255, 114, 0.2);
 }
 
 .progynova-insights__title {
@@ -859,25 +859,25 @@
 
 .shap-explainer__tech-toggle-btn:hover {
   background: var(--primary);
-  color: #0B0F19;
+  color: #000000;
   border-color: transparent;
   transform: translateY(-1px);
   box-shadow: var(--shadow-glow);
 }
 
 [data-theme="dark"] .shap-explainer__tech-toggle-btn:hover {
-  color: #131A26;
+  color: #000000;
 }
 
 .shap-explainer__tech-toggle-btn--active {
   background: var(--primary) !important;
-  color: #0B0F19 !important;
+  color: #000000 !important;
   border-color: transparent !important;
   box-shadow: var(--shadow-glow);
 }
 
 [data-theme="dark"] .shap-explainer__tech-toggle-btn--active {
-  color: #131A26 !important;
+  color: #000000 !important;
 }
 
 .shap-explainer__technical-section {
