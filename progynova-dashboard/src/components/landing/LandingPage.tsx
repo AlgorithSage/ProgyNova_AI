@@ -101,9 +101,18 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
         <nav className="landing-page__links">
           <button onClick={() => onViewChange('metrics')} className="landing-nav-link">ML Metrics</button>
           <button onClick={() => onViewChange('docs')} className="landing-nav-link">Help & Docs</button>
-          <button onClick={() => onViewChange('dashboard')} className="btn btn--primary btn-nav-cta">
+          <button onClick={() => onViewChange('dashboard')} className="btn-nav-cta">
             Launch Dashboard
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: '4px' }}>
+            <svg
+              className="svgIcon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>

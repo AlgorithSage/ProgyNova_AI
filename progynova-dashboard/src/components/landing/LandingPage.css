@@ -68,12 +68,50 @@
   color: var(--text-primary);
 }
 
+/* Nav CTA - same pill + rotating black-badge icon as the hero/metrics CTA,
+   sized down for the navbar. Lime Green pill, black badge, lime glyph. */
 .btn-nav-cta {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
+  gap: 9px;
+  height: 44px;
+  padding: 0 7px 0 18px; /* tight right padding so the badge sits inside */
+  background-color: var(--primary);
+  border-radius: 30px;
+  color: #131313;
+  font-family: var(--font-accent);
   font-size: 0.9rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.12);
+  transition: filter 0.5s, transform 0.2s, box-shadow 0.3s;
+}
+
+.btn-nav-cta .svgIcon {
+  height: 30px;
+  width: 30px;
+  padding: 7px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: #000000; /* Black circular badge behind the arrow */
+  color: var(--primary); /* Lime arrow reads on the black circle */
+  transition: transform 1.5s;
+  flex-shrink: 0;
+}
+
+.btn-nav-cta:hover {
+  filter: brightness(1.08);
+  transform: scale(1.03);
+  box-shadow: 0 8px 22px rgba(193, 255, 114, 0.45);
+}
+
+.btn-nav-cta:hover .svgIcon {
+  transform: rotate(250deg);
+}
+
+.btn-nav-cta:active {
+  transform: scale(0.97);
 }
 
 /* ── Hero Section (Contains SVG background under header) ────────────────── */
@@ -174,9 +212,9 @@
 }
 
 .btn-hero-cta .svgIcon {
-  height: 38px;
-  width: 38px;
-  padding: 8px;
+  height: 32px;
+  width: 32px;
+  padding: 7px;
   box-sizing: border-box;
   border-radius: 50%;
   background-color: #000000; /* Black circular badge behind the pill */
@@ -454,9 +492,10 @@
   border-radius: 50%;
   flex-shrink: 0;
 }
-.window-card__dot--red { background: #ff5f57; }
-.window-card__dot--amber { background: #febc2e; }
-.window-card__dot--green { background: #28c840; }
+/* Traffic-light dots recolored to the 5-color theme palette */
+.window-card__dot--red { background: #545454; }   /* Dark Grey */
+.window-card__dot--amber { background: #FFE6D8; }  /* Peach */
+.window-card__dot--green { background: #c1ff72; }  /* Lime Green */
 
 .window-card__file {
   margin-left: 10px;
