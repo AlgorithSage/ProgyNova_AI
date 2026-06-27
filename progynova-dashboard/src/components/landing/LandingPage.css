@@ -146,13 +146,13 @@
 .landing-hero__description {
   font-size: 1.35rem;
   font-weight: 600;
-  color: #000000; /* Black — high contrast against the lime/peach gradient, theme-independent */
+  color: #000000; /* Black - high contrast against the lime/peach gradient, theme-independent */
   max-width: 660px;
   line-height: 1.6;
   margin: 0;
 }
 
-/* Hero CTA — animated pill button. Lime Green (#c1ff72) is the 5-color
+/* Hero CTA - animated pill button. Lime Green (#c1ff72) is the 5-color
    theme's accent; Black text sits on it for contrast (theme-independent). */
 .btn-hero-cta {
   display: flex;
@@ -199,7 +199,7 @@
   transform: scale(0.97);
 }
 
-/* ── Features Section — glassmorphic, matching the lower-page theme ──────── */
+/* ── Features Section - glassmorphic, matching the lower-page theme ──────── */
 .landing-features {
   width: 100%;
   max-width: 1200px;
@@ -249,7 +249,7 @@
 .landing-feature-card__icon-container {
   width: 52px;
   height: 52px;
-  background-color: #000000; /* Black tile + lime glyph — ties to the step badges */
+  background-color: #000000; /* Black tile + lime glyph - ties to the step badges */
   color: var(--primary);
   border-radius: 14px;
   display: flex;
@@ -276,7 +276,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   LOWER LANDING SECTIONS — tutorial, glass showcase, dataset, metrics CTA
+   LOWER LANDING SECTIONS - tutorial, glass showcase, dataset, metrics CTA
    ══════════════════════════════════════════════════════════════════════ */
 
 /* Shared section intro typography */
@@ -387,7 +387,7 @@
   margin: 0;
 }
 
-/* ── Visual Showcase — glass window-viewer cards ────────────────────────── */
+/* ── Visual Showcase - glass window-viewer cards ────────────────────────── */
 .landing-showcase {
   width: 100%;
   max-width: 1200px;
@@ -495,7 +495,7 @@
 }
 
 [data-theme="light"] .showcase-row__step {
-  color: #2e7d32; /* lime is weak on peach — use readable green */
+  color: #2e7d32; /* lime is weak on peach - use readable green */
 }
 
 .showcase-row__title {

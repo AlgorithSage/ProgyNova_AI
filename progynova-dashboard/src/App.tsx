@@ -350,7 +350,7 @@ function App() {
             </div>
           </section>
 
-          {/* Stockout Alerts — Full dedicated section */}
+          {/* Stockout Alerts - Full dedicated section */}
           <section
             id="alerts"
             ref={alertsRowRef}
@@ -367,7 +367,7 @@ function App() {
               />
             </div>
 
-            {/* Explainer panel — slides in when an alert is selected */}
+            {/* Explainer panel - slides in when an alert is selected */}
             <div id="explain" className={`dashboard__explainer-col ${isExplainerOpen ? 'dashboard__explainer-col--open' : ''}`}>
               <ShapExplainer
                 explanation={explanation}

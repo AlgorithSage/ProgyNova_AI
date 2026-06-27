@@ -1,5 +1,5 @@
 // ============================================================
-// ProgyNovaAI — 5-Color Theme System
+// ProgyNovaAI - 5-Color Theme System
 // Palette: Peach #FFE6D8 · Dark Grey #545454 · White #FFFFFF ·
 //          Black #000000 · Lime Green #c1ff72
 // Every color below is one of these five hex values or an
@@ -69,7 +69,7 @@ export const lightTheme: ThemeVariables = {
   primaryHover: 'rgba(193, 255, 114, 0.8)',
   primaryLight: 'rgba(193, 255, 114, 0.15)',
   primaryGradient: 'linear-gradient(135deg, #c1ff72, rgba(193, 255, 114, 0.55))',
-  secondary: '#545454', // Dark Grey (25%) — panels/secondary structures
+  secondary: '#545454', // Dark Grey (25%) - panels/secondary structures
   accent: '#000000',
   success: '#2E7D32',
   successLight: 'rgba(46, 125, 50, 0.08)',
@@ -82,8 +82,8 @@ export const lightTheme: ThemeVariables = {
   glassBg: 'rgba(255, 255, 255, 0.75)',
   glassBorder: 'rgba(0, 0, 0, 0.08)',
   glassBlur: '16px',
-  chartPrimary: '#c1ff72', // Forecast line — high-energy accent
-  chartSecondary: '#000000', // Actual demand — black on white chart surface
+  chartPrimary: '#c1ff72', // Forecast line - high-energy accent
+  chartSecondary: '#000000', // Actual demand - black on white chart surface
   chartGradientStart: 'rgba(193, 255, 114, 0.2)',
   chartGradientEnd: 'rgba(193, 255, 114, 0)',
   chartPositive: '#c1ff72',
@@ -96,7 +96,7 @@ export const lightTheme: ThemeVariables = {
   fontSans: "'Vollkorn', Georgia, 'Times New Roman', serif",
   fontNumber: "'Roundo', system-ui, -apple-system, sans-serif",
   fontMono: "'Zodiak', Georgia, 'Times New Roman', serif",
-  // Premium spotlight card surface — theme-independent (CSVUploader, SHAP panel,
+  // Premium spotlight card surface - theme-independent (CSVUploader, SHAP panel,
   // recall card, headers/sidebar). Dark Grey is the panel base; nested pills and
   // wells sit on Black; text on top is White/Peach.
   cardBg: '#000000',
@@ -134,8 +134,8 @@ export const darkTheme: ThemeVariables = {
   glassBg: 'rgba(0, 0, 0, 0.75)',
   glassBorder: 'rgba(255, 255, 255, 0.08)',
   glassBlur: '20px',
-  chartPrimary: '#c1ff72', // Forecast line — same high-energy accent in both modes
-  chartSecondary: '#FFE6D8', // Actual demand — peach reads on the dark-grey chart surface
+  chartPrimary: '#c1ff72', // Forecast line - same high-energy accent in both modes
+  chartSecondary: '#FFE6D8', // Actual demand - peach reads on the dark-grey chart surface
   chartGradientStart: 'rgba(193, 255, 114, 0.28)',
   chartGradientEnd: 'rgba(193, 255, 114, 0)',
   chartPositive: '#c1ff72',

@@ -31,11 +31,11 @@
 }
 
 /* ============================================
-   DESIGN TOKENS — Dual Theme System
+   DESIGN TOKENS - Dual Theme System
    ============================================ */
 
 :root {
-  /* 5-Color Palette (Light Mode fallback) — Driven dynamically by theme.tsx/mtheme.ts */
+  /* 5-Color Palette (Light Mode fallback) - Driven dynamically by theme.tsx/mtheme.ts */
   --bg: #FFE6D8; /* Peach canvas */
   --surface: #FFFFFF; /* White card surfaces */
   --surface-elevated: rgba(84, 84, 84, 0.05);
@@ -88,7 +88,7 @@
   --space-xl: 32px;
   --space-xxl: 48px;
 
-  /* Border Radius — Donezo's rounded layout design */
+  /* Border Radius - Donezo's rounded layout design */
   --radius-sm: 12px;
   --radius-md: 20px;
   --radius-lg: 28px;
@@ -101,7 +101,7 @@
   --font-mono: 'Zodiak', Georgia, 'Times New Roman', serif;
   --font-accent: 'Satoshi', system-ui, -apple-system, sans-serif;
 
-  /* Premium spotlight card surface (theme-independent — Dark Grey panel, Black wells) */
+  /* Premium spotlight card surface (theme-independent - Dark Grey panel, Black wells) */
   --card-bg: #000000;
   --card-surface: #000000;
   --card-elevated: #545454;

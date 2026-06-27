@@ -7,15 +7,15 @@ interface LandingPageProps {
   onViewChange: (view: 'dashboard' | 'metrics' | 'docs') => void;
 }
 
-/* Window-viewer showcase cards — each frames a real screenshot of a live
+/* Window-viewer showcase cards - each frames a real screenshot of a live
    ProgyNova AI component with a plain-language explanation of what it does. */
 const SHOWCASE = [
   {
     img: '/screenshots/csv-uploader.png',
     file: 'Upload Dataset',
-    title: 'Bring your own data — or try ours',
+    title: 'Bring your own data - or try ours',
     body:
-      'Drop a pharmacy transaction CSV straight into the dashboard, or click "Use Preloaded Owner Dataset" to explore instantly with a synthetic sample. The AutoSchemaEngine reads your column layout automatically — there is no manual mapping step.',
+      'Drop a pharmacy transaction CSV straight into the dashboard, or click "Use Preloaded Owner Dataset" to explore instantly with a synthetic sample. The AutoSchemaEngine reads your column layout automatically - there is no manual mapping step.',
   },
   {
     img: '/screenshots/forecast-chart.png',
@@ -36,7 +36,7 @@ const SHOWCASE = [
     file: "What's driving this forecast?",
     title: 'Understand every prediction',
     body:
-      'For any item, the explainer shows the top factors pushing demand up or down in clear language — recent sales velocity, seasonality, store size — alongside a concrete action plan. It is never a black box.',
+      'For any item, the explainer shows the top factors pushing demand up or down in clear language - recent sales velocity, seasonality, store size - alongside a concrete action plan. It is never a black box.',
   },
 ];
 
@@ -52,7 +52,7 @@ const STEPS = [
     n: '02',
     title: 'Choose how cautious to be',
     body:
-      'Pick a sensitivity mode — Strict, Balanced, or Clinical Safe — based on how costly a missed stockout is for that medicine. Switch anytime and results recalculate instantly.',
+      'Pick a sensitivity mode - Strict, Balanced, or Clinical Safe - based on how costly a missed stockout is for that medicine. Switch anytime and results recalculate instantly.',
   },
   {
     n: '03',
@@ -63,7 +63,7 @@ const STEPS = [
 ];
 
 export function LandingPage({ onViewChange }: LandingPageProps) {
-  // Lenis smooth scrolling — active only while the landing page is mounted.
+  // Lenis smooth scrolling - active only while the landing page is mounted.
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -159,7 +159,7 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
             <span className="landing-section__eyebrow">Why ProgyNova</span>
             <h2 className="landing-section__heading">Powerful where it matters, simple where it counts</h2>
             <p className="landing-section__lead">
-              Four ideas do the heavy lifting — so you get reliable forecasts without the complexity.
+              Four ideas do the heavy lifting - so you get reliable forecasts without the complexity.
             </p>
           </div>
 
@@ -199,7 +199,7 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
                 </svg>
               </div>
               <h3>Clear explanations</h3>
-              <p>Every forecast comes with the top reasons behind it, written in plain language — so you can trust the number, not just take it on faith.</p>
+              <p>Every forecast comes with the top reasons behind it, written in plain language - so you can trust the number, not just take it on faith.</p>
             </div>
 
             {/* Card 4: Flexible data upload */}
@@ -212,18 +212,18 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
                 </svg>
               </div>
               <h3>Flexible data upload</h3>
-              <p>Upload almost any CSV layout. ProgyNova detects the dates, products, and quantities for you — there is no manual setup or cleaning.</p>
+              <p>Upload almost any CSV layout. ProgyNova detects the dates, products, and quantities for you - there is no manual setup or cleaning.</p>
             </div>
           </div>
         </section>
 
-        {/* ── How It Works — 3-step getting-started tutorial ───────────── */}
+        {/* ── How It Works - 3-step getting-started tutorial ───────────── */}
         <section className="landing-howto" aria-label="How to use ProgyNova AI">
           <div className="landing-howto__intro">
             <span className="landing-section__eyebrow">Getting started</span>
             <h2 className="landing-section__heading">From raw CSV to actionable forecast in three steps</h2>
             <p className="landing-section__lead">
-              ProgyNova AI is built for analysts and researchers — no data-science setup required.
+              ProgyNova AI is built for analysts and researchers - no data-science setup required.
               Here is the entire workflow.
             </p>
           </div>
@@ -238,13 +238,13 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
           </ol>
         </section>
 
-        {/* ── Visual Showcase — glassmorphic window-viewer cards ───────── */}
+        {/* ── Visual Showcase - glassmorphic window-viewer cards ───────── */}
         <section className="landing-showcase" aria-label="See ProgyNova AI in action">
           <div className="landing-showcase__intro">
             <span className="landing-section__eyebrow">A look inside</span>
             <h2 className="landing-section__heading">See exactly how the dashboard works</h2>
             <p className="landing-section__lead">
-              Real screens from the live application — each panel explained in plain language.
+              Real screens from the live application - each panel explained in plain language.
             </p>
           </div>
 
@@ -263,7 +263,7 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
                     <span className="window-card__file">{item.file}</span>
                   </div>
                   <div className="window-card__viewport">
-                    <img src={item.img} alt={`${item.title} — ProgyNova AI screenshot`} loading="lazy" />
+                    <img src={item.img} alt={`${item.title} - ProgyNova AI screenshot`} loading="lazy" />
                   </div>
                 </div>
 
@@ -278,7 +278,7 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
           </div>
         </section>
 
-        {/* ── Dataset Guide — what the data should look like ───────────── */}
+        {/* ── Dataset Guide - what the data should look like ───────────── */}
         <section className="landing-dataset" aria-label="Preparing your dataset">
           <div className="landing-dataset__card">
             <div className="landing-dataset__text">
@@ -286,10 +286,10 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
               <h2 className="landing-section__heading">What a dataset should look like</h2>
               <p className="landing-section__lead">
                 If your export contains roughly these fields, ProgyNova can work with it.
-                Column names do not need to match exactly — the AutoSchemaEngine detects each role by meaning.
+                Column names do not need to match exactly - the AutoSchemaEngine detects each role by meaning.
               </p>
               <ul className="landing-dataset__notes">
-                <li>Upload <strong>wide-form or long-form</strong> CSVs — both are supported.</li>
+                <li>Upload <strong>wide-form or long-form</strong> CSVs - both are supported.</li>
                 <li>Split across multiple files? Upload <strong>sales, drugs and stores</strong> together and they are joined automatically.</li>
                 <li>Up to <strong>10&nbsp;MB</strong> per file. No pre-cleaning or column renaming needed.</li>
               </ul>
@@ -312,14 +312,14 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
           </div>
         </section>
 
-        {/* ── ML Metrics pointer — no metrics on the landing page ──────── */}
+        {/* ── ML Metrics pointer - no metrics on the landing page ──────── */}
         <section className="landing-metrics-cta" aria-label="Model performance metrics">
           <div className="landing-metrics-cta__inner">
             <div>
               <h2 className="landing-metrics-cta__title">Looking for the model’s accuracy?</h2>
               <p className="landing-metrics-cta__body">
-                Validation metrics — MAPE, ROC-AUC, precision &amp; recall, confusion matrices and
-                model comparisons — live on the dedicated <strong>ML Metrics</strong> page inside the
+                Validation metrics - MAPE, ROC-AUC, precision &amp; recall, confusion matrices and
+                model comparisons - live on the dedicated <strong>ML Metrics</strong> page inside the
                 dashboard, and update against the data you upload.
               </p>
             </div>

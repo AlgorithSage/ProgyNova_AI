@@ -12,7 +12,7 @@
 }
 
 /* ── Sidebar ────────────────────────────────── */
-/* Sidebars are a "panel/structural" surface — Dark Grey bg, White/Lime/Peach text */
+/* Sidebars are a "panel/structural" surface - Dark Grey bg, White/Lime/Peach text */
 
 .app-layout__sidebar {
   width: 260px;
@@ -100,7 +100,7 @@
   text-decoration: none;
 }
 
-/* Active sidebar item indicator — Donezo style vertical amber bar */
+/* Active sidebar item indicator - Donezo style vertical amber bar */
 .app-layout__menu-link--active {
   background: var(--card-surface);
   color: var(--primary) !important;
@@ -134,7 +134,7 @@
   color: #FFFFFF;
 }
 
-/* Bottom banner card — Donezo promo block */
+/* Bottom banner card - Donezo promo block */
 .app-layout__promo-card {
   margin-top: auto;
   background: var(--card-surface);
@@ -189,7 +189,7 @@
 }
 
 /* ── Top Bar ────────────────────────────────── */
-/* Glassmorphic peach header — frosted Peach (#FFE6D8) panel, theme-independent */
+/* Glassmorphic peach header - frosted Peach (#FFE6D8) panel, theme-independent */
 
 .app-layout__topbar {
   height: 76px;
