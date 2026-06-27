@@ -11,6 +11,9 @@ This integrated reference document compiles the mathematical formulation, design
 ## Abstract
 This document delineates the mathematical formulation, design logic, and validation outcomes of the ProgyNovaAI forecasting architecture. We outline the transitions from a conceptual multi-branch stacked ensemble to a unified, cost-sensitive gradient boosted regressor integrated with a post-hoc asymmetric threshold optimizer. The architecture addresses the critical challenge of severe class imbalance in clinical demand forecasting, wherein stockout events constitute a rare minority class ($\approx 1.21\%$ of observations).
 
+The system is trained on the **Indian Pharmacy Demand & Stockout Forecasting** dataset:
+> **🔗 Kaggle:** [Indian Pharmacy Demand & Stockout Forecasting](https://www.kaggle.com/datasets/algozenith/indian-pharmacy-demand-and-stockout-forecasting) | **License:** CC BY 4.0
+
 ---
 
 ## 1. Introduction and Problem Formulation
@@ -41,13 +44,16 @@ The M4 and M5 competitions demonstrated that for tabular, highly intermittent, a
 ## 3. Mathematical Formulation of the Pipeline
 
 ### 3.1 Feature Engineering and Adapter Pipeline
-Let the raw transaction ledger be represented as a set of observations $D$. The feature adapter maps each record dynamically to generate a dense, multi-dimensional feature space $X \in \mathbb{R}^{d}$:
-1.  **Historical Lags:** Captures consumption history across intervals $t-k$ for $k \in \{1, 2, 4, 8, 12, 26, 52\}$.
-2.  **Rolling Metrics:** Captures $w$-period rolling demand means and standard deviations:
+Let the raw transaction ledger be represented as a set of observations $D$. The feature adapter maps each record dynamically to generate a dense, **56-dimensional** feature space $X \in \mathbb{R}^{56}$:
+1.  **Historical Lags (7 features):** Captures consumption history across intervals $t-k$ for $k \in \{1, 2, 4, 8, 12, 26, 52\}$.
+2.  **Rolling Metrics (6 features):** Captures $w$-period rolling demand means and standard deviations:
     $$\mu_{t, w} = \frac{1}{w}\sum_{i=1}^{w} y_{t-i}, \quad \sigma_{t, w} = \sqrt{\frac{1}{w-1}\sum_{i=1}^{w} (y_{t-i} - \mu_{t, w})^2} \quad \text{for } w \in \{4, 8, 12\}$$
-3.  **Cyclical Temporal Encodings:** Models seasonal dynamics via sine and cosine transforms:
+3.  **Cyclical Temporal Encodings (3 features):** Models seasonal dynamics via sine, cosine transforms and month:
     $$\text{sin\_week}_t = \sin\left(\frac{2\pi \cdot \text{week\_of\_year}_t}{52}\right), \quad \text{cos\_week}_t = \cos\left(\frac{2\pi \cdot \text{week\_of\_year}_t}{52}\right)$$
-4.  **Lagged Outbreak Signalling:** Formulates features for regional disease indicators when epidemiological severity records exceed a defined activation threshold.
+4.  **Momentum Metrics (2 features):** Captures demand acceleration via week-over-week change ($\Delta y_t = y_t - y_{t-1}$) and 4-week momentum ratio ($M_t = \mu_{t,4} / \mu_{t-4,4}$).
+5.  **Lagged Outbreak Signalling (26 features):** Formulates features for 8 regional disease indicators (dengue, malaria, chikungunya, flu, diarrhoeal, leptospirosis, respiratory, typhoid) at lags $\{0, 1, 2\}$, plus aggregate `outbreak_any_active` and `outbreak_count` flags.
+6.  **Categorical Encodings (5 features):** Ordinal integer encodings for `monsoon_phase`, `region`, `category`, `drug`, and `store` identifiers.
+7.  **Static & Contextual Attributes (7 features):** Population, lead time, baseline demand, shelf life, rainfall anomaly, festival intensity, and stock-on-hand.
 
 ### 3.2 Cost-Sensitive Gradient Loss Weighting
 To prevent the model from ignoring rare stockout events during gradient updates, we compute sample weights during training. Let $N_{\text{neg}}$ be the number of safe weeks ($y_i \le S_i$) and $N_{\text{pos}}$ be the number of stockout weeks ($y_i > S_i$). The sample weight $w_i$ applied to the loss function for observation $i$ is formulated as:
@@ -68,6 +74,13 @@ where $\alpha$ is the demand multiplier, $\beta$ is the safety stock buffer (in 
 | **Strict** | $1.00$ | $0.0$ | High-precision monitoring (minimizes false alarms for expensive inventory). |
 | **Balanced** | $1.00$ | $5.0$ | Optimal trade-off (maximizes F1-score balance). |
 | **Clinical Safe** | $1.05$ | $1.0$ | Recall-maximized monitoring (ensures zero missed stockouts for critical drugs). |
+
+Triggered alerts are classified into severity tiers based on the absolute deficit ($\hat{y} - S$): **CRITICAL** ($>100$ units), **HIGH** ($>50$), **MEDIUM** ($>10$), and **LOW** ($\le 10$).
+
+### 3.4 Prescriptive Reorder Quantity
+Each alert includes a prescriptive replenishment recommendation:
+$$Q_{\text{reorder}} = \max\left(0, \; \mu_{t,4} \times 4 \times 1.2 - S_t\right)$$
+where $\mu_{t,4}$ is the 4-week rolling demand mean, 4 weeks of target inventory cover, and 1.2 is a 20% safety multiplier.
 
 ---
 
@@ -112,6 +125,7 @@ The ProgyNovaAI cost-sensitive framework resolves this paradox. By applying grad
 ### 5.2 Decoupled Optimization and Real-time tree-SHAP Explainability
 *   **Decoupled Prediction:** By separating the regression model (XGBoost forecasting) from the risk preference (post-hoc $\alpha, \beta$ thresholding), the system avoids the need to retrain models when changing risk preferences.
 *   **Exact TreeSHAP Attributions:** Using TreeSHAP on the unified XGBoost model allows the system to compute exact feature attribution matrices in under 15 milliseconds, replacing slower meta-learner calculations.
+*   **Semantic Translation Layer:** The frontend translates raw SHAP feature names (e.g., `demand_lag_1`, `outbreak_dengue_lag0`) into pharmacist-friendly natural language labels with contextual clinical recommendations (e.g., outbreak-driven surge advisories, velocity alerts, seasonal optimization prompts).
 *   **Computational Efficiency:** Consolidating the model pipeline from a parallel ensemble to a single XGBoost regressor reduced batch inference latency from >12 seconds to **under 200 milliseconds** for the entire 47,424-row dataset.
 
 ---
@@ -131,8 +145,10 @@ The evaluation was performed using a publication-grade, temporally enriched phar
 The dynamic ingestion engine automatically resolved columns and structured the data into:
 - **Identifiers**: Entity ID (`drug_id`), Location ID (`store_id`), and Temporal Index (`week`).
 - **Target Variable**: Continuous weekly demand (`units_dispensed`).
+- **Engineered Feature Space**: A **56-dimensional** feature vector including 7 historical demand lags ($k \in \{1,2,4,8,12,26,52\}$), 6 rolling statistical windows (means and standard deviations for $w \in \{4,8,12\}$), 3 cyclical seasonal transforms (sin/cos week-of-year and month), 2 momentum metrics (week-over-week change and 4-week momentum ratio), 26 lagged epidemiological outbreak signals across 8 diseases, 5 ordinal categorical encodings (monsoon phase, region, category, drug, store), and static contextual attributes (population, lead time, shelf life, rainfall anomaly, festival intensity).
 - **Enriched Contextual Fields**: Batch numbers (incorporating drug, store, and year identifiers), dynamic expiration dates based on drug-specific shelf lives (ranging from 52 to 104 weeks), Indian rupee pricing structure (ranging from ₹45 for Paracetamol up to ₹1,350 for insulin), patient demographic classification, copay classifications (Cash, CGHS government scheme, Private Insurance), and prescriber medical specialties.
 - **Dynamic Epidemic and Meteorological Flags**: Lagged outbreak severity indicators across 8 infectious diseases (dengue, malaria, chikungunya, flu, diarrhoeal, leptospirosis, respiratory, and typhoid) and monsoon phase labels.
+- **Prescriptive Inventory Outputs**: Days-of-cover estimates, reorder urgency flags, and prescriptive reorder quantities ($Q = \max(0, \mu_{t,4} \times 4 \times 1.2 - S)$).
 
 ---
 
@@ -154,15 +170,17 @@ Standard regression metrics—Mean Absolute Error (MAE), Root Mean Squared Error
 ### 6.2.2 Stockout Alert Optimization (Classification)
 To convert continuous forecasts into binary stockout warnings, predictions were checked against the current stock-on-hand. In real-world pharmacy logs, missing a stockout (False Negative) has a high clinical cost (untreated patients), while triggering a false alarm (False Positive) is merely a minor operational nuisance. 
 
-Using grid search on the validation dataset (3,952 observations containing 34 actual stockouts), we evaluated the classification performance under three distinct sensitivity profiles defined by:
+Using the asymmetric threshold optimizer on the held-out test set ($N = 3{,}952$ observations, Weeks 143–155, containing 48 actual stockouts), we evaluated the classification performance under three distinct sensitivity profiles defined by:
 $$\text{Alert} = \mathbb{I}\left( (\hat{y} \cdot \alpha + \beta) > S \right)$$
 where $\hat{y}$ is the predicted demand, $S$ is the stock-on-hand, $\alpha$ is the demand multiplier, and $\beta$ is the safety stock buffer.
 
 | Sensitivity Level | Multiplier ($\alpha$) | Buffer ($\beta$) | Accuracy | Precision | Recall (Sensitivity) | F1-Score | True Positives (TP) | False Negatives (FN) | False Positives (FP) | True Negatives (TN) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Strict** | 1.00 | 0.0 | **99.87%** | **91.43%** | 94.12% | **92.75%** | 32 | 2 | **3** | 3,915 |
-| **Balanced** | 1.00 | 5.0 | 99.85% | 86.84% | 97.06% | 91.67% | 33 | 1 | 5 | 3,913 |
-| **Clinical Safe** | 1.05 | 1.0 | 99.82% | 82.93% | **100.00%** | 90.67% | **34** | **0** | 7 | 3,911 |
+| **Strict** | 1.00 | 0.0 | **99.85%** | **95.65%** | 91.67% | **93.62%** | 44 | 4 | **2** | 3,902 |
+| **Balanced** | 1.00 | 5.0 | 99.82% | 93.62% | 91.67% | 92.63% | 44 | 4 | 3 | 3,901 |
+| **Clinical Safe** | 1.05 | 1.0 | 99.80% | 85.71% | **100.00%** | 92.31% | **48** | **0** | 8 | 3,896 |
+
+Triggered alerts are further classified into severity tiers based on the absolute deficit: **CRITICAL** ($>100$ units), **HIGH** ($>50$), **MEDIUM** ($>10$), and **LOW** ($\le 10$).
 
 ---
 
@@ -171,8 +189,8 @@ where $\hat{y}$ is the predicted demand, $S$ is the stock-on-hand, $\alpha$ is t
 1. **The Class Imbalance Trap**: If we optimize solely for overall Accuracy, a model that predicts "No Stockout" for every single row achieves **99.14% Accuracy** because stockouts are rare ($<1\%$). However, it misses 100% of actual stockouts (Recall = 0.0%), making it useless.
 2. **Cost-Sensitive Training**: By applying a sample weight of 115.2 (ratio of safe weeks to stockout weeks) to the XGBoost loss function, the model was forced to splits on features that isolate rare stockouts. This dramatically improved the baseline Recall from 0% to over 91% before threshold tuning.
 3. **Post-Hoc Sensitivity Tuning**: 
-   - **Strict Mode** minimizes false alarms (only 3 false positives), making it ideal for slow-moving, expensive inventory (e.g., specialized oncological drugs).
-   - **Clinical Safe Mode** shifts the decision boundary outward by scaling predicted demand by 1.05 and adding a 1-unit physical buffer. This achieves **100% Recall** (0 missed stockouts) on the validation set, ensuring absolute clinical safety for critical medications (e.g., insulin, asthma inhalers).
+   - **Strict Mode** minimizes false alarms (only 2 false positives), making it ideal for slow-moving, expensive inventory (e.g., specialized oncological drugs).
+   - **Clinical Safe Mode** shifts the decision boundary outward by scaling predicted demand by 1.05 and adding a 1-unit physical buffer. This achieves **100% Recall** (0 missed stockouts) on the test set, ensuring absolute clinical safety for critical medications (e.g., insulin, asthma inhalers).
 
 ---
 
@@ -198,7 +216,7 @@ This chapter summarizes the key findings, achievements, and clinical impact of t
 The ProgyNovaAI project successfully developed and validated a robust, cost-sensitive demand-forecasting and stockout prediction pipeline for pharmacy networks. The key technical findings include:
 - **Ensemble vs. Unified Cost-Sensitive Models**: While stacked neural ensembles (CNN-LSTM + Transformer) look elegant on paper, they suffer from high inference latency, GPU dependence, and failure to handle extreme class imbalance natively. In contrast, a unified XGBoost Regressor combined with gradient sample-weight balancing ($\approx 115.2$) achieved better accuracy (4.90% MAPE) while consuming significantly fewer resources (completing inference on 47,425 rows in under 200 milliseconds).
 - **Asymmetric Loss Optimization**: Adjusting the decision threshold post-hoc allows the system to prioritize clinical safety. By introducing a risk-adjusted warning formula ($\text{Adjusted Forecast} = \text{Forecast} \times \alpha + \beta$), the system achieved a **100% stockout catch rate (zero missed shortages)** for critical medications.
-- **Fast, Exact Explainability**: By utilizing TreeSHAP instead of kernel approximations, the explainability engine computes exact feature attribution values in milliseconds, allowing the dashboard to instantly translate complex model decisions into plain-language summaries (e.g., attributing a stockout warning to a 10% monsoon delay combined with a regional dengue outbreak surge).
+- **Fast, Exact Explainability**: By utilizing TreeSHAP instead of kernel approximations, the explainability engine computes exact feature attribution values in milliseconds, allowing the dashboard to instantly translate complex model decisions into plain-language summaries (e.g., attributing a stockout warning to a 10% monsoon delay combined with a regional dengue outbreak surge). The frontend Semantic Translation Layer maps raw SHAP feature names to pharmacist-friendly labels and generates contextual clinical recommendations (outbreak response advisories, velocity alerts, seasonal optimization prompts).
 
 ---
 
@@ -207,14 +225,15 @@ The ProgyNovaAI project successfully developed and validated a robust, cost-sens
 The implementation of ProgyNovaAI bridges the gap between machine learning and healthcare logistics:
 - **Patient Safety**: In Clinical Safe mode, the system guarantees that pharmacies do not run out of critical, life-saving drugs. This directly reduces emergency room visits or complications arising from patient non-compliance due to unavailable medication.
 - **Operational Efficiency**: By exposing a Strict mode for expensive, slow-moving items, the system minimizes holding costs and prevents capital from being locked up in excess safety stock.
-- **Reduction in Alarm Fatigue**: Traditional inventory systems trigger warnings based on static reorder points, leading to constant alerts. ProgyNovaAI's high precision (82.93% in Clinical Safe, 91.43% in Strict) ensures that pharmacists only receive alerts when there is a true statistical risk.
+- **Reduction in Alarm Fatigue**: Traditional inventory systems trigger warnings based on static reorder points, leading to constant alerts. ProgyNovaAI's high precision (85.71% in Clinical Safe, 95.65% in Strict) ensures that pharmacists only receive alerts when there is a true statistical risk.
+- **Prescriptive Procurement**: Each alert includes a recommended reorder quantity and days-of-cover estimate, enabling immediate procurement action without manual calculations.
 
 ---
 
 ## 7.3 Limitations Faced
 
 Despite its performance, the current implementation has several limitations:
-- **Cold-Start Problem**: The feature engineering pipeline relies relies heavily on temporal lags (up to 52 weeks). For newly opened pharmacy locations or newly launched drug categories, the model lacks historical sequences and must fall back on default global averages, reducing initial forecast precision.
+- **Cold-Start Problem**: The feature engineering pipeline relies heavily on temporal lags (up to 52 weeks). For newly opened pharmacy locations or newly launched drug categories, the model lacks historical sequences and must fall back on default global averages, reducing initial forecast precision.
 - **Data Completeness Dependency**: The accuracy of the outbreak and weather flags depends on external regional logs. If local weather stations or epidemiological databases fail to report anomalies, the model's ability to predict demand surges during monsoon seasons is compromised.
 - **Static Supplier Lead Times**: Although the model incorporates a baseline lead time, supplier behavior in the real world is highly dynamic and subject to transport strikes, customs delays, or manufacturing shortages that are not currently captured in the tabular data.
 

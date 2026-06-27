@@ -19,9 +19,12 @@
   align-items: center;
   padding: 0 4rem;
   height: 80px;
-  background-color: var(--card-elevated);
-  border-bottom: 1px solid var(--card-border);
-  position: relative; /* Positioned in flow so it does not overlap background */
+  background-color: rgba(255, 230, 216, 0.65); /* Peach variant glass bg */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(84, 84, 84, 0.15); /* Clean subtle border */
+  position: sticky; /* Sticky overlay so background content scrolls underneath */
+  top: 0;
   z-index: 100;
 }
 
@@ -29,6 +32,16 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.landing-page__brand-logo-container {
+  background-color: #1b3a24; /* Dark green theme variant background */
+  border-radius: 14px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .landing-page__brand-logo {
@@ -44,7 +57,7 @@
 .landing-nav-link {
   background: none;
   border: none;
-  color: var(--card-text-secondary);
+  color: var(--text-secondary); /* Dark Grey #545454 for contrast on peach */
   font-family: var(--font-accent);
   font-weight: 600;
   font-size: 0.95rem;
@@ -53,7 +66,7 @@
 }
 
 .landing-nav-link:hover {
-  color: var(--primary);
+  color: var(--text-primary);
 }
 
 .btn-nav-cta {
@@ -140,31 +153,70 @@
   margin: 0;
 }
 
+/* Hero CTA — animated pill button. Lime Green (#c1ff72) is the 5-color
+   theme's accent; Black text sits on it for contrast (theme-independent). */
 .btn-hero-cta {
   display: flex;
   align-items: center;
-  padding: 1rem 2.4rem;
-  font-size: 1.1rem;
+  gap: 16px;
+  height: 54px;
+  padding: 0 28px 0 10px; /* Kept left padding tight to balance icon size, and right padding wide */
+  background-color: var(--primary);
+  border-radius: 30px;
+  color: #131313;
+  font-family: inherit;
+  font-size: 1.05rem;
   font-weight: 700;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border: none;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 5px 5px 18px rgba(0, 0, 0, 0.16);
+  transition: filter 0.5s, transform 0.2s, box-shadow 0.3s;
+}
+
+.btn-hero-cta .svgIcon {
+  height: 38px;
+  width: 38px;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: #000000; /* Black circular badge behind the pill */
+  color: var(--primary); /* Lime pill reads on the black circle */
+  transition: transform 1.5s;
+  flex-shrink: 0;
 }
 
 .btn-hero-cta:hover {
+  filter: brightness(1.08);
   transform: scale(1.03);
-  box-shadow: 0 8px 24px rgba(193, 255, 114, 0.3);
+  box-shadow: 0 8px 24px rgba(193, 255, 114, 0.45);
 }
 
-/* ── Features Section (Scrolls up naturally) ────────────────────────────── */
+.btn-hero-cta:hover .svgIcon {
+  transform: rotate(250deg);
+}
+
+.btn-hero-cta:active {
+  transform: scale(0.97);
+}
+
+/* ── Features Section — glassmorphic, matching the lower-page theme ──────── */
 .landing-features {
   width: 100%;
   max-width: 1200px;
-  padding: 6rem 2rem;
+  padding: 6rem 2rem 2rem;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
   box-sizing: border-box;
+}
+
+.landing-features__intro {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
 }
 
 .landing-features__grid {
@@ -175,55 +227,428 @@
 }
 
 .landing-feature-card {
-  background-color: var(--card-elevated);
-  border: 1px solid var(--card-border);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: 20px;
-  padding: 2.5rem 1.8rem;
+  padding: 2.2rem 1.6rem;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Left-aligned content matching mockup */
-  text-align: left;
-  gap: 1rem;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  align-items: center; /* Centered, matching the step cards */
+  text-align: center;
+  gap: 0.9rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
   transition: transform var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
 
 .landing-feature-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(193, 255, 114, 0.4); /* Lime border glow */
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 20px rgba(193, 255, 114, 0.12);
+  border-color: rgba(193, 255, 114, 0.45); /* Lime border glow */
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.16), 0 0 20px rgba(193, 255, 114, 0.14);
 }
 
 .landing-feature-card__icon-container {
-  width: 42px;
-  height: 42px;
-  background-color: var(--primary-light);
-  border: 1px solid rgba(193, 255, 114, 0.3);
+  width: 52px;
+  height: 52px;
+  background-color: #000000; /* Black tile + lime glyph — ties to the step badges */
   color: var(--primary);
-  border-radius: 8px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 0.2rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
 .landing-feature-card h3 {
   font-family: var(--font-accent);
   font-weight: 700;
-  font-size: 1.25rem;
-  color: var(--card-text);
+  font-size: 1.18rem;
+  color: var(--text-primary);
   margin: 0;
   line-height: 1.3;
 }
 
 .landing-feature-card p {
-  color: var(--card-text-secondary);
+  color: var(--text-secondary);
   font-size: 0.92rem;
   line-height: 1.6;
   margin: 0;
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   LOWER LANDING SECTIONS — tutorial, glass showcase, dataset, metrics CTA
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Shared section intro typography */
+.landing-section__eyebrow {
+  display: inline-block;
+  background: #1b3a24; /* Brand dark green chip */
+  color: var(--primary); /* Lime Green text */
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 1rem;
+}
+
+.landing-section__heading {
+  font-family: var(--font-accent);
+  font-size: 2.1rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin: 0 0 0.9rem;
+  letter-spacing: -0.02em;
+}
+
+.landing-section__lead {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 640px;
+}
+
+/* ── How It Works (3 steps) ─────────────────────────────────────────────── */
+.landing-howto {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 5rem 2rem 2rem;
+  box-sizing: border-box;
+}
+
+.landing-howto__intro {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.landing-steps {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.landing-step {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 2.4rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.landing-step:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16), 0 0 18px rgba(193, 255, 114, 0.12);
+}
+
+.landing-step__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #000000;
+  color: var(--primary);
+  font-family: var(--font-number);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 1.1rem;
+}
+
+.landing-step__title {
+  font-family: var(--font-accent);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.landing-step__body {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Visual Showcase — glass window-viewer cards ────────────────────────── */
+.landing-showcase {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  box-sizing: border-box;
+}
+
+.landing-showcase__intro {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3.5rem;
+}
+
+.landing-showcase__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4.5rem;
+}
+
+.showcase-row {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  align-items: center;
+  gap: 3rem;
+}
+
+.showcase-row--reverse .window-card {
+  order: 2;
+}
+
+/* Glassmorphic window viewer framing each screenshot (view-in-view) */
+.window-card {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.window-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 32px 72px rgba(0, 0, 0, 0.34), 0 0 26px rgba(193, 255, 114, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.window-card__bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.18);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.window-card__dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.window-card__dot--red { background: #ff5f57; }
+.window-card__dot--amber { background: #febc2e; }
+.window-card__dot--green { background: #28c840; }
+
+.window-card__file {
+  margin-left: 10px;
+  font-family: var(--font-accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.window-card__viewport {
+  display: block;
+  background: var(--card-elevated);
+  max-height: 460px;
+  overflow: hidden;
+}
+
+.window-card__viewport img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.showcase-row__step {
+  display: inline-block;
+  font-family: var(--font-number);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+  margin-bottom: 0.6rem;
+}
+
+[data-theme="light"] .showcase-row__step {
+  color: #2e7d32; /* lime is weak on peach — use readable green */
+}
+
+.showcase-row__title {
+  font-family: var(--font-accent);
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.7rem;
+  line-height: 1.25;
+}
+
+.showcase-row__body {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Dataset Guide ──────────────────────────────────────────────────────── */
+.landing-dataset {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  box-sizing: border-box;
+}
+
+.landing-dataset__card {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+}
+
+.landing-dataset__notes {
+  list-style: none;
+  padding: 0;
+  margin: 1.4rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.landing-dataset__notes li {
+  position: relative;
+  padding-left: 1.6rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.landing-dataset__notes li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #000000;
+}
+
+.landing-dataset__notes strong { color: var(--text-primary); font-weight: 700; }
+
+.landing-dataset__fields {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.landing-dataset__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 1.1rem;
+  background: #1b3a24; /* Brand dark green */
+  border: 1px solid rgba(193, 255, 114, 0.2);
+  border-radius: 10px;
+}
+
+.landing-dataset__field-key {
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #FFFFFF; /* White */
+}
+
+.landing-dataset__field-desc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.72); /* Soft white */
+}
+
+/* ── ML Metrics pointer CTA ─────────────────────────────────────────────── */
+.landing-metrics-cta {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2rem 6rem;
+  box-sizing: border-box;
+}
+
+.landing-metrics-cta__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.5rem;
+  background: linear-gradient(135deg, rgba(193, 255, 114, 0.16), rgba(193, 255, 114, 0.04));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(193, 255, 114, 0.35);
+  border-radius: 24px;
+  padding: 2.6rem 3rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+}
+
+.landing-metrics-cta__title {
+  font-family: var(--font-accent);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.6rem;
+}
+
+.landing-metrics-cta__body {
+  color: var(--text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 680px;
+}
+
+.landing-metrics-cta__body strong { color: var(--text-primary); }
+
+.landing-metrics-cta__btn {
+  flex-shrink: 0;
+}
+
 /* ── Footer ─────────────────────────────────────────────────────────────── */
+
 .landing-page__footer {
   text-align: center;
   padding: 3rem 0;
@@ -239,6 +664,30 @@
 @media (max-width: 1024px) {
   .landing-features__grid {
     grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+  }
+  .landing-steps {
+    grid-template-columns: 1fr;
+  }
+  .showcase-row,
+  .showcase-row--reverse {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+  }
+  .showcase-row--reverse .window-card {
+    order: 0; /* image always on top when stacked */
+  }
+  .landing-dataset__card {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2.2rem;
+  }
+  .landing-metrics-cta__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem;
+  }
+  .landing-section__heading {
+    font-size: 1.7rem;
   }
 }
 

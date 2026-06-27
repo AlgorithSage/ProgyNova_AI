@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 # --------------------------------------------------------------------------
 # Paths and Constants
 # --------------------------------------------------------------------------
-WORKSPACE_DIR = Path(__file__).resolve().parent
+WORKSPACE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = WORKSPACE_DIR / "progynova-api" / "data"
 MODELS_DIR = WORKSPACE_DIR / "progynova-api" / "models"
 OUTPUT_DIR = WORKSPACE_DIR / "reproduction_results"

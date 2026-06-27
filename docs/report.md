@@ -9,7 +9,10 @@ This report documents the performance evaluation, database enrichment protocols,
 
 In pharmaceutical logistics, stockout events present a critical clinical risk: a lack of life-saving medications (such as insulin, cardiovascular therapies, and bronchodilators) directly impacts patient compliance, leading to clinical complications or emergency hospitalizations. 
 
-The baseline forecasting core employs an **XGBoost regressor** to predict weekly continuous demand. Converting these continuous predictions into binary stockout warnings requires comparing the forecast to the stock-on-hand ($S$). 
+All experiments are conducted on the **Indian Pharmacy Demand & Stockout Forecasting** dataset (47,424 records, 19 drugs, 16 stores, 156 weeks):
+> **🔗** [Kaggle Dataset](https://www.kaggle.com/datasets/algozenith/indian-pharmacy-demand-and-stockout-forecasting) | **License:** CC BY 4.0
+
+The baseline forecasting core employs an **XGBoost regressor** trained on a **56-dimensional** feature space (including historical demand lags, rolling statistics, momentum metrics, cyclical seasonal encodings, epidemiological outbreak flags, categorical encodings, and static context attributes) to predict weekly continuous demand. Converting these continuous predictions into binary stockout warnings requires comparing the forecast to the stock-on-hand ($S$). 
 
 To provide risk adjustment based on therapeutic criticality, we transitioned the warning engine from a static, deterministic checking logic to an **Asymmetric Post-Hoc Threshold Optimizer**. The system evaluates stockout risk using:
 
@@ -67,6 +70,8 @@ This represents the evaluation over the entire historical active dataset (matchi
 *   **Strict Mode** minimizes false alarms (generating only 2 false positives on the test split), making it optimal for expensive, slow-moving therapeutic categories where capital lockup must be avoided.
 *   **Balanced Mode** yields a stable balance, catching 44 out of 48 stockouts with only 3 false alarms.
 *   **Clinical Safe Mode** shifts the decision boundary outward. By scaling predicted demand by 1.05 and adding a 1-unit safety buffer, it achieves a **100.00% Recall rate (zero missed shortages)** on the temporal test split, prioritizing clinical safety for life-saving drugs (such as insulin and bronchodilators) while maintaining a precision rate of **85.71%**.
+
+Triggered alerts are further classified into severity tiers based on the absolute deficit: **CRITICAL** ($>100$ units), **HIGH** ($>50$), **MEDIUM** ($>10$), and **LOW** ($\le 10$). Each alert also includes a prescriptive reorder quantity ($Q = \max(0, \mu_{t,4} \times 4 \times 1.2 - S)$) and a days-of-cover estimate for immediate procurement action.
 
 ---
 

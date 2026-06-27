@@ -89,10 +89,10 @@
   --space-xxl: 48px;
 
   /* Border Radius — Donezo's rounded layout design */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 26px;
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-xl: 38px;
   --radius-full: 9999px;
 
   /* Typography */

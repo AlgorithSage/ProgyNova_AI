@@ -63,8 +63,12 @@ The model's performance is monitored using separate sets of metrics:
 
 ---
 
-## 3. System Architecture
+## 3. Data Architecture & System Flow
 
+The system operates on the **Indian Pharmacy Demand & Stockout Forecasting** dataset, publicly available on Kaggle:
+> **🔗** [Indian Pharmacy Demand & Stockout Forecasting](https://www.kaggle.com/datasets/algozenith/indian-pharmacy-demand-and-stockout-forecasting) | **License:** CC BY 4.0
+
+The dataset contains **47,424 dispensing records** across **19 drugs**, **16 stores**, and **156 weeks** (Jan 2023 – Dec 2025), along with **1,248 epidemiological context rows**.
 The following diagram illustrates the flow of data from ingestion through model prediction and explainability, and finally to the dashboard interface.
 
 ```mermaid
@@ -101,9 +105,13 @@ graph TD
 
 ### 4.1 Format-Agnostic Ingestion (`AutoSchemaEngine`)
 *   **Requirement:** Users must be able to upload custom transactional data tables in CSV format without writing parsing code.
-*   **Implementation:** The backend dynamically maps input column names to the internal pipeline schema (mapping fields for store ID, product ID, temporal indicators, and sales units). It supports schema-agnostic merging of transactional sales records with store and drug directories.
+*   **Implementation:** The backend dynamically maps input column names to the internal pipeline schema (mapping fields for store ID, product ID, temporal indicators, and sales units). It supports long-form, time-wide, and entity-wide layouts with automatic schema-agnostic merging of transactional sales records with store and drug directories.
 
-### 4.2 Timeseries Demand Forecasting Chart
+### 4.2 56-Dimensional Feature Engineering Pipeline
+*   **Requirement:** The system must automatically generate a dense, multi-dimensional feature space from raw transaction logs.
+*   **Implementation:** The pipeline produces a **56-dimensional** feature vector including: 7 historical demand lags ($k \in \{1,2,4,8,12,26,52\}$), 6 rolling statistical windows (means and standard deviations for $w \in \{4,8,12\}$), 3 cyclical seasonal transforms, 2 momentum metrics (week-over-week change and 4-week momentum ratio), 26 lagged epidemiological outbreak signals across 8 diseases, 5 ordinal categorical encodings, and static contextual attributes.
+
+### 4.3 Timeseries Demand Forecasting Chart
 *   **Requirement:** Visualizing predicted vs. actual weekly quantities for any selected product and location.
 *   **UX Design:** Interactive Recharts line chart illustrating:
     *   Continuous historical demand (actual weekly dispensed quantities).
@@ -111,24 +119,25 @@ graph TD
     *   Stock-on-hand marker ($S$).
     *   A clean sans-serif/numeric font (`Roundo` / `Satoshi`) for chart axes and tooltips.
 
-### 4.3 Active Stockout Alerts Table
+### 4.4 Active Stockout Alerts Table
 *   **Requirement:** Listing all predicted stockout warnings with sorting, filtering, and priority indicators.
-*   **UX Design:** Columns displaying store ID, drug name, batch number, unit price, stock-on-hand, predicted demand, and expiry date. Highlighted with soft theme colors indicating stockout risk.
+*   **UX Design:** Columns displaying store ID, drug name, batch number, unit price, stock-on-hand, predicted demand, prescriptive reorder quantity, and expiry date. Alerts are classified into four severity tiers based on deficit magnitude: **CRITICAL** ($>100$ units), **HIGH** ($>50$), **MEDIUM** ($>10$), and **LOW** ($\le 10$).
 
-### 4.4 Local Driver Explainability Drawer (TreeSHAP)
+### 4.5 Local Driver Explainability Drawer (TreeSHAP)
 *   **Requirement:** Procurement officers must understand *why* the model predicts a stockout.
 *   **UX Design:** Clicking on any row in the alerts table slides out a side-panel displaying local TreeSHAP values:
-    *   **Red Bars (Positive SHAP):** Variables driving demand *up* (e.g., active disease season, high recent sales).
-    *   **Blue Bars (Negative SHAP):** Variables driving demand *down* (e.g., low medical coverage, seasonal dip).
+    *   **Red Bars (Positive SHAP):** Variables driving demand *up* (e.g., active disease season, high recent sales, sales momentum acceleration).
+    *   **Blue Bars (Negative SHAP):** Variables driving demand *down* (e.g., low festival intensity, seasonal dip, reduced population density).
+*   **Semantic Translation Layer:** Raw SHAP feature names (e.g., `demand_lag_1`, `outbreak_dengue_lag0`) are translated into pharmacist-friendly labels (e.g., "Sales Last Week", "Dengue Outbreak Activity") with contextual clinical recommendations (outbreak response, velocity alerts, seasonal optimization prompts).
 
-### 4.5 Model Performance Auditor (ML Metrics Page)
+### 4.6 Model Performance Auditor (ML Metrics Page)
 *   **Requirement:** Real-time auditing of model metrics under the chosen sensitivity profiles.
 *   **Functional States:**
     1.  **Model Baseline Benchmark:** Displays static performance profiles computed on historical validation sets.
     2.  **Dynamic Audit (Uploaded Logs):** Instantly recalculates all metrics (MAPE, F1, Recall, Precision, Confusion Matrix) in real-time when the user uploads a custom CSV.
 *   **UX Design:** Interactive Confusion Matrix with descriptive explanations of TP, TN, FP, and FN events in a pharmacy supply context. Residual histograms visualizing forecast error distributions.
 
-### 4.6 Integrated Help & Documentation View
+### 4.8 Integrated Help & Documentation View
 *   **Requirement:** Embedded user guide explaining mathematical models, data schemas, upload procedures, and sensitivity levels.
 *   **UX Design:**
     *   Renders [user_guide.md](file:///c:/Users/USER/Desktop/ProgyNovaAI/docs/user_guide.md) dynamically with ReactMarkdown.
@@ -164,11 +173,15 @@ ProgyNovaAI/
 │
 ├── docs/                       # Unified documentation
 │   ├── architecture.md         # System architecture diagram and notes
-│   ├── daily_summary_2026_06_24.md # Summary of updates made today
+│   ├── chapters_6_7.md         # Results and conclusion chapters
+│   ├── daily_summary_2026_06_24.md # Summary of updates made
+│   ├── ml_model_architecture.md # ML model mathematical specification
 │   ├── model_details.md        # Consolidated technical design & reference
-│   ├── report.md               # Summary report
-│   ├── user_guide.md           # Documentation for the app client UI
-│   └── PRD.md                  # This Product Requirements Document
+│   ├── PRD.md                  # This Product Requirements Document
+│   ├── proj.md                 # Technical specifications and code reference
+│   ├── report.md               # Grid search evaluation report
+│   ├── system_overview.md      # High-level system overview
+│   └── user_guide.md           # Documentation for the app client UI
 │
 ├── progynova-api/              # Python FastAPI Backend
 │   ├── app/
@@ -306,7 +319,7 @@ Evaluated on the strictly held-out **Temporal Test Split ($N=3,952$, Weeks 143�
 
 | Model / Configuration | Accuracy | Precision | Recall | F1-Score | ROC-AUC | False Negatives (FN) | False Positives (FP) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Previous Ensemble** (Unbalanced) | 98.79% | 0.00% | 0.00% | 0.00% | 0.5000 | 48 | 0 |
+| **Previous Ensemble** (Unbalanced) | 99.14% | 0.00% | 0.00% | 0.00% | 0.5000 | 48 | 0 |
 | **Optimized Model** (Strict)        | **99.85%** | **95.65%** | 91.67% | **93.62%** | 0.9991 | 4 | **2** |
 | **Optimized Model** (Balanced)      | 99.82% | 93.62% | 91.67% | 92.63% | 0.9991 | 4 | 3 |
 | **Optimized Model** (Clinical Safe) | 99.80% | 85.71% | **100.00%** | 92.31% | **1.0000** | **0** | 8 |

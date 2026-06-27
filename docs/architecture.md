@@ -5,7 +5,14 @@ This document delineates the mathematical formulation, design logic, and validat
 
 ---
 
-## 1. Introduction and Problem Formulation
+## 1. Introduction
+
+ProgyNovaAI is a unified, cost-sensitive demand forecasting and stockout prevention platform designed for Indian pharmaceutical supply chains. The system combines a single-pass XGBoost regression pipeline with an asymmetric post-hoc threshold optimizer to transform continuous demand predictions into clinically-safe binary stockout alerts.
+
+The system is trained on the **Indian Pharmacy Demand & Stockout Forecasting** dataset, publicly available on Kaggle:
+> **🔗** [Indian Pharmacy Demand & Stockout Forecasting](https://www.kaggle.com/datasets/algozenith/indian-pharmacy-demand-and-stockout-forecasting) | **License:** CC BY 4.0
+
+## 2. Problem Formulation
 
 Predicting pharmaceutical stockout events across distributed pharmacy networks is a highly challenging problem due to two primary data properties:
 
@@ -33,13 +40,16 @@ The M4 and M5 competitions demonstrated that for tabular, highly intermittent, a
 ## 3. Mathematical Formulation of the Pipeline
 
 ### 3.1 Feature Engineering and Adapter Pipeline
-Let the raw transaction ledger be represented as a set of observations $D$. The feature adapter maps each record dynamically to generate a dense, multi-dimensional feature space $X \in \mathbb{R}^{d}$:
-1.  **Historical Lags:** Captures consumption history across intervals $t-k$ for $k \in \{1, 2, 4, 8, 12, 26, 52\}$.
-2.  **Rolling Metrics:** Captures $w$-period rolling demand means and standard deviations:
+Let the raw transaction ledger be represented as a set of observations $D$. The feature adapter maps each record dynamically to generate a dense, **56-dimensional** feature space $X \in \mathbb{R}^{56}$:
+1.  **Historical Lags (7 features):** Captures consumption history across intervals $t-k$ for $k \in \{1, 2, 4, 8, 12, 26, 52\}$.
+2.  **Rolling Metrics (6 features):** Captures $w$-period rolling demand means and standard deviations:
     $$\mu_{t, w} = \frac{1}{w}\sum_{i=1}^{w} y_{t-i}, \quad \sigma_{t, w} = \sqrt{\frac{1}{w-1}\sum_{i=1}^{w} (y_{t-i} - \mu_{t, w})^2} \quad \text{for } w \in \{4, 8, 12\}$$
-3.  **Cyclical Temporal Encodings:** Models seasonal dynamics via sine and cosine transforms:
+3.  **Cyclical Temporal Encodings (3 features):** Models seasonal dynamics via sine, cosine transforms and month:
     $$\text{sin\_week}_t = \sin\left(\frac{2\pi \cdot \text{week\_of\_year}_t}{52}\right), \quad \text{cos\_week}_t = \cos\left(\frac{2\pi \cdot \text{week\_of\_year}_t}{52}\right)$$
-4.  **Lagged Outbreak Signalling:** Formulates features for regional disease indicators when epidemiological severity records exceed a defined activation threshold.
+4.  **Momentum Metrics (2 features):** Captures demand acceleration via week-over-week change ($\Delta y_t = y_t - y_{t-1}$) and 4-week momentum ratio ($M_t = \mu_{t,4} / \mu_{t-4,4}$).
+5.  **Lagged Outbreak Signalling (26 features):** Formulates features for 8 regional disease indicators (dengue, malaria, chikungunya, flu, diarrhoeal, leptospirosis, respiratory, typhoid) at lags $\{0, 1, 2\}$, plus aggregate `outbreak_any_active` and `outbreak_count` flags.
+6.  **Categorical Encodings (5 features):** Ordinal integer encodings for `monsoon_phase`, `region`, `category`, `drug`, and `store` identifiers.
+7.  **Static & Contextual Attributes (7 features):** Population, lead time, baseline demand, shelf life, rainfall anomaly, festival intensity, and stock-on-hand.
 
 ### 3.2 Cost-Sensitive Gradient Loss Weighting
 To prevent the model from ignoring rare stockout events during gradient updates, we compute sample weights during training. Let $N_{\text{neg}}$ be the number of safe weeks ($y_i \le S_i$) and $N_{\text{pos}}$ be the number of stockout weeks ($y_i > S_i$). The sample weight $w_i$ applied to the loss function for observation $i$ is formulated as:
@@ -60,6 +70,13 @@ where $\alpha$ is the demand multiplier, $\beta$ is the safety stock buffer (in 
 | **Strict** | $1.00$ | $0.0$ | High-precision monitoring (minimizes false alarms for expensive inventory). |
 | **Balanced** | $1.00$ | $5.0$ | Optimal trade-off (maximizes F1-score balance). |
 | **Clinical Safe** | $1.05$ | $1.0$ | Recall-maximized monitoring (ensures zero missed stockouts for critical drugs). |
+
+Triggered alerts are classified into severity tiers based on the absolute deficit ($\hat{y} - S$): **CRITICAL** ($>100$ units), **HIGH** ($>50$), **MEDIUM** ($>10$), and **LOW** ($\le 10$).
+
+### 3.4 Prescriptive Reorder Quantity
+Each alert includes a prescriptive replenishment recommendation:
+$$Q_{\text{reorder}} = \max\left(0, \; \mu_{t,4} \times 4 \times 1.2 - S_t\right)$$
+where $\mu_{t,4}$ is the 4-week rolling demand mean, 4 weeks of target inventory cover, and 1.2 is a 20% safety multiplier.
 
 ---
 
@@ -104,4 +121,5 @@ The ProgyNovaAI cost-sensitive framework resolves this paradox. By applying grad
 ### 5.2 Decoupled Optimization and Real-time tree-SHAP Explainability
 *   **Decoupled Prediction:** By separating the regression model (XGBoost forecasting) from the risk preference (post-hoc $\alpha, \beta$ thresholding), the system avoids the need to retrain models when changing risk preferences.
 *   **Exact TreeSHAP Attributions:** Using TreeSHAP on the unified XGBoost model allows the system to compute exact feature attribution matrices in under 15 milliseconds, replacing slower meta-learner calculations.
+*   **Semantic Translation Layer:** The frontend translates raw SHAP feature names (e.g., `demand_lag_1`, `outbreak_dengue_lag0`) into pharmacist-friendly natural language labels with contextual clinical recommendations (e.g., outbreak-driven surge advisories, velocity alerts, seasonal optimization prompts).
 *   **Computational Efficiency:** Consolidating the model pipeline from a parallel ensemble to a single XGBoost regressor reduced batch inference latency from >12 seconds to **under 200 milliseconds** for the entire 47,424-row dataset.

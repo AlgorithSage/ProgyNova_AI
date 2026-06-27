@@ -2,6 +2,9 @@
 
 ProgyNova AI is an advanced, production-grade demand forecasting and clinical stockout prediction platform. It is engineered specifically to address the **class imbalance paradox** of stockout events in healthcare supply chains, where life-saving therapies (such as insulin, bronchodilators, and oncology medications) are rarely out of stock ($\approx 1.21\%$ of observations) but are highly critical when they are.
 
+The system is trained on the **Indian Pharmacy Demand & Stockout Forecasting** dataset (47,424 records, 19 drugs, 16 stores, 156 weeks):
+> **🔗** [Kaggle Dataset](https://www.kaggle.com/datasets/algozenith/indian-pharmacy-demand-and-stockout-forecasting) | **License:** CC BY 4.0
+
 This document serves as a high-level summary and map of the system's architecture, mathematical foundation, and files.
 
 ---
@@ -13,7 +16,7 @@ The model architecture operates as a decoupled pipeline, separating feature engi
 ```mermaid
 graph TD
     Data[Raw Transaction Logs] -->|Ingestion & Formatting| Adapt[Feature Engineering Adapter]
-    Adapt -->|Lags, Rolling Stats, Cyclical Encodings| CoreModel[(Cost-Sensitive XGBoost Regressor)]
+    Adapt -->|Lags, Rolling Stats, Cyclical, Momentum, Outbreak, Categorical| CoreModel[(Cost-Sensitive XGBoost Regressor)]
     
     subgraph Model Training
         Weights[Class Imbalance Gradient Weighting w_i] -.->|Loss Function Penalty| CoreModel
@@ -21,16 +24,21 @@ graph TD
 
     CoreModel -->|Continuous Forecasts y_hat| Optimizer[Asymmetric Threshold Optimizer]
     Optimizer -->|Apply Risk Profiles: Strict / Balanced / Clinical Safe| Alerts[Binary Stockout Alerts]
+    Optimizer -->|Severity: CRITICAL / HIGH / MEDIUM / LOW| Severity[Alert Severity Classification]
     
     CoreModel -->|Tree Ensembles| SHAP[TreeSHAP Explainer]
-    SHAP -->|Exact Feature Attributions| Explanations[Natural Language Explanations]
+    SHAP -->|Exact Feature Attributions| SemanticLayer[Semantic Translation Layer]
+    SemanticLayer -->|Pharmacist-Friendly Labels & Recommendations| Explanations[Natural Language Explanations]
+    
+    Adapt -->|Prescriptive Logic| Prescriptive[Reorder Qty & Days-of-Cover]
 ```
 
 ### Core Pipeline Components
-*   **Automatic Schema Engine ([ingestion.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/ingestion.py)):** Resolves raw input tabular structures dynamically into a standard internal format by mapping semantic roles (timestamps, entities, demand target) based on keywords configured in [schema.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/schema.py).
-*   **Feature Engineering Pipeline ([features.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/features.py)):** Adapts raw data into model features by computing multi-interval historical lags, rolling statistical windows (means, standard deviations), cyclical seasonality sin/cos transforms, and epidemiological outbreak flags.
-*   **Asymmetric Threshold Optimizer ([stockout.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/stockout.py)):** Implements the parameterized boundary decision logic that translates regression forecasts into operational warnings based on stock-on-hand inventory.
-*   **SHAP Explainability Engine ([explainer.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/explainer.py)):** Runs high-performance TreeSHAP calculations directly on the XGBoost tree structures to return exact feature attributions for demand predictions.
+*   **Automatic Schema Engine ([ingestion.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/ingestion.py)):** Resolves raw input tabular structures dynamically into a standard internal format by mapping semantic roles (timestamps, entities, demand target) based on keywords configured in [schema.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/schema.py). Supports long-form, time-wide, and entity-wide CSV layouts with automatic pivoting.
+*   **Feature Engineering Pipeline ([features.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/features.py)):** Produces a **56-dimensional** feature vector by computing multi-interval historical lags ($k \in \{1,2,4,8,12,26,52\}$), rolling statistical windows (means and standard deviations for $w \in \{4,8,12\}$), cyclical sine/cosine seasonality transforms, momentum metrics (week-over-week change and 4-week momentum ratio), epidemiological outbreak flags for 8 diseases at 3 lag levels, ordinal categorical encodings (monsoon phase, region, category, drug, store), and static context attributes (population, lead time, shelf life, rainfall, festival intensity).
+*   **Prescriptive Inventory Logic ([features.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/features.py)):** Computes days-of-cover ($\text{DoC} = S / \mu_{t,4} \times 7$), reorder urgency flags, and prescriptive reorder quantities ($Q = \max(0, \mu_{t,4} \times 4 \times 1.2 - S)$).
+*   **Asymmetric Threshold Optimizer ([stockout.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/stockout.py)):** Implements the parameterized boundary decision logic that translates regression forecasts into operational warnings based on stock-on-hand inventory. Classifies alerts into four severity tiers: CRITICAL ($>100$ units deficit), HIGH ($>50$), MEDIUM ($>10$), and LOW ($\le 10$).
+*   **SHAP Explainability Engine ([explainer.py](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-api/app/pipeline/explainer.py)):** Runs high-performance TreeSHAP calculations directly on the XGBoost tree structures to return exact feature attributions for demand predictions. The frontend [ShapExplainer.tsx](file:///c:/Users/USER/Desktop/ProgyNovaAI/progynova-dashboard/src/components/explain/ShapExplainer.tsx) maps raw attribution names to pharmacist-friendly labels and generates contextual clinical recommendations (outbreak response, velocity alerts, seasonal optimization prompts).
 
 ---
 
@@ -84,6 +92,9 @@ Evaluated on the held-out **Temporal Test Split ($N=3,952$, Weeks 143–155)**, 
 ---
 
 ## 4. Key Advantages
-1. **Zero-Imputation Handling:** Tree splits naturally route missing temporal points, preserving raw log characteristics.
-2. **Sub-200ms Latency:** Consolidating from a multi-branch parallel ensemble to a single XGBoost regressor reduced batch inference time from over 12 seconds to under 200 milliseconds.
-3. **Exact TreeSHAP Attribution:** Calculates exact contributions in under 15ms per store-drug entry, enabling explaining prediction drivers (seasonal spikes, disease outbreaks, lag behavior) instantly.
+1. **56-Dimensional Adaptive Feature Space:** The pipeline generates momentum, seasonal, epidemiological, and categorical features automatically from any CSV layout via the AutoSchemaEngine adapter.
+2. **Zero-Imputation Handling:** Tree splits naturally route missing temporal points, preserving raw log characteristics.
+3. **Sub-200ms Latency:** Consolidating from a multi-branch parallel ensemble to a single XGBoost regressor reduced batch inference time from over 12 seconds to under 200 milliseconds.
+4. **Exact TreeSHAP Attribution:** Calculates exact contributions in under 15ms per store-drug entry, enabling explaining prediction drivers (seasonal spikes, disease outbreaks, lag behavior) instantly.
+5. **Semantic Translation:** Raw SHAP feature names are translated into pharmacist-friendly labels with actionable clinical recommendations.
+6. **Prescriptive Reorder Logic:** Each alert includes a recommended reorder quantity and days-of-cover estimate for immediate procurement action.

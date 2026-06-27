@@ -10,10 +10,16 @@ ProgyNova AI is a demand forecasting and stockout prediction platform designed s
 
 ProgyNova solves this using a **Cost-Sensitive XGBoost Regressor** paired with an **Asymmetric Post-Hoc Threshold Optimizer**, ensuring life-saving therapies (like insulin and bronchodilators) are never under-ordered.
 
+The platform is built on the **Indian Pharmacy Demand & Stockout Forecasting** dataset:
+> **🔗** [Available on Kaggle](https://www.kaggle.com/datasets/algozenith/indian-pharmacy-demand-and-stockout-forecasting) | **License:** CC BY 4.0
+
 ### Core Capabilities:
-- **Format-Agnostic Ingestion:** Upload varied CSV schemas; the `AutoSchemaEngine` dynamically maps columns.
-- **TreeSHAP Explainability:** Understand *why* a demand surge is predicted (e.g., local outbreaks, seasonal trends).
+- **Format-Agnostic Ingestion:** Upload varied CSV schemas; the `AutoSchemaEngine` dynamically maps columns (long-form, time-wide, and entity-wide layouts).
+- **56-Dimensional Feature Engineering:** Automatically computes historical lags, rolling statistics, momentum metrics, cyclical seasonal encodings, epidemiological outbreak flags, and categorical encodings.
+- **TreeSHAP Explainability:** Understand *why* a demand surge is predicted (e.g., local outbreaks, seasonal trends), translated into pharmacist-friendly language.
 - **Dynamic Sensitivity Adjustments:** Toggle between Strict, Balanced, and Clinical Safe alerting profiles on the fly.
+- **Prescriptive Reorder Quantities:** Each alert includes a recommended order quantity and days-of-cover estimate.
+- **Severity Classification:** Alerts are classified as CRITICAL, HIGH, MEDIUM, or LOW based on the projected deficit magnitude.
 
 ---
 
@@ -76,7 +82,25 @@ The underlying XGBoost regressor (which powers the continuous demand line) opera
 
 By clicking on any alert in the table, the **Driver Explainer** panel will slide in. This uses exact TreeSHAP calculations to show you exactly which variables pushed the forecast higher or lower.
 
-- **Red Bars (Positive SHAP):** Variables driving demand *up* (e.g., an active regional disease outbreak, high historical lags).
-- **Blue Bars (Negative SHAP):** Variables driving demand *down* (e.g., off-season timing, low copay coverage).
+- **Red Bars (Positive SHAP):** Variables driving demand *up* (e.g., an active regional disease outbreak, high historical lags, recent sales momentum).
+- **Blue Bars (Negative SHAP):** Variables driving demand *down* (e.g., off-season timing, low festival intensity, reduced population density).
+
+The system automatically translates raw feature names into **pharmacist-friendly labels** (e.g., `demand_lag_1` → "Sales Last Week", `outbreak_dengue_lag0` → "Dengue Outbreak Activity") and generates **contextual clinical recommendations** such as:
+- **CRITICAL OUTBREAK RESPONSE**: When an outbreak is the primary demand driver.
+- **VELOCITY ALERT**: When sales momentum is accelerating rapidly.
+- **SEASONAL OPTIMIZATION**: When year-over-year seasonality suggests reduced demand.
 
 Use these explanations to justify large reorder capital requests to hospital management.
+
+---
+
+## 6. Alert Severity Tiers
+
+Triggered stockout alerts are classified into severity tiers based on the projected deficit magnitude ($\hat{y} - S$):
+
+| Deficit Range (units) | Severity | Recommended Action |
+| :---: | :--- | :--- |
+| $> 100$ | **CRITICAL** | Immediate emergency procurement required |
+| $> 50$ | **HIGH** | Expedite scheduled replenishment order |
+| $> 10$ | **MEDIUM** | Flag for next review cycle |
+| $\le 10$ | **LOW** | Monitor; no immediate action |
