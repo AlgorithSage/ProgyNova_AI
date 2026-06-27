@@ -953,7 +953,6 @@
   justify-content: center;
   background: rgba(11, 15, 25, 0.55);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   animation: metricsOverlayFadeIn 0.2s ease-out;
   padding: var(--space-md);
 }
