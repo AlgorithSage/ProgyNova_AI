@@ -9,8 +9,10 @@ import { auth, googleProvider } from '../../firebase';
 import './AuthPage.css';
 
 interface AuthPageProps {
-  /** Navigate elsewhere in the app (close -> landing, success -> dashboard). */
-  onViewChange: (view: 'landing' | 'dashboard') => void;
+  /** Called once the user is successfully signed in (Google or phone). */
+  onAuthenticated: () => void;
+  /** Called when the user dismisses the auth page (back to landing). */
+  onClose: () => void;
 }
 
 type Panel = 'choose' | 'phone';
@@ -53,7 +55,7 @@ function errCode(e: unknown): string | undefined {
     : undefined;
 }
 
-export function AuthPage({ onViewChange }: AuthPageProps) {
+export function AuthPage({ onAuthenticated, onClose }: AuthPageProps) {
   const [panel, setPanel] = useState<Panel>('choose');
 
   // Phone flow
@@ -72,7 +74,7 @@ export function AuthPage({ onViewChange }: AuthPageProps) {
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      onViewChange('dashboard');
+      onAuthenticated();
     } catch (err) {
       setError(friendlyError(errCode(err)));
     } finally {
@@ -119,7 +121,7 @@ export function AuthPage({ onViewChange }: AuthPageProps) {
     setLoading(true);
     try {
       await confirmationRef.current.confirm(otp.trim());
-      onViewChange('dashboard');
+      onAuthenticated();
     } catch (err) {
       setError(friendlyError(errCode(err)));
     } finally {
@@ -263,7 +265,7 @@ export function AuthPage({ onViewChange }: AuthPageProps) {
           <button
             type="button"
             className="auth-visual__close"
-            onClick={() => onViewChange('landing')}
+            onClick={onClose}
             aria-label="Back to home"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">

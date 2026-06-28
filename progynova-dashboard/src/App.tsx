@@ -21,6 +21,25 @@ function getInitialTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+// ── Navigation model ────────────────────────────────────────────────────────
+// The app is a single-page state machine (no router). We mirror each view into
+// the browser history stack so the Back button walks the view stack (instead of
+// exiting the app), and we gate the in-app views behind Firebase auth (RBAC).
+type View = 'landing' | 'auth' | 'dashboard' | 'metrics' | 'docs';
+
+/** Views that require a signed-in user. Everything else is public. */
+const PROTECTED_VIEWS: ReadonlySet<View> = new Set(['dashboard', 'metrics', 'docs']);
+const isProtected = (v: View): boolean => PROTECTED_VIEWS.has(v);
+
+const VIEW_STORAGE_KEY = 'progynova-view';
+
+/** Restore the last in-app view after a reload (only protected views are cached). */
+function getInitialView(): View {
+  const saved = sessionStorage.getItem(VIEW_STORAGE_KEY) as View | null;
+  if (saved && isProtected(saved)) return saved;
+  return 'landing';
+}
+
 function App() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [isConnected, setIsConnected] = useState(false);
@@ -41,17 +60,87 @@ function App() {
   const alertsRowRef = useRef<HTMLDivElement>(null);
 
   // View & ML Metrics states
-  const [currentView, setCurrentView] = useState<'landing' | 'auth' | 'dashboard' | 'metrics' | 'docs'>('landing');
+  const [currentView, setCurrentView] = useState<View>(getInitialView);
   const [uploadedMetrics, setUploadedMetrics] = useState<MLMetricsResponse | null>(null);
   const [sensitivityMode, setSensitivityMode] = useState<'strict' | 'balanced' | 'safe'>('balanced');
 
-  // Firebase auth state — tracks the signed-in user across the app
+  // Firebase auth state — tracks the signed-in user across the app.
+  // `authReady` flips true after the first auth callback so we don't flash a
+  // protected view (or bounce a still-restoring user) before persistence loads.
   const [authUser, setAuthUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setAuthUser(u));
-    return unsub;
+  // Latest currentView for use inside event listeners that subscribe once.
+  const currentViewRef = useRef<View>(currentView);
+  useEffect(() => { currentViewRef.current = currentView; }, [currentView]);
+
+  // Where to send the user once they finish signing in (set when a launch button
+  // bounces an unauthenticated user to the auth page).
+  const pendingViewRef = useRef<View>('dashboard');
+
+  // ── History-stack navigation ──────────────────────────────────────────────
+  /** Navigate to a view and record it in the browser history stack. */
+  const navigate = useCallback((view: View, opts?: { replace?: boolean }) => {
+    setCurrentView(view);
+    const state = { view };
+    if (opts?.replace) window.history.replaceState(state, '');
+    else window.history.pushState(state, '');
   }, []);
+
+  /** Guarded navigation used by launch/CTA links: protected views require auth. */
+  const requestView = useCallback((view: View) => {
+    if (isProtected(view) && !auth.currentUser) {
+      pendingViewRef.current = view;     // remember intended destination
+      navigate('auth');
+      return;
+    }
+    navigate(view);
+  }, [navigate]);
+
+  // Seed the initial history entry + handle Back/Forward (popstate).
+  useEffect(() => {
+    window.history.replaceState({ view: currentViewRef.current }, '');
+    const onPop = (e: PopStateEvent) => {
+      const view = ((e.state as { view?: View } | null)?.view) ?? 'landing';
+      // Re-apply the auth guard on Back/Forward so protected views can't be
+      // reached without a session.
+      if (isProtected(view) && !auth.currentUser) {
+        setCurrentView('landing');
+        return;
+      }
+      setCurrentView(view);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Persist the current view so a reload restores the in-app page (cache).
+  useEffect(() => {
+    if (isProtected(currentView)) sessionStorage.setItem(VIEW_STORAGE_KEY, currentView);
+    else sessionStorage.removeItem(VIEW_STORAGE_KEY);
+  }, [currentView]);
+
+  // ── Auth lifecycle ────────────────────────────────────────────────────────
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setAuthUser(u);
+      setAuthReady(true);
+      // If the session ends (or never existed) while on a protected view, leave.
+      if (!u && isProtected(currentViewRef.current)) {
+        navigate('landing', { replace: true });
+      }
+    });
+    return unsub;
+  }, [navigate]);
+
+  /** Called by AuthPage on a successful sign-in. */
+  const handleAuthenticated = useCallback(() => {
+    const dest = pendingViewRef.current || 'dashboard';
+    pendingViewRef.current = 'dashboard';
+    // Replace the 'auth' entry so Back from the dashboard skips the login page
+    // and returns to the landing page instead.
+    navigate(dest, { replace: true });
+  }, [navigate]);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -59,8 +148,10 @@ function App() {
     } catch (err) {
       console.error('[Auth] sign-out failed', err);
     }
-    setCurrentView('landing');
-  }, []);
+    sessionStorage.removeItem(VIEW_STORAGE_KEY);
+    pendingViewRef.current = 'dashboard';
+    navigate('landing', { replace: true });
+  }, [navigate]);
 
   // Apply theme dynamically using the theme manager
   useEffect(() => {
@@ -228,12 +319,30 @@ function App() {
     ? selectedAlert.entity_id
     : (selectedForecast ? selectedForecast.entity_id : '');
 
+  // Hold protected views behind a lightweight loader until Firebase has
+  // restored (or cleared) the persisted session — prevents a flash of the
+  // dashboard for a user whose session is still loading.
+  if (isProtected(currentView) && !authReady) {
+    return (
+      <div className="app-boot" role="status" aria-live="polite">
+        <span className="app-boot__spinner" aria-hidden="true" />
+        <span className="app-boot__text">Loading your workspace…</span>
+      </div>
+    );
+  }
+
+  // Auth resolved with no user on a protected view: render the public landing
+  // page while the auth effect redirects (never leak the dashboard).
+  if (isProtected(currentView) && !authUser) {
+    return <LandingPage onViewChange={requestView} />;
+  }
+
   if (currentView === 'landing') {
-    return <LandingPage onViewChange={setCurrentView} />;
+    return <LandingPage onViewChange={requestView} />;
   }
 
   if (currentView === 'auth') {
-    return <AuthPage onViewChange={setCurrentView} />;
+    return <AuthPage onAuthenticated={handleAuthenticated} onClose={() => navigate('landing')} />;
   }
 
   return (
@@ -246,7 +355,7 @@ function App() {
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
       currentView={currentView}
-      onViewChange={(view) => setCurrentView(view as 'landing' | 'auth' | 'dashboard' | 'metrics' | 'docs')}
+      onViewChange={(view) => requestView(view as View)}
       onNavClick={handleNavClick}
       userName={authUser?.displayName || authUser?.phoneNumber || 'Account'}
       userEmail={authUser?.email || authUser?.phoneNumber || ''}
