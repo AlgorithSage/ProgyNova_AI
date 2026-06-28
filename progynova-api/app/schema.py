@@ -4,17 +4,23 @@ from typing import Dict, Any
 
 class AutoSchemaEngine:
     TIME_KW = ["time", "date", "week", "timestamp", "period", "day", "hour", "year", "month"]
-    STOCK_KW = ["stock_on_hand", "stock", "inventory", "current_stock", "available_stock", "on_hand", "stock_qty"]
+    STOCK_KW = ["stock_on_hand", "stock", "inventory", "current_stock", "available_stock", "on_hand", "stock_qty", "inventory_level", "stock_level"]
     LEAD_KW = ["lead_time", "leadtime", "supplier_lead", "delivery_time", "lead_weeks", "lead"]
-    ENTITY_ID_KW = ["drug_id", "sku", "item_id", "product_id", "material_id", "ndc", "entity_id", "product", "drug"]
+    ENTITY_ID_KW = ["drug_id", "sku", "item_id", "product_id", "material_id", "ndc", "entity_id", "product", "drug", "sku_id"]
     LOCATION_ID_KW = ["store", "location", "branch", "facility", "site", "depot", "warehouse", "location_id", "store_id"]
-    TARGET_KW = ["demand", "sales", "quantity", "units", "target", "demand_units", "qty", "sold"]
+    TARGET_KW = ["demand", "sales", "quantity", "units", "target", "demand_units", "qty", "sold", "units_sold", "sold_qty", "quantity_sold"]
 
     @classmethod
     def score_column(cls, col_name: str, keywords: list) -> int:
-        col_clean = str(col_name).lower().replace("-", "_")
+        col_clean = str(col_name).lower().replace("-", "_").replace(" ", "_").replace("/", "_")
         if any(kw == col_clean for kw in keywords): return 100
-        return sum(20 for kw in keywords if kw in col_clean)
+        
+        words = col_clean.split("_")
+        score = 0
+        for kw in keywords:
+            if kw in words:
+                score += 40
+        return score
 
     @classmethod
     def validate_and_parse(cls, df: pd.DataFrame) -> Dict[str, Any]:

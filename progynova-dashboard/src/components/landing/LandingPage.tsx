@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import './LandingPage.css';
+import { GooeyText } from './GooeyText';
 
 interface LandingPageProps {
-  onViewChange: (view: 'dashboard' | 'metrics' | 'docs') => void;
+  onViewChange: (view: 'dashboard' | 'metrics' | 'docs' | 'auth') => void;
 }
 
 /* Window-viewer showcase cards - each frames a real screenshot of a live
@@ -38,7 +39,7 @@ const SHOWCASE = [
     body:
       'For any item, the explainer shows the top factors pushing demand up or down in clear language - recent sales velocity, seasonality, store size - alongside a concrete action plan. It is never a black box.',
   },
-];
+  ];
 
 /* Three-step getting-started flow, written for a first-time researcher. */
 const STEPS = [
@@ -63,6 +64,8 @@ const STEPS = [
 ];
 
 export function LandingPage({ onViewChange }: LandingPageProps) {
+  const [datasetTab, setDatasetTab] = useState<'general' | 'erp'>('general');
+
   // Lenis smooth scrolling - active only while the landing page is mounted.
   useEffect(() => {
     const lenis = new Lenis({
@@ -101,6 +104,7 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
         <nav className="landing-page__links">
           <button onClick={() => onViewChange('metrics')} className="landing-nav-link">ML Metrics</button>
           <button onClick={() => onViewChange('docs')} className="landing-nav-link">Help & Docs</button>
+          <button onClick={() => onViewChange('auth')} className="landing-nav-link">Sign In</button>
           <button onClick={() => onViewChange('dashboard')} className="btn-nav-cta">
             Launch Dashboard
             <svg
@@ -134,31 +138,52 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
               />
             </div>
             
+            {/* Gooey Text Animation */}
+            <GooeyText
+              texts={[
+                'ProgyNova AI',
+                'Demand Forecasting',
+                'Dataset-agnostic',
+                'Stock-out Forecasting',
+                'Pharmacy Intelligence',
+              ]}
+              morphTime={1.0}
+              cooldownTime={2.0}
+            />
+            
             {/* SaaS value proposition text */}
             <p className="landing-hero__description">
               A B2B SaaS platform utilizing cost-sensitive machine learning to forecast demand and prevent stockouts in pharmacy retail networks.
             </p>
             
-            {/* Launch App Call to Action inside the card */}
-            <button
-              className="btn-hero-cta"
-              onClick={() => onViewChange('dashboard')}
-            >
-              <svg
-                className="svgIcon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+            {/* Call to action row inside the card */}
+            <div className="landing-hero__actions">
+              <button
+                className="btn-hero-cta"
+                onClick={() => onViewChange('dashboard')}
               >
-                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
-                <path d="m8.5 8.5 7 7" />
-              </svg>
-              Launch Forecasting Dashboard
-            </button>
+                <svg
+                  className="svgIcon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+                  <path d="m8.5 8.5 7 7" />
+                </svg>
+                Launch Forecasting Dashboard
+              </button>
+              <button
+                className="btn-hero-secondary"
+                onClick={() => onViewChange('auth')}
+              >
+                Sign In / Sign Up
+              </button>
+            </div>
           </div>
         </section>
 
@@ -292,26 +317,70 @@ export function LandingPage({ onViewChange }: LandingPageProps) {
           <div className="landing-dataset__card">
             <div className="landing-dataset__text">
               <span className="landing-section__eyebrow">Your data</span>
-              <h2 className="landing-section__heading">What a dataset should look like</h2>
-              <p className="landing-section__lead">
-                If your export contains roughly these fields, ProgyNova can work with it.
-                Column names do not need to match exactly - the AutoSchemaEngine detects each role by meaning.
-              </p>
-              <ul className="landing-dataset__notes">
-                <li>Upload <strong>wide-form or long-form</strong> CSVs - both are supported.</li>
-                <li>Split across multiple files? Upload <strong>sales, drugs and stores</strong> together and they are joined automatically.</li>
-                <li>Up to <strong>10&nbsp;MB</strong> per file. No pre-cleaning or column renaming needed.</li>
-              </ul>
+              
+              <div className="landing-dataset__tabs">
+                <button
+                  type="button"
+                  className={`landing-dataset__tab-btn ${datasetTab === 'general' ? 'active' : ''}`}
+                  onClick={() => setDatasetTab('general')}
+                >
+                  General Dataset
+                </button>
+                <button
+                  type="button"
+                  className={`landing-dataset__tab-btn ${datasetTab === 'erp' ? 'active' : ''}`}
+                  onClick={() => setDatasetTab('erp')}
+                >
+                  ERP Systems <span className="tab-coming-soon">(BETA)</span>
+                </button>
+              </div>
+
+              {datasetTab === 'general' ? (
+                <>
+                  <h2 className="landing-section__heading">What a dataset should look like</h2>
+                  <p className="landing-section__lead">
+                    If your export contains roughly these fields, ProgyNova can work with it. Column names do not need to match exactly - the AutoSchemaEngine detects each role by meaning.
+                  </p>
+                  <ul className="landing-dataset__notes">
+                    <li>Upload <strong>wide-form or long-form</strong> CSVs - both are supported.</li>
+                    <li>Split across multiple files? Upload <strong>sales, drugs and stores</strong> together and they are joined automatically.</li>
+                    <li>Up to <strong>10&nbsp;MB</strong> per file. No pre-cleaning or column renaming needed.</li>
+                  </ul>
+                </>
+              ) : (
+                <>
+                  <h2 className="landing-section__heading">Integrate with Any ERP System</h2>
+                  <p className="landing-section__lead">
+                    Simply export transaction data from your ERP software (such as SAP, Oracle, NetSuite, Odoo, or custom pharmacy systems) as a CSV. Once integrated, the system parses the database automatically.
+                  </p>
+                  <ul className="landing-dataset__notes">
+                    <li>Export from <strong>any ERP or pharmacy software</strong> directly to CSV.</li>
+                    <li>Upload <strong>wide-form or long-form</strong> CSVs - both are supported.</li>
+                    <li>Split across multiple files? Upload <strong>sales, drugs and stores</strong> together and they are joined automatically.</li>
+                    <li>Up to <strong>10&nbsp;MB</strong> per file. No pre-cleaning or column renaming needed.</li>
+                  </ul>
+                </>
+              )}
             </div>
+
             <ul className="landing-dataset__fields">
-              {[
-                ['Date / week', 'When each transaction happened'],
-                ['Product / SKU', 'Identifier for the medicine'],
-                ['Store / location', 'Where it was sold or dispensed'],
-                ['Units sold', 'Quantity dispensed that period'],
-                ['Stock on hand', 'Current inventory level'],
-                ['Lead time', 'Supplier delivery delay (optional)'],
-              ].map(([k, v]) => (
+              {(datasetTab === 'general'
+                ? [
+                    ['Date / week', 'When each transaction happened.'],
+                    ['Product / SKU', 'Identifier for the medicine.'],
+                    ['Store / location', 'Where it was sold or dispensed.'],
+                    ['Units sold', 'Quantity dispensed that period.'],
+                    ['Stock on hand', 'Current inventory level.'],
+                    ['Lead time', 'Supplier delivery delay (optional).'],
+                  ]
+                : [
+                    ['Time Index', 'A date or week column.'],
+                    ['Product & Location IDs', 'Unique identifiers for the medicine (SKU) and the pharmacy branch.'],
+                    ['Sales / Demand Value', 'The historical quantities sold or dispensed.'],
+                    ['Current Stock', 'Current inventory levels to flag upcoming stockout events (optional but recommended).'],
+                    ['Lead Time', 'Supplier delivery delay (optional).'],
+                  ]
+              ).map(([k, v]) => (
                 <li className="landing-dataset__field" key={k}>
                   <span className="landing-dataset__field-key">{k}</span>
                   <span className="landing-dataset__field-desc">{v}</span>

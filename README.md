@@ -90,6 +90,19 @@ Evaluated on the strictly held-out **Temporal Test Split ($N=3,952$, Weeks 143�
 | **Optimized Model** (Balanced)      | 99.82% | 93.62% | 91.67% | **92.63%**| 0.9991 | 4 | 3 |
 | **Optimized Model** (Clinical Safe) | 99.80% | 85.71% | **100.00%**| 92.31% | 1.0000 | 0 | 8 |
 
+## 📚 Documentation Reference Map
+
+For researchers, peer-reviewers, and pharmacists seeking to navigate the codebase, here is the structured index of all repository documentation with direct links:
+
+| Document / Module | Relative Path | Purpose / Description |
+| :--- | :--- | :--- |
+| 📖 **User Guide** | [docs/user_guide.md](docs/user_guide.md) | Full guide to system operations, custom dataset uploads, and operational modes. |
+| 🐍 **Backend API Documentation** | [progynova-api/README.md](progynova-api/README.md) | FastAPI routing references, requirements, backend startup steps, and test instructions. |
+| ⚛️ **Frontend Dashboard README** | [progynova-dashboard/README.md](progynova-dashboard/README.md) | React component layout, client-side TreeSHAP translations, and client startup guides. |
+| 🏗️ **System Architecture** | [docs/architecture.md](docs/architecture.md) | In-depth layout of the 5 layers, data ingestion flow, and component relationships. |
+| 🧠 **Model Deep Dive** | [docs/model_details.md](docs/model_details.md) | Loss functions, TreeSHAP explanation mechanisms, and model training metrics. |
+| 📋 **System Overview Guide** | [docs/system_overview.md](docs/system_overview.md) | Compact workflow review for pharmacists and managers. |
+
 ---
 
 ## Directory Structure
@@ -242,24 +255,49 @@ To evaluate model performance and output publication-grade figures locally:
 
 ## Testing on Custom Datasets
 
-ProgyNova AI is equipped with an `AutoSchemaEngine` that allows you to easily test the model on your own pharmacy or retail transaction datasets without writing new ingestion code.
+ProgyNova AI is equipped with an `AutoSchemaEngine` that allows you to test the model on your own pharmacy or retail transaction datasets without writing new ingestion code.
 
-### 1. Prepare your Data
-Your custom dataset should be a CSV file containing at minimum:
-- **Temporal Index:** A date or week column.
-- **Entity & Location:** Unique IDs for the product/drug and the store/location.
-- **Demand/Target:** The historical sales or dispensed quantities.
-- **Inventory Context (Optional):** Current stock-on-hand for stockout evaluation.
+### 1. The Scope of Dataset-Agnosticism: How it Works
+The dataset-agnostic ingestion is **true at the data-pipeline and interface level**. The system will automatically ingest, restructure, and process arbitrary spreadsheets because of three core mechanisms:
 
-*Note: The `AutoSchemaEngine` will automatically attempt to map your custom column names (e.g., `item_code`, `qty_sold`, `inventory_level`) to the system's internal schema.*
+1. **Auto-Mapping (Semantic Roles)**: The `AutoSchemaEngine` scores your column headers using a word-boundary match (splitting on spaces, dashes, and slashes) against dictionary vocabularies. It automatically maps columns to core internal variables:
+   * **`time_index`** (matches: *date, time, week, timestamp, period*)
+   * **`entity_id`** (matches: *drug_id, sku, item_id, product_id, sku_id*)
+   * **`location_id`** (matches: *store_id, location, branch, facility*)
+   * **`target`** (matches: *demand, sales, quantity, units, units_sold, quantity_sold*)
+   * **`stock_on_hand`** (matches: *stock, inventory, stock_on_hand, inventory_level, stock_level*)
+2. **Layout Normalization**: The pipeline automatically detects the table layout and reshapes it:
+   * **Long-Form**: Standard row-by-row transaction log (mapped directly).
+   * **Time-Wide**: Columns represent time-steps (automatically melted/pivoted into long-form).
+   * **Entity-Wide**: Columns represent individual SKUs (automatically melted/pivoted).
+3. **Agnostic Feature Extraction**: Regardless of the input columns, the engine automatically constructs a **56-dimensional feature space** on-the-fly (lag features, rolling averages, std deviations, cyclic temporal sin/cos waves, and momentum markers).
 
-### 2. Upload and Forecast
-1. **Via Dashboard:** Open the React dashboard (`http://localhost:5173`), navigate to the data upload section, and drop your CSV file. The frontend will automatically route it to the backend and render the forecasts and metrics.
-2. **Via API:** You can programmatically post your dataset directly to the backend:
+---
+
+### 2. Limitations & Boundary Conditions: Where it Fails
+While the *software architecture* is completely dataset-agnostic, the *pre-trained model weights* are not. Researchers and reviewers must keep in mind the following boundary conditions:
+
+* **Domain & Scale Shift (The False-Positive Phenomenon)**: The pre-trained XGBoost weights are fitted to the owner's hospital pharmacy dataset (which has a high average demand of ~17–18 units per week, up to 500+ units on hot SKUs). If you upload a retail dataset with a different scale (e.g. low sales of 0–1 units per week), **the pre-trained model will over-forecast**, leading to a large number of **False Positives** in the confusion matrix. To get accurate results on a new dataset, the model must be retrained on that local data.
+* **Temporal Continuity Requirement**: The dataset must contain a column representing a chronological sequence (calendar dates, integer weeks, or timestamps). If no parseable date/time column exists, feature lags cannot be computed, and the engine will throw a `ValueError`.
+* **Hash Collisions (Categorical Indexing)**: Categorical string variables (`entity_id` and `location_id`) are mapped to integers using a deterministic hash modulo 1000 to keep features numerical. If a custom dataset contains significantly more than 1,000 unique SKUs or stores, hash collisions may occur, degrading the model's accuracy.
+* **Column Ambiguity Fallbacks**: If columns are named randomly (e.g., `col_a`, `col_b`) and do not match any semantic keywords, the engine will inject safe defaults (e.g., mapping stock on hand to `0.0`). This ensures the system runs but will trigger stockout alarms for every row since stock is assumed to be zero.
+
+---
+
+### 3. How to Run Custom Audits
+1. **Prepare your CSV**: Ensure your file has columns that closely resemble dates, SKU names, inventory levels, and units sold.
+2. **Upload via Dashboard**: Drop the CSV into the upload section of the dashboard (`http://localhost:5173`). The UI will display the dynamically auto-mapped fields and update the charts.
+3. **Toggle Baseline View**: After uploading, you will see a `View Model Baseline Metrics` button. Click it to switch back and forth between your custom data audit (dynamic metrics) and the model's original baseline results.
+4. **Programmatic Endpoint API**:
    ```bash
-   curl -X POST "http://localhost:8000/upload" -F "file=@your_custom_data.csv"
-   curl -X POST "http://localhost:8000/forecast" -F "file=@your_custom_data.csv"
+   # Upload and inspect dynamic column mapping
+   curl -X POST "http://localhost:8000/upload" -F "file=@your_data.csv"
+   
+   # Run forecasting and get time-series results
+   curl -X POST "http://localhost:8000/forecast" -F "file=@your_data.csv"
    ```
+
+---
 
 ---
 

@@ -183,16 +183,19 @@ export function MLMetricsPage({
   const [showSensitivityModal, setShowSensitivityModal] = useState(false);
   const [showAccuracyModal, setShowAccuracyModal] = useState(false);
   const [showMatrixTermsModal, setShowMatrixTermsModal] = useState(false);
+  const [forceViewBaseline, setForceViewBaseline] = useState(false);
 
   // Switch between baseline (pre-computed model benchmarks) and uploaded logs audit
   const metrics = useMemo(() => {
-    if (hasUploaded && uploadedMetrics) {
+    if (hasUploaded && uploadedMetrics && !forceViewBaseline) {
       return uploadedMetrics;
     }
     if (sensitivityMode === 'strict') return BASELINE_METRICS_STRICT;
     if (sensitivityMode === 'safe') return BASELINE_METRICS_SAFE;
     return BASELINE_METRICS_BALANCED;
-  }, [hasUploaded, uploadedMetrics, sensitivityMode]);
+  }, [hasUploaded, uploadedMetrics, forceViewBaseline, sensitivityMode]);
+
+  const isViewingBaseline = !hasUploaded || forceViewBaseline || !uploadedMetrics;
 
   const toggleRecallExplanation = () => {
     setShowRecallExplanation((prev) => !prev);
@@ -209,7 +212,10 @@ export function MLMetricsPage({
         <div className="metrics-page__title-section">
           <h2 className="metrics-page__title">Model Performance & Audit</h2>
           <span className="metrics-page__subtitle">
-            Algorithmic diagnostics and validation matrix of the ProgyNova forecasting core.
+            {isViewingBaseline 
+              ? "Trained model metrics based on training and testing of the model on the owner's historical dataset."
+              : "Dynamic evaluation matrix based on your uploaded transaction logs."
+            }
           </span>
         </div>
         <div className="metrics-page__header-actions">
@@ -251,14 +257,40 @@ export function MLMetricsPage({
               </button>
             </div>
           </div>
+          {hasUploaded && uploadedMetrics && (
+            <button
+              className="view-baseline-btn"
+              onClick={() => setForceViewBaseline(!forceViewBaseline)}
+              title={forceViewBaseline ? "Switch back to the uploaded dataset audit" : "Switch back to the baseline trained model metrics"}
+            >
+              {forceViewBaseline ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '6px' }}>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  View Uploaded Dataset Metrics
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '6px' }}>
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  View Model Baseline Metrics
+                </>
+              )}
+            </button>
+          )}
           <div className="metrics-page__status">
-            {hasUploaded ? (
-              <span className="badge badge--success">
+            {!isViewingBaseline ? (
+              <span className="badge badge--success" title="This dynamic audit reflects performance on your uploaded dataset logs.">
                 <span className="badge__dot" /> Dynamic Audit (Uploaded Logs)
               </span>
             ) : (
-              <span className="badge badge--warning">
-                <span className="badge__dot" /> Model Baseline Benchmark
+              <span className="badge badge--warning" title="These metrics are based on the training and testing of the model on the owner's historical dataset.">
+                <span className="badge__dot" /> Model Baseline (Owner's Dataset)
               </span>
             )}
           </div>
@@ -516,6 +548,21 @@ export function MLMetricsPage({
                 </div>
               </div>
             </div>
+            
+            {!isViewingBaseline && (
+              <div className="metrics-page__domain-warning">
+                <div className="metrics-page__domain-warning-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                </div>
+                <div className="metrics-page__domain-warning-text">
+                  <strong>Domain Adaptation Notice for Reviewers & Pharmacists:</strong> You are currently auditing a custom uploaded dataset using model weights pre-trained on the owner's baseline hospital pharmacy data. If your uploaded dataset has a different sales volume or represents a well-stocked retail store with zero historical stockout events, you will naturally observe a high number of False Positives. This is a classic ML <em>Domain Shift</em> phenomenon. To achieve optimal performance in your local setting, the model must be retrained on your local transactions.
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -565,6 +612,11 @@ export function MLMetricsPage({
                       <h4 className="interpretation-title">Unnecessary Restock Alert</h4>
                       <p className="interpretation-text">
                         The model triggered a stockout alert, but the actual demand was low, meaning current shelf stock was already sufficient.
+                        {!isViewingBaseline && (
+                          <span style={{ display: 'block', marginTop: '8px', color: 'var(--text-tertiary)', fontSize: '0.8rem', lineHeight: '1.4' }}>
+                            <strong>Domain Shift Notice:</strong> Custom uploads run inference using the pre-trained weights of the owner's baseline pharmacy (which has a different demand scale). Retraining the model on your local store data is required to resolve these false alarms.
+                          </span>
+                        )}
                       </p>
                       <ul className="interpretation-bullets">
                         <li><strong>Clinical Impact:</strong> Safe. No patient goes without medication.</li>

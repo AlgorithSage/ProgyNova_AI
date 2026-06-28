@@ -1,0 +1,338 @@
+/* ==========================================================================
+   AUTH PAGE — Sign in / Sign up (peach gradient, dark-green + lime accents)
+   ========================================================================== */
+
+.auth-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+  /* Full-bleed branded background (landscape) for PC / laptop / tablet.
+     Optimized WebP (~146 KB vs 2.2 MB SVG). Peach is the load fallback. */
+  background: #FFE6D8 url('/Images_videos/ProgyNova%20AI%20bg3.webp') center center / cover no-repeat;
+}
+
+/* Mobile: portrait background variant (~125 KB WebP) */
+@media (max-width: 767px) {
+  .auth-page {
+    background: #FFE6D8 url('/Images_videos/ProgyNova%20AI%20bg%28mob%29.webp') center center / cover no-repeat;
+  }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 26px;
+  box-shadow: 0 30px 80px rgba(27, 58, 36, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+/* ── Left form panel ─────────────────────────────────────────────────────── */
+.auth-panel {
+  padding: 1.5rem 2.6rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.auth-brand {
+  margin-bottom: 1.1rem;
+}
+
+.auth-brand__logo-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1b3a24; /* Brand dark green */
+  border-radius: 14px;
+  padding: 9px 20px;
+  box-shadow: 0 6px 16px rgba(27, 58, 36, 0.22);
+}
+
+.auth-brand__logo {
+  height: 26px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.auth-form-wrap {
+  margin: auto 0;
+  max-width: 380px;
+  width: 100%;
+}
+
+.auth-form__head {
+  margin-bottom: 1.1rem;
+}
+
+.auth-form__title {
+  font-family: var(--font-accent);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #14241a;
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.auth-form__subtitle {
+  font-size: 0.92rem;
+  color: #5a6b5f;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.auth-error {
+  background: rgba(198, 40, 40, 0.08);
+  border: 1px solid rgba(198, 40, 40, 0.3);
+  color: #b3261e;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.auth-submit:disabled,
+.auth-social-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* reCAPTCHA mount point — invisible, takes no layout space */
+#recaptcha-container { position: absolute; }
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.auth-field__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5a6b5f;
+}
+
+.auth-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #14241a;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(27, 58, 36, 0.14);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.auth-input::placeholder { color: #9aa79d; }
+
+.auth-input:focus {
+  border-color: #1b3a24;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(193, 255, 114, 0.4);
+}
+
+.auth-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-group .auth-input {
+  padding-right: 46px;
+}
+
+.auth-input-group__toggle {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  color: #7c8a80;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.auth-input-group__toggle:hover { color: #1b3a24; background: rgba(27, 58, 36, 0.06); }
+
+/* Primary CTA — lime fill, dark-green text (uses both theme greens) */
+.auth-submit {
+  margin-top: 0.2rem;
+  width: 100%;
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary); /* Lime Green */
+  color: #14241a;
+  font-family: var(--font-accent);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(193, 255, 114, 0.5);
+  transition: filter 0.25s, transform 0.15s, box-shadow 0.25s;
+}
+
+.auth-submit:hover { filter: brightness(1.06); transform: translateY(-1px); box-shadow: 0 14px 28px rgba(193, 255, 114, 0.6); }
+.auth-submit:active { transform: translateY(0); }
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1rem 0;
+  color: #8a978c;
+  font-size: 0.78rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(27, 58, 36, 0.14);
+}
+.auth-divider span { padding: 0 0.8rem; }
+
+.auth-social {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+/* Stacked variant — full-width Google + phone buttons (primary sign-in) */
+.auth-social--stack {
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  margin-top: 0.4rem;
+}
+.auth-social--stack .auth-social-btn {
+  height: 50px;
+  font-size: 0.98rem;
+}
+
+.auth-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid rgba(27, 58, 36, 0.18);
+  border-radius: 12px;
+  color: #1b3a24;
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.auth-social-btn:hover {
+  border-color: #1b3a24;
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.auth-foot {
+  margin: 1.2rem 0 0;
+  font-size: 0.85rem;
+  color: #5a6b5f;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.auth-foot__link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: #1b3a24;
+  cursor: pointer;
+}
+.auth-foot__link:hover { text-decoration: underline; }
+.auth-foot__link--muted { color: #5a6b5f; font-weight: 600; margin-left: auto; }
+.auth-foot__sep { color: #b8c2ba; }
+
+/* ── Right media panel — image on mobile, video on larger screens ────────── */
+.auth-visual {
+  position: relative;
+  min-height: 420px;
+  /* Image base: serves mobile + acts as the video poster/fallback. No overlay
+     so the media renders at full brightness with no visual barrier. */
+  background-image: url('/Images_videos/login%20BG.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+/* Looping video sits on top of the image — shown on laptop/tablet/PC only */
+.auth-visual__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 1;
+}
+
+.auth-visual__close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #14241a;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  transition: transform 0.15s, background 0.2s;
+  z-index: 3;
+}
+.auth-visual__close:hover { transform: scale(1.06); background: #ffffff; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 880px) {
+  .auth-page { padding: 1rem; }
+  .auth-card { grid-template-columns: 1fr; max-width: 460px; }
+  /* Mobile: show the IMAGE as a top banner; no video (bandwidth/autoplay) */
+  .auth-visual { order: -1; min-height: 170px; }
+  .auth-visual__video { display: none; }
+  .auth-panel { padding: 2rem 1.6rem; }
+  .auth-form-wrap { max-width: 100%; }
+}

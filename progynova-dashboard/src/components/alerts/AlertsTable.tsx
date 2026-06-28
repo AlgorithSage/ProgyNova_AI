@@ -88,9 +88,6 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
   const textSecondary = isDark ? '#FFE6D8' : '#545454';
   const border = isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(84, 84, 84, 0.25)';
   const primary = '#c1ff72';
-  const primaryGradient = isDark
-    ? 'linear-gradient(135deg, #c1ff72, rgba(193, 255, 114, 0.5))'
-    : 'linear-gradient(135deg, #c1ff72, rgba(193, 255, 114, 0.55))';
   const onPrimaryText = '#000000';
   const errorColor = isDark ? '#F87171' : '#EF4444';
 
@@ -103,8 +100,12 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
     .map(
       (a, i) => `
     <tr style="animation: fadeIn 0.2s ease ${Math.min(i * 10, 500)}ms both;">
-      <td style="font-weight:600;">${a.entity_id}</td>
-      <td>${a.location_id}</td>
+      <td class="sku-cell">
+        <span class="sku-wrap">
+          <span class="sev-dot sev-dot--${a.severity.toLowerCase()}" style="background:${severityColors[a.severity]?.color};"></span>${a.entity_id}
+        </span>
+      </td>
+      <td class="loc-cell">${a.location_id}</td>
       <td class="num" style="text-align:right;">${a.stock_on_hand.toFixed(0)}</td>
       <td class="num" style="text-align:right;">${a.forecast.toFixed(1)}</td>
       <td class="num" style="text-align:right;color:${errorColor};font-weight:700;">${a.deficit.toFixed(1)}</td>
@@ -165,9 +166,7 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
       font-size: 1.75rem;
       font-weight: 850;
       letter-spacing: -0.02em;
-      background: ${primaryGradient};
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: ${textPrimary};
     }
     .count-badge {
       display: inline-flex; align-items: center; justify-content: center;
@@ -253,7 +252,18 @@ function openFullViewWindow(alerts: StockoutAlert[]) {
     .num {
       font-family: 'Roundo', system-ui, sans-serif !important;
     }
-    tr:hover { background: rgba(193, 255, 114, 0.05); }
+    /* Match dashboard alerts table — SKU cell with severity dot */
+    .sku-cell, .loc-cell {
+      font-family: 'Vollkorn', Georgia, serif;
+      color: ${textPrimary};
+    }
+    .sku-wrap { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+    .sev-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0; display: inline-block;
+    }
+    .sev-dot--critical { box-shadow: 0 0 6px ${severityColors.CRITICAL.color}; }
+    tr:hover { background: rgba(193, 255, 114, 0.06); }
     tr:last-child td { border-bottom: none; }
 
     .footer {

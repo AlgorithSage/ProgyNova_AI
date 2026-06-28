@@ -54,3 +54,6 @@ reproduction_results/
 # Dump folder for archived files
 dump/
 agentation_setup.md
+
+# Colab testing script
+ml_model_dummy.py

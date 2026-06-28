@@ -15,6 +15,10 @@ interface AppLayoutProps {
   currentView?: string;
   onViewChange?: (view: string) => void;
   onNavClick?: (sectionId: string) => void;
+  userName?: string;
+  userEmail?: string;
+  userPhotoURL?: string;
+  onSignOut?: () => void;
 }
 
 export function AppLayout({
@@ -29,6 +33,10 @@ export function AppLayout({
   currentView = 'dashboard',
   onViewChange,
   onNavClick,
+  userName = 'Chief Pharmacist',
+  userEmail = 'pharmacist@progynova.ai',
+  userPhotoURL,
+  onSignOut,
 }: AppLayoutProps) {
   return (
     <div className="app-layout">
@@ -249,25 +257,41 @@ export function AppLayout({
               <div className="app-layout__avatar-container">
                 <img
                   className="app-layout__avatar"
-                  src="/user_avatar.png"
-                  alt="Chief Pharmacist Profile"
+                  src={userPhotoURL || '/user_avatar.png'}
+                  alt={`${userName} profile`}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     const parent = e.currentTarget.parentElement;
                     if (parent && !parent.querySelector('.app-layout__avatar-fallback')) {
                       const span = document.createElement('span');
                       span.className = 'app-layout__avatar-fallback';
-                      span.innerText = 'CP';
+                      span.innerText = userName.trim().slice(0, 2).toUpperCase() || 'PN';
                       parent.appendChild(span);
                     }
                   }}
                 />
               </div>
               <div className="app-layout__profile-info">
-                <span className="app-layout__profile-name">Chief Pharmacist</span>
-                <span className="app-layout__profile-email">pharmacist@progynova.ai</span>
+                <span className="app-layout__profile-name">{userName}</span>
+                {userEmail && <span className="app-layout__profile-email">{userEmail}</span>}
               </div>
             </div>
+
+            {onSignOut && (
+              <button
+                type="button"
+                className="app-layout__icon-btn app-layout__signout-btn"
+                onClick={onSignOut}
+                title="Sign out"
+                aria-label="Sign out"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </button>
+            )}
           </div>
         </header>
 

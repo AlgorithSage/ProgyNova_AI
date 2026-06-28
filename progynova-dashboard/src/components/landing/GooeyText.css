@@ -1,0 +1,62 @@
+.gooey-wrapper {
+  position: relative;
+  width: 100%;
+  height: 80px; /* Reduced from 120px to utilize space properly and decrease distance */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0; /* Removed margins to equalize flex gap distances */
+}
+
+.gooey-svg-filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.gooey-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.gooey-span {
+  position: absolute;
+  display: inline-block;
+  user-select: none;
+  text-align: center;
+  font-family: var(--font-accent), sans-serif;
+  font-weight: 900; /* Bolder (Heavy/Black weight) */
+  font-size: 70px; /* Precise size requested by user */
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  transform: translate3d(0, 0, 0); /* Force GPU render */
+}
+
+/* Individual letter styling */
+.gooey-span span {
+  display: inline-block;
+  color: #1b3a24; /* Solid brand dark green color, no gradient */
+  will-change: clip-path, filter, opacity;
+}
+
+@media (max-width: 768px) {
+  .gooey-wrapper {
+    height: 65px;
+  }
+  .gooey-span {
+    font-size: 3.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .gooey-wrapper {
+    height: 50px;
+  }
+  .gooey-span {
+    font-size: 2.2rem;
+  }
+}

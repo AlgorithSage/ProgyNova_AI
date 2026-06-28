@@ -36,6 +36,19 @@ Your custom dataset should be a CSV file containing at minimum:
 
 *Note: The system automatically attempts to map your custom column names (e.g., `item_code`, `qty_sold`, `inventory_level`) to the internal schema.*
 
+### The Scope & Limits of Dataset-Agnosticism
+While the platform structurally accommodates varied spreadsheet layouts, researchers and pharmacists must consider these parameters and boundary conditions:
+
+* **What it Supports (True Agnosticism)**:
+  * **Dynamic Mapping**: Automatically parses headers using word-boundary matching to resolve synonyms (e.g., `item_code` → `entity_id`).
+  * **Layout Normalization**: Supports Long-form, Time-Wide (dates as columns), and Entity-Wide (SKUs as columns) tables, reshaping them automatically.
+  * **Unified Feature Space**: Auto-generates 56 lags, rolling stats, cyclic time parameters, and disease outbreak markers on-the-fly.
+* **Failure Modes & Limitations (Where it Fails)**:
+  * **Domain & Scale Shift**: Pre-trained model weights are calibrated to a high-volume hospital database (demand up to 500+). Running this baseline model on a retail dataset with lower scales (demand 0–1) will over-forecast, inflating **False Positives** (unnecessary alerts). **Local retraining is required** to adapt decision boundaries.
+  * **Temporal Discontinuity**: Lags and rolling metrics require chronological sequence continuity. Datasets missing a dates/weeks column will fail to process.
+  * **Categorical Cardinality Limit**: SKUs and Store Locations are mapped using modulo-1000 numeric hashing. Datasets with $>1,000$ unique SKUs or stores will experience hash collisions, degrading forecast precision.
+  * **Ambiguity Defaults**: Unmatched columns default to conservative constraints (e.g. Stock = `0.0`), which will saturate the dashboard with alerts.
+
 ### How to Upload
 1. Open the Dashboard (Home page).
 2. Click **"Import Data"** or use the drag-and-drop panel on the right.

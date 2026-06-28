@@ -239,7 +239,8 @@ df_processed["target_momentum_4wk"] = (df_processed["target_roll_mean_4"] / df_p
 
 # Build custom calendar cycles using integer day delta extraction guards
 t_col = df_processed["time_index"]
-days_delta = (t_col.max() - t_col.min()).days
+t_diff = t_col.max() - t_col.min()
+days_delta = t_diff.days if hasattr(t_diff, "days") else int(t_diff)
 cycle_len = 52 if (days_delta < 500) else 365
 df_processed["sin_time"] = np.sin(2 * np.pi * (t_col.dt.dayofyear if hasattr(t_col, 'dt') else t_col) / cycle_len)
 df_processed["cos_time"] = np.cos(2 * np.pi * (t_col.dt.dayofyear if hasattr(t_col, 'dt') else t_col) / cycle_len)

@@ -7,6 +7,9 @@ import { ShapExplainer } from './components/explain/ShapExplainer';
 import { MLMetricsPage } from './components/metrics/MLMetricsPage';
 import { DocsPage } from './components/docs/DocsPage';
 import { LandingPage } from './components/landing/LandingPage';
+import { AuthPage } from './components/auth/AuthPage';
+import { onAuthStateChanged, signOut as firebaseSignOut, type User } from 'firebase/auth';
+import { auth } from './firebase';
 import { getForecast, getAlerts, getExplanation, checkHealth, getMetrics } from './services/api';
 import { applyTheme } from './mtheme';
 import type { Theme, ForecastPoint, StockoutAlert, ShapExplanation, UploadResponse, MLMetricsResponse } from './types';
@@ -38,9 +41,26 @@ function App() {
   const alertsRowRef = useRef<HTMLDivElement>(null);
 
   // View & ML Metrics states
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'metrics' | 'docs'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'auth' | 'dashboard' | 'metrics' | 'docs'>('landing');
   const [uploadedMetrics, setUploadedMetrics] = useState<MLMetricsResponse | null>(null);
   const [sensitivityMode, setSensitivityMode] = useState<'strict' | 'balanced' | 'safe'>('balanced');
+
+  // Firebase auth state — tracks the signed-in user across the app
+  const [authUser, setAuthUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => setAuthUser(u));
+    return unsub;
+  }, []);
+
+  const handleSignOut = useCallback(async () => {
+    try {
+      await firebaseSignOut(auth);
+    } catch (err) {
+      console.error('[Auth] sign-out failed', err);
+    }
+    setCurrentView('landing');
+  }, []);
 
   // Apply theme dynamically using the theme manager
   useEffect(() => {
@@ -212,6 +232,10 @@ function App() {
     return <LandingPage onViewChange={setCurrentView} />;
   }
 
+  if (currentView === 'auth') {
+    return <AuthPage onViewChange={setCurrentView} />;
+  }
+
   return (
     <AppLayout
       theme={theme}
@@ -222,8 +246,12 @@ function App() {
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
       currentView={currentView}
-      onViewChange={(view) => setCurrentView(view as 'landing' | 'dashboard' | 'metrics' | 'docs')}
+      onViewChange={(view) => setCurrentView(view as 'landing' | 'auth' | 'dashboard' | 'metrics' | 'docs')}
       onNavClick={handleNavClick}
+      userName={authUser?.displayName || authUser?.phoneNumber || 'Account'}
+      userEmail={authUser?.email || authUser?.phoneNumber || ''}
+      userPhotoURL={authUser?.photoURL || undefined}
+      onSignOut={handleSignOut}
     >
       {currentView === 'dashboard' ? (
         <div id="dashboard" className="dashboard">
